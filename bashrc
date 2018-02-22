@@ -25,6 +25,10 @@ alias ~='cd ~'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 
+### installer
+alias p="sudo pacman"
+alias y="yaourt"
+
 ###
 alias diskspace="du -S | sort -n -r | more"
 alias folder="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"

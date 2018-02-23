@@ -1,4 +1,3 @@
-
 # ~/.bashrc
 #
 
@@ -45,6 +44,7 @@ alias rm='timeout 3 rm -Iv --one-file-system'
 
 ###
 alias so0="cmatrix"
+alias myip="curl icanhazip.com"
 
 
 ## functions
@@ -83,3 +83,7 @@ export ANDROID_HOME=/opt/android-sdk
 alias ls='ls --color=auto'
 PS1='[\u@\h \W]\$'
 
+powerline-daemon -q
+POWERLINE_BASH_CONTINUATION=1
+POWERLINE_BASH_SELECT=1
+. /usr/lib/python3.6/site-packages/powerline/bindings/bash/powerline.sh

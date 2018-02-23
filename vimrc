@@ -10,6 +10,8 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 
+"ADDED Powerline
+"Plugin 'powerline/powerline'
 " ADDED Dragula colour scheme
 Plugin 'dracula/dracula-theme'
 " ADDED Nerdtree
@@ -85,7 +87,8 @@ set copyindent                  " Copy previous indentation on auto
 set foldenable                  " Auto fold code
 set showmode                    " Show current mode currently in
 set showmatch                   " Cursor shows matching parentthesis
-set number                      " Shows line numbers
+"set number                      " Shows line numbers
+set relativenumber              " Show line number relative to cursor
 
 
 set wildmenu                    " Tab completion for files act like in bash
@@ -143,6 +146,10 @@ let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
+
+let g:powerline_pycmd="py3"  
+let g:Powerline_symbols = 'fancy'  
+:set laststatus=2                   " show powerline all the time
 
 set tabstop=4
 set shiftwidth=4

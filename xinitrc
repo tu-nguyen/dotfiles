@@ -1,3 +1,5 @@
 exec startkde
 
-pgrep redshift &> /dev/null || redshift-gtk &> /dev/null &
+#ppgrep redshift &> /dev/null || redshift-gtk &> /dev/null &
+#
+xmodmap ~/.Xmodmap

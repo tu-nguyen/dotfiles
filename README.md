@@ -13,4 +13,8 @@ I'm trying to make them worthwhile, that's the plan for 2021
 git clone https://github.com/tu-nguyen/dotfiles.git
 ```
 
+```sh
+ln -sv <location>/dotfiles/<.??> ~
+```
+
 i use arch btw

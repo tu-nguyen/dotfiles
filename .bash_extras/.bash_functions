@@ -2,7 +2,7 @@
 
 ## functions
 
-# extract
+# Extract a file
 extract () {
    if [ -f $1 ] ; then
        case $1 in
@@ -24,7 +24,7 @@ extract () {
    fi
  }
 
-#Display a PDF of a given man page
-function pdfman() {
+# Display a PDF of a given man page
+pdfman() {
         man -t $@ | pstopdf -i -o /tmp/$1.pdf && open /tmp/$1.pdf
 }

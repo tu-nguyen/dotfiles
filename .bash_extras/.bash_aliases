@@ -31,7 +31,7 @@ alias folder="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
 ##
 alias so0="cmatrix"
 alias myip="curl icanhazip.com"
-
+alias r="source ~/.bashrc"
 
 
 

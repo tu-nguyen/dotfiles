@@ -6,11 +6,13 @@
 BASHRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 EXTRAS_DIR="$BASHRC_DIR/.bash_extras"
 
+shopt -s dotglob nullglob  # enable dotfiles and skip empty globs
 if [ -d "$EXTRAS_DIR" ]; then
   for file in "$EXTRAS_DIR"/*; do
     [ -f "$file" ] && . "$file"
   done
 fi
+shopt -u dotglob nullglob  # optional: reset settings
 
 PS1='[\u@\h \W]\$'
 

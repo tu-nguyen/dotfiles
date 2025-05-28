@@ -19,12 +19,37 @@ function print_tt() {
     }' "$file"
 }
 
-function dockertt() {
-    print_tt "$EXTRAS_DIR/.bash_docker_functions"
+function dktt() {
+  print_tt "$EXTRAS_DIR/.bash_docker_functions"
 }
 
 function tt() {
-    echo "test"
+  br="-------------------------------------------------------------------"
+  # ls
+  printf "%s\n" "$br"
+  printf "ls                   -> ll (ls -alh)\n"
+  printf "                     -> la (ls -A)\n"
+  printf "                     -> lsd (ls -a1F | grep /$)\n"
+  printf "                     -> lt (la -lt)\n"
+  printf "                     -> la (ls -A)\n"
+  # cd
+  printf "%s\n" "$br"
+  printf "cd                   -> ~ (cd ~)\n"
+  printf "                     -> .. (cd ..)\n"
+  printf "                     -> ... (cd ../..)\n"
+  printf "                     -> ... (cd ../../..)\n"
+  
+  printf "%s\n" "$br"
+  printf "primary functions    -> r (source .bashrc)"
+  printf "                     -> p4 (ping)"
+  printf "                     -> diskspace ()"
+  printf "                     -> folder ()"
+  printf "                     -> so0 (cmatrix)"
+  printf "                     -> myip (curl icanhazip.com)"
+  print_tt "$EXTRAS_DIR/.bash_functions"
+  
+  printf "%s\n" "$br"
+  printf "dktt => to view docker stuff"
+  printf "tworktt => to view twork stuff"
 
-    print_tt "$EXTRAS_DIR/.bash_docker_functions"
 }

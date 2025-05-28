@@ -40,16 +40,20 @@ function tt() {
   printf "                     -> ... (cd ../../..)\n"
   
   printf "%s\n" "$br"
-  printf "primary functions    -> r (source .bashrc)"
-  printf "                     -> p4 (ping)"
-  printf "                     -> diskspace ()"
-  printf "                     -> folder ()"
-  printf "                     -> so0 (cmatrix)"
-  printf "                     -> myip (curl icanhazip.com)"
+  printf "primary functions    -> r (source .bashrc)\n"
+  printf "                     -> p4 (ping)\n"
+  printf "                     -> diskspace ()\n"
+  printf "                     -> folder ()\n"
+  printf "                     -> so0 (cmatrix)\n"
+  printf "                     -> myip (curl icanhazip.com)\n"
   print_tt "$EXTRAS_DIR/.bash_functions"
   
   printf "%s\n" "$br"
-  printf "dktt => to view docker stuff"
-  printf "tworktt => to view twork stuff"
+  printf "dktt                 -> to view docker stuff\n"
 
+  if [[ ! -f "$EXTRAS_DIR/.bash_twork" ]]; then
+    printf "tworktt              -> .bash_twork does not exist inside .bash_extras\n"
+  else
+    printf "tworktt              -> to view twork stuff\n"
+  fi
 }

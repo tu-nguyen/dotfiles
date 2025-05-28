@@ -1,0 +1,29 @@
+#
+
+## ref for twork
+#
+alias tworktt='echo "ssh-swarm (rmove-swarm-01)
+ssh-swarm-test (rmove-swarm-test-01)
+ssh-indri-api (current production server)
+ssh-indri-dash ()
+ssh-indri-munge ()
+ssh-indri-stage (current staging server)
+ssh-indri-test ()
+ssh-ds (data science server)"'
+
+## twork TODO
+#
+alias qs="ssh something@something.com"
+#alias op="startx"
+alias ssh-swarm='az ssh vm --ip rmove-swarm-01.canadaeast.cloudapp.azure.com'
+alias ssh-swarm-test='az ssh vm --ip rmove-swarm-test-01.canadacentral.cloudapp.azure.com'
+alias ssh-indri-api='az ssh vm --ip indri-api-rmove.canadaeast.cloudapp.azure.com'
+alias ssh-indri-dash='az ssh vm --ip indri-dash-rmove.canadaeast.cloudapp.azure.com'
+alias ssh-indri-munge='az ssh vm --ip indri-munge-rmove.canadaeast.cloudapp.azure.com'
+alias ssh-indri-stage='az ssh vm --ip indri-stage-rmove.canadaeast.cloudapp.azure.com'
+alias ssh-indri-test='az ssh vm --ip indri-test-rmove.canadaeast.cloudapp.azure.com'
+alias ssh-ds='az ssh vm --ip rsg-ds-vp-w01.canadaeast.cloudapp.azure.com'
+#
+
+
+

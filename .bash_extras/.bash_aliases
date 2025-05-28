@@ -24,14 +24,29 @@ alias ....="cd ../../.."
 alias p="sudo pacman"
 alias y="yaourt"
 
-##
+## utils
 alias diskspace="du -S | sort -n -r | more"
 alias folder="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
 
-##
+## other
+alias c='clear'
+alias h='history'
+alias x='exit'
+alias v='vim'
+# timeout not on macos, so gtimeout
+if [[ "$(uname)" == "Darwin" ]]; then
+  alias timeout=gtimeout
+fi
+alias mv='timeout 8 mv -iv'
+alias rm='timeout 3 rm -Iv --one-file-system'
 alias so0="cmatrix"
 alias myip="curl icanhazip.com"
-alias r="source ~/.bashrc"
+function r() {
+  ln -sv $(pwd) ~/.bash_extras
+  ln -sv $(pwd)/../.bashrc ~/.bashrc
+source ~/.bashrc
+  source ~/.bashrc
+}
 
 
 

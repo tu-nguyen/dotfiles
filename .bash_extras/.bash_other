@@ -1,0 +1,26 @@
+
+
+HISTCONTROL=ignoreboth
+#
+## append to the history file, don't overwrite it
+#
+shopt -s histappend
+#
+## history size
+#
+HISTSIZE=1000
+HISTFILESIZE=2000
+#
+## check win size after each cmd
+shopt -s checkwinsize
+#
+## set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+#
+## bash-completion
+#
+if [ -f /opt/local/etc/profile.d/bash_completion.sh ]; then
+  . /opt/local/etc/profile.d/bash_completion.sh
+fi

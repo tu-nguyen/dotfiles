@@ -20,6 +20,7 @@ function print_tt() {
 }
 
 function dktt() {
+  dktt_ref
   print_tt "$EXTRAS_DIR/.bash_docker_functions"
 }
 

@@ -14,7 +14,28 @@ if [ -d "$EXTRAS_DIR" ]; then
 fi
 shopt -u dotglob nullglob  # optional: reset settings
 
-PS1='[\u@\h \W]\$'
+# old
+# PS1='[\u@\h \W]\$'
+RED="\[$(tput setaf 1)\]"
+GREEN="\[$(tput setaf 2)\]"
+YELLOW="\[$(tput setaf 3)\]"
+BLUE="\[$(tput setaf 4)\]"
+MAGENTA="\[$(tput setaf 5)\]"
+CYAN="\[$(tput setaf 6)\]"
+WHITE="\[$(tput setaf 7)\]"
+GRAY="\[$(tput setaf 8)\]"
+BOLD="\[$(tput bold)\]"
+
+# Set colors/font-weights.
+CUSER=$MAGENTA
+CPATH=$CYAN
+BOLD=$BOLD
+RESET="\[$(tput sgr0)\]"
+CCOLOR=$YELLOW
+
+# Custom prompt.
+export PS1="${CUSER}\u@\h${RESET}:${CPATH}${BOLD}\w${RESET}#"
+
 
 # powerline-daemon -q
 # POWERLINE_BASH_CONTINUATION=1

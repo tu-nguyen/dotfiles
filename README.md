@@ -10,10 +10,8 @@ Um these are kinda personal and VERY tailored to me but if you want...
 
 ```sh
 git clone https://github.com/tu-nguyen/dotfiles.git
-```
-
-```sh
-ln -sv <location>/dotfiles/<.??> ~
+cd dotfiles
+ln -sv .bashrc ~
 ```
 
 i use arch btw

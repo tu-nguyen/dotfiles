@@ -11,7 +11,9 @@ Um these are kinda personal and VERY tailored to me but if you want...
 ```sh
 git clone https://github.com/tu-nguyen/dotfiles.git
 cd dotfiles
-ln -sv .bashrc ~
+ln -sv $(pwd)/.bash_extras ~
+ln -sv $(pwd)/.bashrc ~
+source ~/.bashrc
 ```
 
 i use arch btw

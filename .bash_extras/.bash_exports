@@ -1,0 +1,5 @@
+# ~/.bash_extras/.bash_exports
+
+export VISUAL="vim"
+export JAVA_HOME="/usr/"
+export ANDROID_HOME=/opt/android-sdk

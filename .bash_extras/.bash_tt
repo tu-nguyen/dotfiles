@@ -1,0 +1,30 @@
+# ~/.bash_extras/.bash_tt
+
+# Generalized function printer
+function print_tt() {
+    local file="$1"
+    if [[ ! -f "$file" ]]; then
+        echo "File not found: $file"
+        return 1
+    fi
+
+    awk '
+    BEGIN { comment="" }
+    /^#/ { comment = $0; next }
+    /^[a-zA-Z_][a-zA-Z0-9_]* *\(\) *\{/ {
+        gsub(/^# *|^## */, "", comment)
+        sub(/ *\(\) *\{/, "", $0)
+        printf "%-20s -> %s\n", $0, comment
+        comment=""
+    }' "$file"
+}
+
+function dockertt() {
+    print_tt "$EXTRAS_DIR/.bash_docker_functions"
+}
+
+function tt() {
+    echo "test"
+
+    print_tt "$EXTRAS_DIR/.bash_docker_functions"
+}

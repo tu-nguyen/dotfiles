@@ -41,12 +41,6 @@ alias mv='timeout 8 mv -iv'
 alias rm='timeout 3 rm -Iv --one-file-system'
 alias so0="cmatrix"
 alias myip="curl icanhazip.com"
-function r() {
-  ln -sv $(pwd) ~/.bash_extras
-  ln -sv $(pwd)/../.bashrc ~/.bashrc
-source ~/.bashrc
-  source ~/.bashrc
-}
 
 
 

@@ -1,5 +1,7 @@
 # ~/.bash_extras/.bash_tt
 
+
+br="-------------------------------------------------------------------"
 # Generalized function printer
 function print_tt() {
     local file="$1"
@@ -21,11 +23,23 @@ function print_tt() {
 
 function dktt() {
   dktt_ref
+  printf "%s\n" "$br"  
   print_tt "$EXTRAS_DIR/.bash_docker_functions"
 }
 
 function tt() {
-  br="-------------------------------------------------------------------"
+  printf "%s\n" "$br"
+  printf "primary functions    -> r (source .bashrc)\n"
+  printf "                     -> p4 (ping)\n"
+  printf "                     -> diskspace ()\n"
+  printf "                     -> folder ()\n"
+  printf "                     -> so0 (cmatrix)\n"
+  printf "                     -> myip (curl icanhazip.com)\n"
+  printf "                     -> c (clear)\n"
+  printf "                     -> h (history)\n"
+  printf "                     -> x (exit)\n"
+  printf "                     -> v (vim)\n"
+
   # ls
   printf "%s\n" "$br"
   printf "ls                   -> ll (ls -alh)\n"
@@ -41,12 +55,7 @@ function tt() {
   printf "                     -> ... (cd ../../..)\n"
   
   printf "%s\n" "$br"
-  printf "primary functions    -> r (source .bashrc)\n"
-  printf "                     -> p4 (ping)\n"
-  printf "                     -> diskspace ()\n"
-  printf "                     -> folder ()\n"
-  printf "                     -> so0 (cmatrix)\n"
-  printf "                     -> myip (curl icanhazip.com)\n"
+  printf "other functions      \n"
   print_tt "$EXTRAS_DIR/.bash_functions"
   
   printf "%s\n" "$br"

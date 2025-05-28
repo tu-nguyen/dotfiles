@@ -41,3 +41,21 @@ export PS1="${CUSER}\u@\h${RESET}:${CPATH}${BOLD}\w${RESET}#"
 # POWERLINE_BASH_CONTINUATION=1
 # POWERLINE_BASH_SELECT=1
 #. /usr/lib/python3.6/site-packages/powerline/bindings/bash/powerline.sh
+
+function r() {
+  if [[ "$(pwd)" == *"/dotfiles" ]]; then
+    if [[ -d "~/.bash_extras" ]]; then
+      echo "bash_extras exists"
+    else
+      mkdir ~/.bash_extras
+    fi
+    ln -sv $(pwd)/.bash_extras/.bash_aliases ~/.bash_extras/bash_aliases
+    ln -sv $(pwd)/.bash_extras/.bash_docker_functions ~/.bash_extras/bash_docker_functions
+    ln -sv $(pwd)/.bash_extras/.bash_exports ~/.bash_extras/bash_exports
+    ln -sv $(pwd)/.bash_extras/.bash_functions ~/.bash_extras/bash_functions
+    ln -sv $(pwd)/.bash_extras/.bash_other ~/.bash_extras/bash_other
+    ln -sv $(pwd)/.bash_extras/.bash_tt ~/.bash_extras/bash_tt
+    ln -sv $(pwd).bashrc ~/.bashrc
+  fi
+  source ~/.bashrc
+}

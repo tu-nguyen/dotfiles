@@ -49,13 +49,13 @@ function r() {
     else
       mkdir ~/.bash_extras
     fi
-    ln -sv $(pwd)/.bash_extras/.bash_aliases ~/.bash_extras/bash_aliases
-    ln -sv $(pwd)/.bash_extras/.bash_docker_functions ~/.bash_extras/bash_docker_functions
-    ln -sv $(pwd)/.bash_extras/.bash_exports ~/.bash_extras/bash_exports
-    ln -sv $(pwd)/.bash_extras/.bash_functions ~/.bash_extras/bash_functions
-    ln -sv $(pwd)/.bash_extras/.bash_other ~/.bash_extras/bash_other
-    ln -sv $(pwd)/.bash_extras/.bash_tt ~/.bash_extras/bash_tt
-    ln -sv $(pwd).bashrc ~/.bashrc
+    ln -sv $(pwd)/.bash_extras/.bash_aliases ~/.bash_extras/.bash_aliases
+    ln -sv $(pwd)/.bash_extras/.bash_docker_functions ~/.bash_extras/.bash_docker_functions
+    ln -sv $(pwd)/.bash_extras/.bash_exports ~/.bash_extras/.bash_exports
+    ln -sv $(pwd)/.bash_extras/.bash_functions ~/.bash_extras/.bash_functions
+    ln -sv $(pwd)/.bash_extras/.bash_other ~/.bash_extras/.bash_other
+    ln -sv $(pwd)/.bash_extras/.bash_tt ~/.bash_extras/.bash_tt
+    ln -sv $(pwd)/.bashrc ~/.bashrc
   fi
   source ~/.bashrc
 }

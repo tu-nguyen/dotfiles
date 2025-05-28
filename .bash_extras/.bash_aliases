@@ -25,6 +25,11 @@ alias p="sudo pacman"
 alias y="yaourt"
 
 ## utils
+if [[ "$(uname)" == "Darwin" ]]; then
+    alias diskspace="du | sort -n -r | more"
+  else
+    alias diskspace="du -S | sort -n -r | more"
+fi
 alias diskspace="du -S | sort -n -r | more"
 alias folder="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
 

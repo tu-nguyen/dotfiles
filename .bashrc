@@ -120,7 +120,7 @@ function reset_bashrc() {
   else
     printf "[INFO].bash_twork exists!\n"
   fi
-  echo "You are all set!"
+  echo "[INFO] Resetting .bashrc completed!"
 }
 
 function reset_vimrc() {
@@ -138,7 +138,21 @@ function reset_vimrc() {
   ln -sv $(pwd)/.vimrc ~/.vimrc
   echo "[INFO] linking successful, sourcing .vimrc.."
   source ~/.vimrc
-  echo "You are all set!"
+  echo "[INFO] Resetting .vimrc completed!"
+}
+
+function setup_git_config() {
+  if [ -z "$FORCE_YES" ]; then
+    read -p "Are you sure you want to set the git config? This will overwrite existing data, review git_config_setup.sh first! [y/N] " -n 1 -r
+    echo ""
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      echo "Exiting.."
+      return
+    fi
+  fi
+  chmod +x git_config_setup.sh
+  ./git_config_setup.sh
+  echo "[INFO] Setting git config completed!"
 }
 
 function r() {
@@ -163,7 +177,9 @@ function r() {
   echo "Resetting settings.."
   reset_bashrc
   reset_vimrc
+  setup_git_config
   if [ "$IS_PROJECT_ROOT" = false ]; then
     popd > /dev/null
   fi
+  echo "You are all set!"
 }

@@ -57,20 +57,20 @@ function reset_vimrc() {
   echo "[INFO] linking .vimrc.."
   ln -sv $(pwd)/.vimrc ~/.vimrc
   echo "[INFO] linking successful, sourcing .vimrc.."
-  ln -sv $(pwd)/.vimrc ~/.vimrc
+  source ~/.vimrc
   echo "You are all set!"
+}
 
-function reset_bash() {
+function reset_bashrc() {
   if [ -z "$FORCE_YES" ]; then
     read -p "Are you sure you want to reset the .bashrc? This will erase existing data, might want to create a backup! [y/N] " -n 1 -r
-      echo ""
-      if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo "Exiting.."
-        exit 1
-      fi
+    echo ""
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      echo "Exiting.."
+      exit 1
+    fi
   fi
 
-  shopt -s dotglob nullglob  # enable dotfiles and skip empty globs
   echo "[WARNING] Deleting old .bashrc"
   rm ~/.bashrc
   if [[ -d "$HOME/.bash_extras" ]]; then
@@ -120,7 +120,7 @@ function reset_vimrc() {
   echo "[INFO] linking .vimrc.."
   ln -sv $(pwd)/.vimrc ~/.vimrc
   echo "[INFO] linking successful, sourcing .vimrc.."
-  ln -sv $(pwd)/.vimrc ~/.vimrc
+  source ~/.vimrc
   echo "You are all set!"
 }
 
@@ -134,4 +134,3 @@ function r() {
     exit 1
   fi
 }
-

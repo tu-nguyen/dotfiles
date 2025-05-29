@@ -49,7 +49,7 @@ function reset_vimrc() {
       echo ""
       if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         echo "Exiting.."
-        exit 1
+        return
       fi
   fi
   echo "[WARNING] Deleting old .vimrc"
@@ -67,7 +67,7 @@ function reset_bashrc() {
     echo ""
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
       echo "Exiting.."
-      exit 1
+      return
     fi
   fi
 
@@ -112,7 +112,7 @@ function reset_vimrc() {
     echo ""
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
       echo "Exiting.."
-      exit 1
+      return
     fi
   fi
   echo "[WARNING] Deleting old .vimrc"
@@ -131,6 +131,6 @@ function r() {
     reset_vimrc
   else
     echo "[ERROR] You are not in the root of the dotfiles project! Exiting.."
-    exit 1
+    return
   fi
 }

@@ -3,6 +3,8 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
+set -o vi
+
 BASHRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 EXTRAS_DIR="$BASHRC_DIR/.bash_extras"
 
@@ -43,19 +45,49 @@ export PS1="${CUSER}\u@\h${RESET}:${CPATH}${BOLD}\w${RESET}#"
 #. /usr/lib/python3.6/site-packages/powerline/bindings/bash/powerline.sh
 
 function r() {
+  if [ -z "$FORCE_YES" ]; then \
+    read -p "Are you sure you want to reset the .bashrc? This will erase existing data, might want to create a backup! [y/N] " -n 1 -r; \
+      echo ""; \
+      if [[ ! $REPLY =~ ^[Yy]$ ]]; then \
+        echo "Exiting.."; \
+        exit 1; \
+      fi; \
+  fi
+
+  shopt -s dotglob nullglob  # enable dotfiles and skip empty globs
   if [[ "$(pwd)" == *"/dotfiles" ]]; then
-    if [[ -d "~/.bash_extras" ]]; then
-      echo "bash_extras exists"
+    echo "[WARNING] Deleting old .bashrc"
+    rm ~/.bashrc
+    if [[ -d "$HOME/.bash_extras" ]]; then
+      echo "[INFO] $HOME/.bash_extras exists, deleting stock .bash files within.."
+      rm ~/.bash_extras/.bash_aliases
+      rm ~/.bash_extras/.bash_docker_functions
+      rm ~/.bash_extras/.bash_exports
+      rm ~/.bash_extras/.bash_functions
+      rm ~/.bash_extras/.bash_other
+      rm ~/.bash_extras/.bash_tt
     else
+      echo "[WARNING] $HOME/.bash_extras does not exist, creating.."
+      echo "[WARNING] For twork setup, be sure to create a .bash_twork file"
       mkdir ~/.bash_extras
     fi
+    echo "[INFO] linking .bash_extras files.."
     ln -sv $(pwd)/.bash_extras/.bash_aliases ~/.bash_extras/.bash_aliases
     ln -sv $(pwd)/.bash_extras/.bash_docker_functions ~/.bash_extras/.bash_docker_functions
     ln -sv $(pwd)/.bash_extras/.bash_exports ~/.bash_extras/.bash_exports
     ln -sv $(pwd)/.bash_extras/.bash_functions ~/.bash_extras/.bash_functions
     ln -sv $(pwd)/.bash_extras/.bash_other ~/.bash_extras/.bash_other
     ln -sv $(pwd)/.bash_extras/.bash_tt ~/.bash_extras/.bash_tt
+    echo "[INFO] linking .bashrc.."
     ln -sv $(pwd)/.bashrc ~/.bashrc
   fi
+  shopt -u dotglob nullglob  # optional: reset settings
+  echo "[INFO] linking successful, sourcing.."
   source ~/.bashrc
+  if [[ ! -f "$EXTRAS_DIR/.bash_twork" ]]; then
+    printf "[WARNING].bash_twork does not exist inside .bash_extras, considering creating it!\n"
+  else
+    printf "[INFO].bash_twork exists!\n"
+  fi
+  echo "You are all set!"
 }

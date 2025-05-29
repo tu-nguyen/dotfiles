@@ -1,7 +1,7 @@
 # ~/.bash_extras/.bash_tt
 
+br="------------------------------------------------------------------------------------------"
 
-br="-------------------------------------------------------------------"
 # Generalized function printer
 function print_tt() {
     local file="$1"
@@ -28,17 +28,12 @@ function dktt() {
 }
 
 function tt() {
-  printf "%s\n" "$br"
-  printf "primary functions    -> r (source .bashrc)\n"
-  printf "                     -> p4 (ping)\n"
-  printf "                     -> diskspace ()\n"
-  printf "                     -> folder ()\n"
-  printf "                     -> so0 (cmatrix)\n"
-  printf "                     -> myip (curl icanhazip.com)\n"
-  printf "                     -> c (clear)\n"
-  printf "                     -> h (history)\n"
-  printf "                     -> x (exit)\n"
-  printf "                     -> v (vim)\n"
+  printf "\n"
+  printf "primary functions    -> r (source .bashrc)  -> p4 (ping)\n"
+  printf "                     -> c (clear)           -> diskspace ()\n"
+  printf "                     -> h (history)         -> folder ()\n"
+  printf "                     -> x (exit)            -> so0 (cmatrix)\ \n"
+  printf "                     -> v (vim)             -> myip (curl icanhazip.com)\\n"
 
   # ls
   printf "%s\n" "$br"
@@ -59,6 +54,7 @@ function tt() {
   print_tt "$EXTRAS_DIR/.bash_functions"
   
   printf "%s\n" "$br"
+  printf "ttcs                 -> to view bash cheatsheet\n"
   printf "dktt                 -> to view docker stuff\n"
 
   if [[ ! -f "$EXTRAS_DIR/.bash_twork" ]]; then

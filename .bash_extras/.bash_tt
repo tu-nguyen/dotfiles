@@ -21,6 +21,21 @@ function print_tt() {
     }' "$file"
 }
 
+function ttgit() {
+  printf "git                  -> s (status -s)                -> b (fancy branch)\n"
+  printf "                     -> st (status)                  -> br (branch)\n"
+  printf "                     -> co (checkout)                -> a (add)\n"
+  printf "                     -> cob (checkout -b)            -> ap (add -p)\ \n"
+  printf "                     -> coB (checkout -B)            \n"
+  
+  printf "                     -> c (commit)                   -> d (diff)\n" 
+  printf "                     -> ca (commit -a)               -> ds (diff --stat)\n" 
+  printf "                     -> cm (commit -m)               -> dc (diff --cached)\n"
+  printf "                     -> cam (commit -a -m)           -> l(diff)\n" 
+  printf "                     -> m (commit -m)                -> la (diff)\n" 
+}
+
+
 function dktt() {
   dktt_ref
   printf "%s\n" "$br"  
@@ -29,32 +44,33 @@ function dktt() {
 
 function tt() {
   printf "\n"
-  printf "primary functions    -> r (source .bashrc)  -> p4 (ping)\n"
-  printf "                     -> c (clear)           -> diskspace ()\n"
-  printf "                     -> h (history)         -> folder ()\n"
-  printf "                     -> x (exit)            -> so0 (cmatrix)\ \n"
-  printf "                     -> v (vim)             -> myip (curl icanhazip.com)\\n"
-
+  printf "primary functions    -> r (source .bashrc)           -> j (jobs -l)\n"
+  printf "                     -> c (clear)                    -> df (df -H)\n"
+  printf "                     -> h (history)                  -> du (du -ch)\n"
+  printf "                     -> x (exit)                     -> top (atop)\n"
+  printf "                     -> v (vim)                      -> \n"
   # ls
   printf "%s\n" "$br"
-  printf "ls                   -> ll (ls -alh)\n"
-  printf "                     -> la (ls -A)\n"
-  printf "                     -> lsd (ls -a1F | grep /$)\n"
-  printf "                     -> lt (la -lt)\n"
-  printf "                     -> la (ls -A)\n"
+  printf "ls & cd              -> ll (ls -alh)                 -> ~ (cd ~)\n"
+  printf "                     -> la (ls -A)                   -> .. (cd ..)\n"
+  printf "                     -> lsd (ls -a1F | grep /$)      -> ... (cd ../..)\n"
+  printf "                     -> lt (la -lt)                  -> .... (cd ../../..)\n"
+  printf "                     -> la (ls -A)                   -> .4 (../../../../)\n"
   # cd
   printf "%s\n" "$br"
-  printf "cd                   -> ~ (cd ~)\n"
-  printf "                     -> .. (cd ..)\n"
-  printf "                     -> ... (cd ../..)\n"
-  printf "                     -> ... (cd ../../..)\n"
-  
+  printf "utils                -> myip (get ip)                -> now/nowtime (time)\n"
+  printf "                     -> ping (ping -c 5)             -> nowdate (date)\n" 
+  printf "                     -> p4 (ping 4.2.2.2 -c 4)       -> diskspace (du)\n"
+  printf "                     -> fastping (ping -c 100 -s.2)  -> folder ()\n"
+  printf "                     -> ports (netstat -tulanp)      -> path ()->\n"
+  # other
   printf "%s\n" "$br"
   printf "other functions      \n"
   print_tt "$EXTRAS_DIR/.bash_functions"
-  
+  # other other
   printf "%s\n" "$br"
   printf "ttcs                 -> to view bash cheatsheet\n"
+  printf "ttgit                -> to view git aliases\n"
   printf "dktt                 -> to view docker stuff\n"
 
   if [[ ! -f "$EXTRAS_DIR/.bash_twork" ]]; then

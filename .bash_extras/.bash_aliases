@@ -19,7 +19,7 @@ alias j='jobs -l'
 alias x='exit'
 alias v='vim'
 alias df='df -H'
-alias du='du -ch'=
+alias du='du -ch'
 alias top='atop'
 alias cp='cp -i'
 alias mv='timeout 8 mv -iv'

@@ -43,7 +43,6 @@ function dktt() {
 }
 
 function tt() {
-  printf "\n"
   printf "primary functions    -> r (source .bashrc)           -> j (jobs -l)\n"
   printf "                     -> c (clear)                    -> df (df -H)\n"
   printf "                     -> h (history)                  -> du (du -ch)\n"
@@ -69,6 +68,7 @@ function tt() {
   print_tt "$EXTRAS_DIR/.bash_functions"
   # other other
   printf "%s\n" "$br"
+  printf "other tt      \n"
   printf "ttcs                 -> to view bash cheatsheet\n"
   printf "ttgit                -> to view git aliases\n"
   printf "dktt                 -> to view docker stuff\n"

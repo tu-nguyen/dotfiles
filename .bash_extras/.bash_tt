@@ -32,7 +32,7 @@ function ttgit() {
   printf "                     -> ca (commit -a)               -> ds (diff --stat)\n" 
   printf "                     -> cm (commit -m)               -> dc (diff --cached)\n"
   printf "                     -> cam (commit -a -m)           -> l(diff)\n" 
-  printf "                     -> m (commit -m)                -> la (diff)\n" 
+  printf "                     -> m (commit -m)                -> la (list config)\n" 
 }
 
 

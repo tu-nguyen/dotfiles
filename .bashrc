@@ -43,6 +43,23 @@ export PS1="${CUSER}\u@\h${RESET}:${CPATH}${BOLD}\w${RESET}#"
 # POWERLINE_BASH_SELECT=1
 #. /usr/lib/python3.6/site-packages/powerline/bindings/bash/powerline.sh
 
+save_dotfile_pwd() {
+  local init_file="$HOME/.bash_extras/.bash_init"
+  mkdir -p "$HOME/.bash_extras"
+  echo "DOTFILE_DIR=$(pwd)" > "$init_file"
+  echo "[INFO] Saved current directory to $init_file"
+}
+
+get_dotfile_pwd() {
+  local init_file="$HOME/.bash_extras/.bash_init"
+  if [[ -f "$init_file" ]]; then
+    grep '^DOTFILE_DIR=' "$init_file" | cut -d'=' -f2-
+  else
+    echo "[ERROR] No saved directory found at $init_file"
+    return
+  fi
+}
+
 function reset_vimrc() {
   if [ -z "$FORCE_YES" ]; then
     read -p "Are you sure you want to reset the .vimrc? This will erase existing data, might want to create a backup! [y/N] " -n 1 -r
@@ -126,11 +143,27 @@ function reset_vimrc() {
 
 function r() {
   if [[ "$(pwd)" == *"/dotfiles" ]]; then
-    echo "Resetting settings.."
-    reset_bashrc
-    reset_vimrc
+    save_dotfile_pwd
+    IS_PROJECT_ROOT=true
+    DOTFILE_DIR=$(pwd)
   else
-    echo "[ERROR] You are not in the root of the dotfiles project! Exiting.."
-    return
+    IS_PROJECT_ROOT=false
+    DOTFILE_DIR=$(get_dotfile_pwd)
+  fi
+
+  echo "[INFO] Resetting settings.."
+  if [ "$IS_PROJECT_ROOT" = false ]; then
+    if [[ -n "$DOTFILE_DIR" ]]; then
+      pushd $DOTFILE_DIR > /dev/null
+    else
+      echo "[ERROR] You are not in the root of the dotfile project! Exiting.."
+      return
+    fi
+  fi
+  echo "Resetting settings.."
+  reset_bashrc
+  reset_vimrc
+  if [ "$IS_PROJECT_ROOT" = false ]; then
+    popd > /dev/null
   fi
 }

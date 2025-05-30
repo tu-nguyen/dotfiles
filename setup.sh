@@ -1,9 +1,17 @@
 
 
-sudo apt install python3-pip
-sudo apt install git
-sudo apt install powerline
-sudo apt install fonts-powerline 
+if [[ "$(uname)" == "Darwin" ]]; then
+    brew install coreutils
+    brew install python@3.12
+    pip install --user git+git://github.com/powerline/powerline
+    brew install macvim --env-std --with-override-system-vim
+  else
+    sudo apt install python3-pip
+    sudo apt install git
+    sudo apt install powerline
+    sudo apt install fonts-powerline 
+fi
+
 
 # Font
 wget https://github.com/Lokaltog/powerline/raw/develop/font/PowerlineSymbols.otf https://github.com/Lokaltog/powerline/raw/develop/font/10-powerline-symbols.conf

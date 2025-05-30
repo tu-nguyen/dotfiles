@@ -2,12 +2,8 @@
 
 sudo apt install python3-pip
 sudo apt install git
-sudo rm -rf /usr/lib/python3.12/EXTERNALLY-MANAGED
-pip install powerline-status
-
-# alt
-# sudo apt install powerline 
-# sudo apt install fonts-powerline
+sudo apt install powerline
+sudo apt install fonts-powerline 
 
 # Font
 wget https://github.com/Lokaltog/powerline/raw/develop/font/PowerlineSymbols.otf https://github.com/Lokaltog/powerline/raw/develop/font/10-powerline-symbols.conf

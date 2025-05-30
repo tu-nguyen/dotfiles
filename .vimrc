@@ -11,7 +11,7 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 
 "ADDED Powerline
-Plugin 'powerline/powerline'
+" Plugin 'powerline/powerline'
 " ADDED Nerdtree
 Plugin 'scrooloose/nerdtree'
 " ADDED Nerdtree-Tab
@@ -168,7 +168,7 @@ let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 
-set rtp+=/usr/lib/python3.6/site-packages/powerline/bindings/vim
+" set rtp+=/usr/lib/python3.6/site-packages/powerline/bindings/vim
 
 " let g:powerline_pycmd="py3"  
 let g:Powerline_symbols = 'fancy'  

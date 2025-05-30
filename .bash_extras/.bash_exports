@@ -6,7 +6,7 @@ export ANDROID_HOME=/opt/android-sdk
 export HISTCONTROL=ignoredups:ignorespace
 export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 export EDITOR=vim
-export TERM=”screen-256color” 
+export TERM="screen-256color"
 export COMPOSE_PROFILES=dev
 
 if [[ "$(uname)" == "Darwin" ]]; then

@@ -11,9 +11,7 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 
 "ADDED Powerline
-"Plugin 'powerline/powerline'
-" ADDED Dragula colour scheme
-Plugin 'dracula/dracula-theme'
+Plugin 'powerline/powerline'
 " ADDED Nerdtree
 Plugin 'scrooloose/nerdtree'
 " ADDED Nerdtree-Tab
@@ -26,7 +24,8 @@ Plugin 'ervandew/supertab'
 Plugin 'SirVer/ultisnips'   
 " Snippets are separated from the engine. Add this if you want them:
 Plugin 'honza/vim-snippets'
-
+" ADDED Dracula colour scheme.
+Plugin 'dracula/vim', { 'name': 'dracula' }
 
 
 " The following are examples of different formats supported.
@@ -49,6 +48,7 @@ Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
+
 " To ignore plugin indent changes, instead use:
 "filetype plugin on
 "
@@ -137,8 +137,6 @@ Plugin 'vim-scripts/indentpython.vim'
 Plugin 'tmhedberg/SimpylFold'
 "ADDED Powerline
 "Plugin 'powerline/powerline'
-" ADDED Dragula colour scheme
-Plugin 'dracula/dracula-theme'
 " ADDED Nerdtree
 Plugin 'scrooloose/nerdtree'
 " ADDED Nerdtree-Tab
@@ -149,7 +147,8 @@ Plugin 'scrooloose/syntastic'
 Plugin 'ervandew/supertab'
 " ADDED YouCompleteMe 
 "Bundle 'Valloric/YouCompleteMe'
-
+" ADDED Dragula colour scheme
+Plugin 'dracula/vim', { 'name': 'dracula' }
 
 " The following are examples of different formats supported.
 " Keep Plugin commands between vundle#begin/end.

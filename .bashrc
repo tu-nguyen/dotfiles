@@ -75,6 +75,10 @@ function reset_vimrc() {
   ln -sv $(pwd)/.vimrc ~/.vimrc
   echo "[INFO] linking successful, sourcing .vimrc.."
   source ~/.vimrc
+
+  echo "[INFO] installing Vundle.."
+  chmod +x vim_setup.sh
+  ./vim_setup.sh
   echo "You are all set!"
 }
 

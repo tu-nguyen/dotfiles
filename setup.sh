@@ -29,12 +29,12 @@ if [[ "$(uname)" == "Darwin" ]]; then
     echo "Powerline is already installed (pip)."
   fi
 
-  if brew list macvim &>/dev/null; then
-    echo "macvim is already installed."
-  else
-    echo "Installing macvim..."
-    brew install macvim --env-std --with-override-system-vim
-  fi
+  # if brew list macvim &>/dev/null; then
+  #   echo "macvim is already installed."
+  # else
+  #   echo "Installing macvim..."
+  #   brew install macvim --env-std --with-override-system-vim
+  # fi
 
 else
   install_linux_package python3-pip

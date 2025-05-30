@@ -46,7 +46,7 @@ function tt() {
   printf "primary functions    -> r (source .bashrc)           -> j (jobs -l)\n"
   printf "                     -> c (clear)                    -> df (df -H)\n"
   printf "                     -> h (history)                  -> du (du -ch)\n"
-  printf "                     -> x (exit)                     -> top (atop)\n"
+  printf "                     -> x (exit)                     -> top (htop)\n"
   printf "                     -> v (vim)                      -> \n"
   # ls
   printf "%s\n" "$br"

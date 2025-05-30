@@ -39,3 +39,18 @@ CCOLOR=$YELLOW
 
 # Custom prompt.
 export PS1="${CUSER}\u@\h${RESET}:${CPATH}${BOLD}\w${RESET}#"
+
+POWERLINE_INSTALLED=$(pip list --format=columns 2>/dev/null | grep -i '^powerline-status')
+if [[ -n "$POWERLINE_INSTALLED" ]]; then
+  POWERLINE_PATH=$(pip show powerline-status 2>/dev/null | grep '^Location:' | cut -d' ' -f2-)
+  if [[ -n "$POWERLINE_PATH" ]]; then
+          powerline-daemon -q
+              POWERLINE_BASH_CONTINUATION=1
+                  POWERLINE_BASH_SELECT=1
+                      . "$POWERLINE_PATH/powerline/bindings/bash/powerline.sh"
+  fi
+else
+  echo "Powerline is not installed."
+fi
+
+

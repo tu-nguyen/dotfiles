@@ -2,7 +2,7 @@
 
 sudo apt install python3-pip
 sudo apt install git
-
+sudo rm -rf /usr/lib/python3.12/EXTERNALLY-MANAGED
 pip install powerline-status
 
 # alt

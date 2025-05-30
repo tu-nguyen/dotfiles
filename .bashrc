@@ -47,28 +47,37 @@ is_powerline_enabled() {
     return 1
 }
 
+enable_powerline() {
+  POWERLINE_PATH=$(pip show powerline-status 2>/dev/null | grep '^Location:' | cut -d' ' -f2-)
+  if [[ -n "$POWERLINE_PATH" ]]; then
+    powerline-daemon -q
+    POWERLINE_BASH_CONTINUATION=1
+    POWERLINE_BASH_SELECT=1
+    source /usr/share/powerline/bindings/bash/powerline.sh
+    # echo "Restart the terminal to see powerline!"
+    if is_powerline_enabled; then
+        echo "Powerline is enabled"
+    else
+        echo "Restart the terminal to see powerline!"
+    fi
+  fi
+}
+
 # Try to detect where powerline is installed
-POWERLINE_SITE=$(python3 -m site --user-site)/powerline/bindings/bash/powerline.sh
-if [[ -f "$POWERLINE_SITE" ]]; then
+if [[ "$(uname)" == "Darwin" ]]; then
+  if brew list powerline-status &>/dev/null; then
+    enable_powerline
+  fi
+    echo "Powerline not found. Skipping powerline setup."
+else
+  if [ -f "$(python3 -m site --user-site)/powerline/bindings/bash/powerline.sh" ]; then
     if command -v powerline-daemon >/dev/null 2>&1; then
-      POWERLINE_PATH=$(pip show powerline-status 2>/dev/null | grep '^Location:' | cut -d' ' -f2-)
-      if [[ -n "$POWERLINE_PATH" ]]; then
-              powerline-daemon -q
-              POWERLINE_BASH_CONTINUATION=1
-              POWERLINE_BASH_SELECT=1
-              source /usr/share/powerline/bindings/bash/powerline.sh
-              # echo "Restart the terminal to see powerline!"
-              if is_powerline_enabled; then
-                  echo "Powerline is enabled"
-              else
-                  echo "Restart the terminal to see powerline!"
-              fi
-      fi
+        enable_powerline
     else
       echo "Powerline not found. Skipping powerline setup."
     fi
-else
+  else
     echo "powerline-status not found. Skipping powerline setup."
+  fi
 fi
-
 

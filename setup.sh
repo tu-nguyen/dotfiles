@@ -24,7 +24,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
   # Check if powerline is installed via pip
   if ! pip show powerline-status &>/dev/null; then
     echo "Installing Powerline via pip..."
-    pip install --user git+git://github.com/powerline/powerline
+    pip install powerline-status
   else
     echo "Powerline is already installed (pip)."
   fi

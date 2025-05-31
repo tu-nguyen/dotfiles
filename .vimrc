@@ -178,11 +178,16 @@ let s:uname = system("uname")
 if s:uname == "Darwin\n"
     set guifont=Inconsolata\ for\ Powerline:h15
     set fillchars+=stl:\ ,stlnc:\
+else
+    python3 from powerline.vim import setup as powerline_setup
+    python3 powerline_setup()
+    python3 del powerline_setup
 endif
 
-python3 from powerline.vim import setup as powerline_setup
-python3 powerline_setup()
-python3 del powerline_setup
+" TODO figure out how to make this work on macos"
+" python3 from powerline.vim import setup as powerline_setup
+" python3 powerline_setup()
+" python3 del powerline_setup
 
 set laststatus=2                   " show powerline all the time
 "set showtabline=2      " Always display the tabline

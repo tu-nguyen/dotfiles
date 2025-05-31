@@ -90,7 +90,6 @@ alias y="yaourt"
 alias myip="curl icanhazip.com"
 alias ping='ping -c 5'
 alias p4="ping 4.2.2.2 -c 4"
-alias fastping='ping -c 100 -s.2'
 alias ports='netstat -tulanp'
 ## shortcut  for iptables and pass it via sudo#
 alias ipt='sudo /sbin/iptables'

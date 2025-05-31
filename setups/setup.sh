@@ -8,33 +8,10 @@ pre_setup() {
       return
     fi
   fi
+  echo ""
   chmod +x $DOTFILE_PATH/setups/pre_setup.sh
   bash -i $DOTFILE_PATH/setups/pre_setup.sh
   t SUCCESS "Setup completed!"
-}
-
-reset_vimrc() {
-  if [ -z "$FORCE_YES" ]; then
-    read -p "Are you sure you want to ${GREEN}reset the .vimrc${NC}? This will ${RED}erase existing data${NC}, might want to create a backup! [y/N] " -n 1 -r
-      if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        t "Exiting.."
-        return
-      fi
-  fi
-  t wARNING "Deleting old .vimrc"
-  rm ~/.vimrc
-  t WARNING "Deleting old .vim/bundle"
-  rm -rf ~/.vim/bundle
-
-  t "Linking .vimrc.."
-  ln -sv $DOTFILE_PATH/.vimrc ~/.vimrc
-  t "Linking successful!"
-
-  t "Installing Vundle and plugins.."
-  chmod +x $DOTFILE_PATH/setups/setups/vim_setup.sh
-  bash -i $DOTFILE_PATH/setups/vim_setup.sh
-
-  t SUCCESS "You are all set!"
 }
 
 reset_bashrc() {
@@ -45,7 +22,7 @@ reset_bashrc() {
       return
     fi
   fi
-
+  echo ""
   t INFO "Deleting old .bashrc"
   rm ~/.bashrc
   if [[ -d "$HOME/.bash_extras" ]]; then
@@ -94,6 +71,31 @@ reset_bashrc() {
   t SUCCESS "Resetting .bashrc completed!"
 }
 
+reset_vimrc() {
+  if [ -z "$FORCE_YES" ]; then
+    read -p "Are you sure you want to ${GREEN}reset the .vimrc${NC}? This will ${RED}erase existing data${NC}, might want to create a backup! [y/N] " -n 1 -r
+      if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        t "Exiting.."
+        return
+      fi
+  fi
+  echo ""
+  t WARNING "Deleting old .vimrc"
+  rm ~/.vimrc
+  t WARNING "Deleting old .vim/bundle"
+  rm -rf ~/.vim/bundle
+
+  t "Linking .vimrc.."
+  ln -sv $DOTFILE_PATH/.vimrc ~/.vimrc
+  t "Linking successful!"
+
+  t "Installing Vundle and plugins.."
+  chmod +x $DOTFILE_PATH/setups/setups/vim_setup.sh
+  bash -i $DOTFILE_PATH/setups/vim_setup.sh
+
+  t SUCCESS "You are all set!"
+}
+
 reset_git_config() {
   if [ -z "$FORCE_YES" ]; then
     read -p "Are you sure you want to ${GREEN}reset the git config${NC}? This will ${RED}overwrite existing data${NC}, review git_config_setup.sh first! [y/N] " -n 1 -r
@@ -102,8 +104,9 @@ reset_git_config() {
       return
     fi
   fi
+  echo ""
   chmod +x $DOTFILE_PATH/setups/git_config_setup.sh
-  bash -i $DOTFILE_PATH/setups/git_config_setup.sh
+  $DOTFILE_PATH/setups/git_config_setup.sh
   t SUCCESS "Setting git config completed!"
 }
 
@@ -115,7 +118,8 @@ reset_vscode_config() {
       return
     fi
   fi
+  echo ""
   chmod +x $DOTFILE_PATH/setups/vscode_setup.sh
-  $DOTFILE_PATH/setups/vscode_setup.sh $DOTFILE_PATH
+  bash -i $DOTFILE_PATH/setups/vscode_setup.sh $DOTFILE_PATH
   t SUCCESS "Setting vscode config completed!"
 }

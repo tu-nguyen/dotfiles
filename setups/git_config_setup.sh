@@ -15,7 +15,7 @@ git config --global alias.co "checkout"
 git config --global alias.cob "checkout -b"
 git config --global alias.coB "checkout -B"
 
-git config --global alias.b "!git for-each-ref --sort='-authordate' --format='%(authordate)%09%(objectname:short)%09%(refname)' refs/heads | sed -e 's-refs/heads/--'"
+git config --global alias.b "!git for-each-ref --sort='-authordate' --format='%(authordate)%09%(objectname:short)%09%(refname)' refs/heads | sed -e 's-refs/heads/--'" --replace-all
 git config --global alias.br branch
 git config --global alias.a "add"
 git config --global alias.ap "add -p"

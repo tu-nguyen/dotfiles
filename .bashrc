@@ -65,20 +65,20 @@ enable_powerline() {
 
 # Try to detect where powerline is installed
 if [[ "$(uname)" == "Darwin" ]]; then
-  if pip3 show powerline-status &>/dev/null; then
-    enable_powerline
-  else
-    echo "Powerline not found. Skipping powerline setup."
-  fi
-else
-  if [ -f "$(python3 -m site --user-site)/powerline/bindings/bash/powerline.sh" ]; then
-    if command -v powerline-daemon >/dev/null 2>&1; then
+    if pip show powerline-status &>/dev/null; then
         enable_powerline
     else
-      echo "Powerline not found. Skipping powerline setup."
+        echo "Powerline not found. Skipping powerline setup."
     fi
-  else
-    echo "powerline-status not found. Skipping powerline setup."
-  fi
+else
+    if [ -f "$(python3 -m site --user-site)/powerline/bindings/bash/powerline.sh" ]; then
+        if command -v powerline-daemon >/dev/null 2>&1; then
+            enable_powerline
+        else
+            echo "Powerline not found. Skipping powerline setup."
+        fi
+    else
+        echo "powerline-status not found. Skipping powerline setup."
+    fi
 fi
 

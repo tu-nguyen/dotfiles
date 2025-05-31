@@ -9,8 +9,8 @@ pre_setup() {
       return
     fi
   fi
-  chmod +x $DOTFILE_DIR/setups/pre_setup
-  $DOTFILE_DIR/setups/pre_setup
+  chmod +x $DOTFILE_DIR/setups/pre_setup.sh
+  $DOTFILE_DIR/setups/pre_setup.sh
   echo "[INFO] Setup completed!"
 }
 

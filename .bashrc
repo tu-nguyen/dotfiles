@@ -6,9 +6,18 @@
 set -o vi
 shopt -s dotglob nullglob  # enable dotfiles and skip empty globs
 
-SOURCE="${BASH_SOURCE[0]:-$0}"
-BASHRC_DIR="$(cd "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
-EXTRAS_DIR="$BASHRC_DIR/.bash_extras"
+# Determine script directory safely
+if [[ -n "${BASH_SOURCE[0]}" ]]; then
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+elif [[ -n "$0" ]]; then
+  SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
+else
+  # Fallback — hardcode or exit
+  echo "Could not determine script directory"
+  exit 1
+fi
+
+EXTRAS_DIR="$SCRIPT_DIR/.bash_extras"
 INIT="$EXTRAS_DIR/init"
 
 if [ -n "$INIT/.bash_setup" ]; then

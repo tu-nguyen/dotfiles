@@ -90,7 +90,7 @@ reset_vimrc() {
   t "Linking successful!"
 
   t "Installing Vundle and plugins.."
-  chmod +x $DOTFILE_PATH/setups/setups/vim_setup.sh
+  chmod +x $DOTFILE_PATH/setups/vim_setup.sh
   bash -i $DOTFILE_PATH/setups/vim_setup.sh
 
   t SUCCESS "You are all set!"

@@ -93,6 +93,11 @@ set noerrorbells                " Disable beeping
 set visualbell
 set t_vb=
 set tm=500
+set guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20
+" n-v-c-sm:block → Normal, Visual, Command modes: block cursor
+" i-ci-ve:ver25 → Insert, Command-line Insert, Visual Exclusive: thin vertical bar
+" r-cr-o:hor20 → Replace, Command-line Replace, Operator-pending: horizontal cursor
+au VimLeave * set guicursor=a:ver25
 
 
 set nowrap                      " Do not wrap long lines

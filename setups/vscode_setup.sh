@@ -1,8 +1,10 @@
 #!/bin/bash
 
 if [[ "$(uname)" == "Darwin" ]]; then
-    echo "[INFO] Copying settings.json for VSCode"
+    t "Copying settings.json for VSCode"
     cp $1/setups/files/vscode-settings.json  $HOME/Library/Application\ Support/Code/User/settings.json
 else
-    echo "TBD"
+    t "TBD"
 fi
+
+t SUCCESS "Setting VSCode config completed!"

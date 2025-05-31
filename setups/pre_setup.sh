@@ -2,18 +2,18 @@
 
 install_mac_package() {
   if brew list "$1" &>/dev/null; then
-    echo "$1 is already installed via brew."
+    t "$1 is already installed via brew."
   else
-    echo "Installing $1..."
+    t "Installing $1..."
     brew install "$@"
   fi
 }
 
 install_linux_package() {
   if dpkg -s "$1" &>/dev/null; then
-    echo "$1 is already installed via apt."
+    t "$1 is already installed via apt."
   else
-    echo "Installing $1..."
+    t "Installing $1..."
     sudo apt install -y "$@"
   fi
 }
@@ -29,11 +29,11 @@ if [[ "$(uname)" == "Darwin" ]]; then
   export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH" 
   # Check if powerline is installed via pip
   if ! pip show powerline-status &>/dev/null; then
-    echo "Installing Powerline via pip..."
+    t "Installing Powerline via pip..."
     # sudo rm -rf /usr/local/lib/python3.12/EXTERNALLY-MANAGED
     pip install powerline-status --user --break-system-packages
   else
-    echo "Powerline is already installed (pip)."
+    t "Powerline is already installed (pip)."
   fi
 
   # clone
@@ -55,9 +55,9 @@ if [[ "$(uname)" == "Darwin" ]]; then
 
   brew install vim
   if brew list vim &>/dev/null; then
-    echo "vim is already installed."
+    t "vim is already installed."
   else
-    echo "Installing vim..."
+    t "Installing vim..."
     brew link vim
   fi
 

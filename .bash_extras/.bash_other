@@ -45,9 +45,7 @@ else
 fi
 unset color_prompt force_color_prompt
 
-#
-## bash-completion
-#
+# bash-completion
 if [ -f /opt/local/etc/profile.d/bash_completion.sh ]; then
   . /opt/local/etc/profile.d/bash_completion.sh
 fi

@@ -2,12 +2,12 @@
 
 set -e
 
-VUNDLE_DIR="$HOME/.vim/bundle/Vundle.vim"
+VUNDLE_PATH="$HOME/.vim/bundle/Vundle.vim"
 
-sudo rm -rf "$VUNDLE_DIR"
+sudo rm -rf "$VUNDLE_PATH"
 
-echo "[INFO] Installed Vundle.."
-git clone https://github.com/VundleVim/Vundle.vim.git "$VUNDLE_DIR"
-echo "[Info] Vundle installed at $VUNDLE_DIR"
+t "Installed Vundle.."
+git clone https://github.com/VundleVim/Vundle.vim.git "$VUNDLE_PATH"
+t SUCCESS "Vundle installed at $VUNDLE_PATH"
 
 vim +PluginInstall +qall

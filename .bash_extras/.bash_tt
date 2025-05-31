@@ -39,7 +39,7 @@ function ttgit() {
 function dktt() {
   dktt_ref
   printf "%s\n" "$br"  
-  print_tt "$EXTRAS_DIR/.bash_docker_functions"
+  print_tt "$BASHRC_EXTRAS_PATH/.bash_docker_functions"
 }
 
 function tt() {
@@ -65,7 +65,7 @@ function tt() {
   # other
   printf "%s\n" "$br"
   printf "other functions      \n"
-  print_tt "$EXTRAS_DIR/.bash_functions"
+  print_tt "$BASHRC_EXTRAS_PATH/.bash_functions"
   # other other
   printf "%s\n" "$br"
   printf "other tt      \n"

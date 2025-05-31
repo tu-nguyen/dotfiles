@@ -17,10 +17,10 @@ extract () {
            *.zip)       unzip $1       ;;
            *.Z)         uncompress $1  ;;
            *.7z)        7z x $1        ;;
-           *)           echo "don't know how to extract '$1'..." ;;
+           *)           t ERROR "don't know how to extract '$1'..." ;;
        esac
    else
-       echo "'$1' is not a valid file!"
+       t ERROR "'$1' is not a valid file!"
    fi
  }
 
@@ -49,11 +49,11 @@ printv() {
   done
 
   if [[ -z "$env_file" ]]; then
-    echo "No .env file found in current or parent directories"
+    t "No .env file found in current or parent directories"
     return 1
   fi
 
-  echo "Found .env at: $env_file"
+  t "Found .env at: $env_file"
 
   if $show_limited; then
     for var in "${limit_vars[@]}"; do

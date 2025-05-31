@@ -32,4 +32,3 @@ git config --global alias.m "commit --amend --verbose"
 
 git config --global alias.l 'log --pretty=format:"%C(yellow)%h\\ %ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short'
 git config --global alias.la "!git config -l | grep alias | cut -c 7-"
-

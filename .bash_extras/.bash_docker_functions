@@ -50,26 +50,25 @@ function dkrmif() {
         REMOVE_IMAGES=$(docker images -q | grep -v -F "$(printf "%s\n" "${KEEP_EXISTING_IMAGES[@]}" | awk '{print $1}')")
 
         if [[ -n "$REMOVE_IMAGES" ]]; then
-                echo "Removing all images except the specified ones.."
+                t "Removing all images except the specified ones.."
                 docker rmi -f $REMOVE_IMAGES
         else
-                echo "No images to remove."
+                t "No images to remove."
         fi
 	
-	echo "These images were preserved:"
+	t "These images were preserved:"
 	for image in "${KEEP_IMAGES[@]}"; do
 		echo "	$image"
 	done
-	echo ""
 }
 
 # Load a docker image from tar
 dkimport () {
 	if [ -z "$1" ]; then 
-		echo "no arg given, defaulting to 'docker_image_backup.tar'"
+		t WARNING "no arg given, defaulting to 'docker_image_backup.tar'"
 		$1="docker_image_backup.tar"
 	else
-		echo "importing ${1}"
+		t "importing ${1}"
 	fi
 
 	docker load -i $1
@@ -77,13 +76,13 @@ dkimport () {
 
 ## docker prep
 function dkprep() {
-	echo "pulling rmove-base"
+	t "pulling rmove-base"
 	docker pull ghcr.io/rsginc/rmove-base:2.3.0-312@sha256:b73f3a3ed32f6053d11b4342686cdba72e60fb8a523eac777fffc6e39e4e9d69
-	echo "tagging rmove-base to tag used in current Dockerfile"
+	t "tagging rmove-base to tag used in current Dockerfile"
 	$RMOVEBASEIMAGEID=$(docker images)
 	docker tag $(docker images --filter=reference='ghcr.io/rsginc/rmove-base' -q) ghcr.io/rsginc/rmove-base:2.3.0-312
 
-	echo "pulling uv"
+	t "pulling uv"
 	docker pull ghcr.io/astral-sh/uv:latest
 }
 
@@ -110,7 +109,7 @@ function dkbuildup() {
 
 ## docker restart
 function dkrestart() {
-	echo "todo"
+	t "todo"
 }
 
 # Run stop, rmi, and prunes
@@ -139,14 +138,14 @@ dkstop() {
 dkkill() {
 	if [ -n "$1" ]; then
 		docker stop "$1" && docker rm "$1" \
-			&& echo "Container "$1" stopped and removed successfully." \
-			|| echo "Failed to stop or remove container $1."
+			&& t SUCCESS "Container "$1" stopped and removed successfully." \
+			|| t ERROR "Failed to stop or remove container $1."
 	else
 		docker ps -aq | while read -r container_id; do
 			docker stop "$container_id" && docker rm "$container_id" \
- 				&& echo "Container $container_id stopped and removed successfully."
+ 				&& t SUCCESS "Container $container_id stopped and removed successfully."
 		done
-		[ "$(docker ps -aq)" ] || echo "No containers to stop or remove."
+		[ "$(docker ps -aq)" ] || t WARNING "No containers to stop or remove."
 	fi
 }
 

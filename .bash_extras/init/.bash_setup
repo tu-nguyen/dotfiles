@@ -1,33 +1,33 @@
 #
 
-if [ -f "$DOTFILE_DIR/setups/setup.sh" ]; then
-    . "$DOTFILE_DIR/setups/setup.sh"
+if [ -f "$DOTFILE_PATH/setups/setup.sh" ]; then
+    . "$DOTFILE_PATH/setups/setup.sh"
 fi
 
 r() {
   if [[ "$(pwd)" == *"/dotfiles" ]]; then
     IS_PROJECT_ROOT=true
-    DOTFILE_DIR=$(pwd)
+    DOTFILE_PATH=$(pwd)
   else
     IS_PROJECT_ROOT=false
   fi
 
-  echo "[INFO] Resetting settings.."
+  t "Resetting settings.."
   if [ "$IS_PROJECT_ROOT" = false ]; then
-    if [[ -n "$DOTFILE_DIR" ]]; then
-      pushd $DOTFILE_DIR > /dev/null
+    if [[ -n "$DOTFILE_PATH" ]]; then
+      pushd $DOTFILE_PATH > /dev/null
     else
-      echo "[ERROR] You are not in the root of the dotfile project! Exiting.."
+      t ERROR "You are not in the root of the dotfile project! Exiting.."
       return
     fi
   fi
 
-  echo "Setup starting.."
+  t "Setup starting.."
   pre_setup
 
   git pull
 
-  echo "Resetting settings.."
+  t "Resetting settings.."
   reset_bashrc
   reset_vimrc
   reset_git_config
@@ -36,5 +36,5 @@ r() {
   if [ "$IS_PROJECT_ROOT" = false ]; then
     popd > /dev/null
   fi
-  echo "You are all set!"
+  t SUCCESS "You are all set!"
 }

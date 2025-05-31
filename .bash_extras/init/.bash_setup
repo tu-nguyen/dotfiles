@@ -1,19 +1,11 @@
 # 
 
-save_dotfile_pwd() {
-  local init_file="$HOME/.bash_extras/.bash_init"
-  mkdir -p "$HOME/.bash_extras"
-  echo "DOTFILE_DIR=$(pwd)" > "$init_file"
-  echo "[INFO] Saved current directory to $init_file"
-}
-
 get_dotfile_pwd() {
-  local init_file="$HOME/.bash_extras/.bash_init"
-  if [[ -f "$init_file" ]]; then
-    grep '^DOTFILE_DIR=' "$init_file" | cut -d'=' -f2-
+  if [[ -f "$INIT_FILE" ]]; then
+    grep '^DOTFILE_DIR=' "$INIT_FILE" | cut -d'=' -f2-
   else
-    echo "[ERROR] No saved directory found at $init_file"
-    return
+    echo "[WARNING] No saved directory found at $INIT_FILE"
+    echo "[WARNING] Using $DOTFILE_DIR from .bashrc"
   fi
 }
 

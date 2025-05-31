@@ -6,18 +6,31 @@
 set -o vi
 shopt -s dotglob nullglob  # enable dotfiles and skip empty globs
 
-# Determine script directory safely
+INIT_FILE="$HOME/.bash_extras/.bash_init"
+
 if [[ -n "${BASH_SOURCE[0]}" ]]; then
-  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-elif [[ -n "$0" ]]; then
-  SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
+  DOTFILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+  mkdir -p "$HOME/.bash_extras"
+  echo "DOTFILE_DIR=$(pwd)" > "$INIT_FILE"
 else
-  # Fallback — hardcode or exit
-  echo "Could not determine script directory"
-  exit 1
+  CURRENT_DIR="$(pwd)"
+  if [[ "$CURRENT_DIR" != "$HOME" ]]; then
+    DOTFILE_DIR="$CURRENT_DIR"
+    mkdir -p "$HOME/.bash_extras"
+    echo "DOTFILE_DIR=$(pwd)" > "$INIT_FILE"
+  else
+    echo "[WARNING] Falling back logic for DOTFILE_DIR"
+    if [[ -f "$INIT_FILE" ]]; then
+      grep '^DOTFILE_DIR=' "$INIT_FILE" | cut -d'=' -f2-
+    else
+      echo "[WARNING] No saved directory found at $INIT_FILE"
+      echo "[WARNING] Hardcoding.."
+      DOTFILE_DIR="$HOME/workplace/repo/dotfiles" 
+    fi
+  fi
 fi
 
-EXTRAS_DIR="$SCRIPT_DIR/.bash_extras"
+EXTRAS_DIR="$DOTFILE_DIR/.bash_extras"
 INIT="$EXTRAS_DIR/init"
 
 if [ -n "$INIT/.bash_setup" ]; then
@@ -38,7 +51,6 @@ if [ -d "$EXTRAS_DIR" ]; then
   done
 fi
 
-# old
 # PS1='[\u@\h \W]\$'
 RED="\[$(tput setaf 1)\]"
 GREEN="\[$(tput setaf 2)\]"

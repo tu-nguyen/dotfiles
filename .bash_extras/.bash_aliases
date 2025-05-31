@@ -115,23 +115,3 @@ alias so0="cmatrix"
 
 # install  colordiff package
 # alias diff='colordiff'
-
-# Although this is a function, I have it here instead of .bash_functions so it won't print via tt
-cd() {
-  if [ -n "$1" ]; then
-    builtin cd "$@" && ls --group-directories-first
-  else
-    builtin cd ~ && ls --group-directories-first
-  fi
-}
-
-
-
-
-
-
-
-
-
-
-

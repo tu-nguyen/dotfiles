@@ -20,6 +20,8 @@ install_linux_package() {
 
 if [[ "$(uname)" == "Darwin" ]]; then
   install_mac_package coreutils
+  install_mac_package make
+  PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
   install_mac_package lesspipe
   install_mac_package python@3.12
 

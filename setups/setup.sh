@@ -2,8 +2,7 @@
 
 pre_setup() {
   if [ -z "$FORCE_YES" ]; then
-    read -p "Are you sure you want to run pre_setup? This will install packages, SKIP if you already ran this once! [y/N] " -n 1 -r
-    echo ""
+    read -p "Are you sure you want to run ${GREEN}pre_setup${NC}? This will install packages, ${RED}SKIP${NC} if you already ran this once! [y/N] " -n 1 -r
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
       t "Exiting.."
       return
@@ -16,8 +15,7 @@ pre_setup() {
 
 reset_vimrc() {
   if [ -z "$FORCE_YES" ]; then
-    read -p "Are you sure you want to reset the .vimrc? This will erase existing data, might want to create a backup! [y/N] " -n 1 -r
-      echo ""
+    read -p "Are you sure you want to ${GREEN}reset the .vimrc${NC}? This will ${RED}erase existing data${NC}, might want to create a backup! [y/N] " -n 1 -r
       if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         t "Exiting.."
         return
@@ -41,8 +39,7 @@ reset_vimrc() {
 
 reset_bashrc() {
   if [ -z "$FORCE_YES" ]; then
-    read -p "Are you sure you want to reset the .bashrc? This will erase existing data, might want to create a backup! [y/N] " -n 1 -r
-    echo ""
+    read -p "Are you sure you want to ${GREEN}reset the .bashrc${NC}? This will ${RED}erase existing data${NC}, might want to create a backup! [y/N] " -n 1 -r
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
       t "Exiting.."
       return
@@ -99,8 +96,7 @@ reset_bashrc() {
 
 reset_git_config() {
   if [ -z "$FORCE_YES" ]; then
-    read -p "Are you sure you want to reset the git config? This will overwrite existing data, review git_config_setup.sh first! [y/N] " -n 1 -r
-    echo ""
+    read -p "Are you sure you want to ${GREEN}reset the git config${NC}? This will ${RED}overwrite existing data${NC}, review git_config_setup.sh first! [y/N] " -n 1 -r
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
       t "Exiting.."
       return
@@ -113,8 +109,7 @@ reset_git_config() {
 
 reset_vscode_config() {
   if [ -z "$FORCE_YES" ]; then
-    read -p "Are you sure you want to reset the vscode config? This will overwrite existing config, review vscode_setup.sh first! [y/N] " -n 1 -r
-    echo ""
+    read -p "Are you sure you want to ${GREEN}reset the vscode config${NC}? This will ${RED}overwrite existing config${NC}, review vscode_setup.sh first! [y/N] " -n 1 -r
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
       t "Exiting.."
       return

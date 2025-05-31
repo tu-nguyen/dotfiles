@@ -29,7 +29,7 @@ pdfman() {
         man -t $@ | pstopdf -i -o /tmp/$1.pdf && open /tmp/$1.pdf
 }
 
-# Print env
+# Print env, use -l to only display core details
 printv() {
   local show_limited=false
   local env_file=""

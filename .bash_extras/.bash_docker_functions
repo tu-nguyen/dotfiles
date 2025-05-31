@@ -1,7 +1,7 @@
 #
 
 function dktt_ref() {
-  printf "docker               -> dk (docker)\n"
+  printf "${BOLD}docker${NC}               -> dk (docker)\n"
   printf "                     -> dkps (list running containers)\n"
   printf "                     -> dkc (list all docker containers)\n"
   printf "                     -> dki (list docker images)\n"
@@ -123,15 +123,15 @@ dkclean() {
 }
 
 # Stop a docker container
-dkstop() {	
-	if [ -n "$1" ]; then 
-                docker stop "$1" && echo "Container $1 stopped successfully." || echo "Failed to stop container $1" 
-        else
-                docker ps -q | while read -r container_id; do
-			docker stop "$container_id" && echo "Container $container_id stopped successfully."
-		done
+dkstop() {
+	if [ -n "$1" ]; then
+		docker stop "$1" && echo "Container $1 stopped successfully." || echo "Failed to stop container $1" 
+	else
+ 		docker ps -q | while read -r container_id; do
+		docker stop "$container_id" && echo "Container $container_id stopped successfully."
+	done
 		[ "$(docker ps -q)" ] || echo "No running containers to stop."
-        fi
+    fi
 }
 
 # Kill a docker container
@@ -158,7 +158,7 @@ function dkkillp() {
 
 # Do more than just clean
 dknuke() {
-        dkstop
+    dkstop
 	docker rm $(docker ps -aq)
 	docker container prune -f
 	docker image prune -f

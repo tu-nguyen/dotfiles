@@ -1,6 +1,6 @@
 # ~/.bash_extras/.bash_tt
 
-br="------------------------------------------------------------------------------------------"
+br="${BOLD}----------------------------------------------------------------------------------${NC}"
 
 # Generalized function printer
 function print_tt() {
@@ -22,7 +22,7 @@ function print_tt() {
 }
 
 function ttgit() {
-  printf "git                  -> s (status -s)                -> b (fancy branch)\n"
+  printf "${BOLD}git${NC}                  -> s (status -s)                -> b (fancy branch)\n"
   printf "                     -> st (status)                  -> br (branch)\n"
   printf "                     -> co (checkout)                -> a (add)\n"
   printf "                     -> cob (checkout -b)            -> ap (add -p)\ \n"
@@ -32,49 +32,51 @@ function ttgit() {
   printf "                     -> ca (commit -a)               -> ds (diff --stat)\n" 
   printf "                     -> cm (commit -m)               -> dc (diff --cached)\n"
   printf "                     -> cam (commit -a -m)           -> l(diff)\n" 
-  printf "                     -> m (commit -m)                -> la (list config)\n" 
+  printf "                     -> m (commit -m)                \n" 
+  printf "${GREEN}git la${NC} (to ALL git config)\n" 
 }
 
 
 function dktt() {
   dktt_ref
-  printf "%s\n" "$br"  
+  printf "%s\n" "$br"
+  printf "${BOLD}docker functions${NC}      \n"
   print_tt "$BASHRC_EXTRAS_PATH/.bash_docker_functions"
 }
 
 function tt() {
-  printf "primary functions    -> r (source .bashrc)           -> j (jobs -l)\n"
+  printf "${BOLD}primary functions${NC}    -> r (source .bashrc)           -> j (jobs -l)\n"
   printf "                     -> c (clear)                    -> df (df -H)\n"
   printf "                     -> h (history)                  -> du (du -ch)\n"
   printf "                     -> x (exit)                     -> top (htop)\n"
   printf "                     -> v (vim)                      -> \n"
   # ls
   printf "%s\n" "$br"
-  printf "ls & cd              -> ll (ls -alh)                 -> ~ (cd ~)\n"
+  printf "${BOLD}ls${NC} & ${BOLD}cd${NC}              -> ll (ls -alh)                 -> ~ (cd ~)\n"
   printf "                     -> la (ls -A)                   -> .. (cd ..)\n"
   printf "                     -> lsd (ls -a1F | grep /$)      -> ... (cd ../..)\n"
   printf "                     -> lt (la -lt)                  -> .... (cd ../../..)\n"
   printf "                     -> la (ls -A)                   -> .4 (../../../../)\n"
   # cd
   printf "%s\n" "$br"
-  printf "utils                -> myip (get ip)                -> now/nowtime (time)\n"
+  printf "${BOLD}utils${NC}                -> myip (get ip)                -> now/nowtime (time)\n"
   printf "                     -> ping (ping -c 5)             -> nowdate (date)\n" 
   printf "                     -> p4 (ping 4.2.2.2 -c 4)       -> diskspace (du)\n"
   printf "                     -> fastping (ping -c 100 -s.2)  -> folder ()\n"
   printf "                     -> ports (netstat -tulanp)      -> path ()->\n"
   # other
   printf "%s\n" "$br"
-  printf "other functions      \n"
+  printf "${BOLD}other functions${NC}      \n"
   print_tt "$BASHRC_EXTRAS_PATH/.bash_functions"
   # other other
   printf "%s\n" "$br"
-  printf "other tt      \n"
+  printf "${BOLD}other tt${NC}      \n"
   printf "ttcs                 -> to view bash cheatsheet\n"
   printf "ttgit                -> to view git aliases\n"
   printf "dktt                 -> to view docker stuff\n"
 
   if [[ ! -f "$HOME/.bash_extras/.bash_twork" ]]; then
-    printf "tworktt              -> .bash_twork does not exist inside .bash_extras\n"
+    printf "tworktt              -> .bash_twork ${RED}does not exist${NC} inside .bash_extras\n"
   else
     printf "tworktt              -> to view twork stuff\n"
   fi

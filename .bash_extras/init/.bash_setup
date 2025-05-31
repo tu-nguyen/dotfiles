@@ -22,6 +22,8 @@ r() {
     fi
   fi
 
+  source .bashrc
+
   t "Setup starting.."
   pre_setup
 

@@ -101,7 +101,7 @@ set copyindent                  " Copy previous indentation on auto
 set foldenable                  " Auto fold code
 set showmode                    " Show current mode currently in
 set showmatch                   " Cursor shows matching parentthesis
-"set number                      " Shows line numbers
+set number                      " Shows line numbers
 set relativenumber              " Show line number relative to cursor
 
 

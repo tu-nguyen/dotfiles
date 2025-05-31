@@ -6,7 +6,8 @@
 set -o vi
 shopt -s dotglob nullglob  # enable dotfiles and skip empty globs
 
-BASHRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+SOURCE="${BASH_SOURCE[0]:-$0}"
+BASHRC_DIR="$(cd "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)"
 EXTRAS_DIR="$BASHRC_DIR/.bash_extras"
 INIT="$EXTRAS_DIR/init"
 

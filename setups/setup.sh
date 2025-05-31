@@ -123,3 +123,22 @@ reset_vscode_config() {
   bash -i $DOTFILE_PATH/setups/vscode_setup.sh $DOTFILE_PATH
   t SUCCESS "Setting vscode config completed!"
 }
+
+reset_wsl_config() {
+  if [[ "$(uname)" == "Darwin" ]]; then
+      t "No need to change WSl setting as this is a mac"
+      return
+  fi
+
+  if [ -z "$FORCE_YES" ]; then
+    read -p "Are you sure you want to ${GREEN}reset the wsl config${NC}? This will ${RED}overwrite existing config${NC}, review wsl_setup.sh first! [y/N] " -n 1 -r
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      t "Exiting.."
+      return
+    fi
+  fi
+  echo ""
+  chmod +x $DOTFILE_PATH/setups/wsl_setup.sh
+  bash -i $DOTFILE_PATH/setups/wsl_setup.sh $DOTFILE_PATH
+  t SUCCESS "Setting wsl config completed!"
+}

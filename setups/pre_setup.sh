@@ -24,6 +24,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
   export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
   install_mac_package lesspipe
   install_mac_package python@3.12
+  install_mac_package htop
 
   brew unlink python@3.12 && brew link python@3.12
   export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH" 
@@ -66,6 +67,7 @@ else
   install_linux_package git
   install_linux_package powerline
   install_linux_package fonts-powerline
+  install_linux_package htop
 fi
 
 if ! pip show powerline-gitstatus &>/dev/null; then

@@ -64,6 +64,44 @@ printv() {
   fi
 }
 
-now() {
+# Display date and time
+function now() {
   echo "$(date +"%d-%m-%Y") $(date +"%T")"
 }
+
+# Switch to a specified Git branch with confirmation
+function gco() {
+    local branch=$1
+    if [ -z "$branch" ]; then
+        t "Usage: gsw <branch_name>"
+        return 1
+    fi
+    git checkout $branch
+    if [ $? -eq 0 ]; then
+        t SUCCESS "Switched to branch ${GREEN}$branch${NC}"
+    else
+        t ERROR "Failed to switch branch"
+    fi
+}
+
+# Same as above but with fallback to create a branch
+function gco() {
+    local branch=$1
+    if [ -z "$branch" ]; then
+        t "Usage: gsw <branch_name>"
+        return 1
+    fi
+    git checkout $branch
+    if [ $? -eq 0 ]; then
+        t SUCCESS "Switched to branch ${GREEN}$branch${NC}"
+    else
+        git checkout -B $branch
+        if [ $? -eq 0 ]; then
+            t SUCCESS "Created and switched to branch ${GREEN}$branch${NC}"
+        else
+            t ERROR "Failed to create and switch branch"
+        fi
+    fi
+}
+
+

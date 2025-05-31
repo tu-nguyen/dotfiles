@@ -34,6 +34,7 @@ r() {
   reset_vimrc
   reset_git_config
   reset_vscode_config
+  reset_wsl_config
  
   if [ "$IS_PROJECT_ROOT" = false ]; then
     popd > /dev/null

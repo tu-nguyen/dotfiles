@@ -21,7 +21,7 @@ function print_tt() {
     }' "$file"
 }
 
-function ttgit() {
+function gtt() {
   printf "${BOLD}git${NC}                  → s (status -s)                → b (fancy branch)\n"
   printf "                     → st (status)                  → br (branch)\n"
   printf "                     → co (checkout)                → a (add)\n"
@@ -33,7 +33,15 @@ function ttgit() {
   printf "                     → cm (commit -m)               → dc (diff --cached)\n"
   printf "                     → cam (commit -a -m)           → l(diff)\n" 
   printf "                     → m (commit -m)                \n" 
-  printf "${GREEN}git la${NC} (to ALL git config)\n" 
+  printf "%s\n" "$br"
+  printf "${BOLD}git alt${NC}              → ga (add)                     → gb (branch)\n"
+  printf "                     → gs (status)                  → gbr (fance branch)\n"
+  printf "                     → gc (cam)                     → gcl (cl show last commit)\n"
+  printf "                     → cl (log)                     → gll (bigger log)\n"
+  printf "                     → crr (hard reset)             → ${GREEN}git la${NC} (to ALL git config)\n"
+  printf "${BOLD}git functions${NC}      \n"
+  printf "gco                  → Switch to a specified Git branch with confirmation\n"
+  printf "gcob                 → Same as above but with fallback to create a branch\n"
 }
 
 
@@ -46,10 +54,11 @@ function dktt() {
 
 function tt() {
   printf "${BOLD}primary functions${NC}    → r (source .bashrc)           → j (jobs -l)\n"
-  printf "                     → c (clear)                    → df (df -H)\n"
-  printf "                     → h (history)                  → du (du -ch)\n"
+  printf "                     → cls (clear and ls)           → df (df -H)\n"
+  printf "                     → mkcd (mkdir then cd)         → du (du -ch)\n"
+  printf "                     → h (history)                  → dmesg10 (10 recent logs)\n"
   printf "                     → x (exit)                     → top (htop)\n"
-  printf "                     → v (vim)                      → \n"
+  printf "                     → v (vim)                      → top10 (top 10 ps)\n"
   # ls
   printf "%s\n" "$br"
   printf "${BOLD}ls${NC} & ${BOLD}cd${NC}              → ll (ls -alh)                 → ~ (cd ~)\n"
@@ -72,7 +81,7 @@ function tt() {
   printf "%s\n" "$br"
   printf "${BOLD}other tt${NC}      \n"
   printf "ttcs                 → to view bash cheatsheet\n"
-  printf "ttgit                → to view git aliases\n"
+  printf "gtt                  → to view git aliases\n"
   printf "dktt                 → to view docker stuff\n"
 
   if [[ ! -f "$HOME/.bash_extras/.bash_twork" ]]; then
@@ -85,6 +94,8 @@ function tt() {
 function ttt() {
   printf "r (source .bashrc) \n"
   printf "c (clear) \n"
+  printf "cls (clear && ls) \n"
+  printf "clss (clear && lsa) \n"
   printf "h (history)   \n"
   printf "x (exit) \n"
   printf "v (vim)   \n"
@@ -92,9 +103,14 @@ function ttt() {
   printf "df (df -H) \n"
   printf "du (du -ch) \n"
   printf "top (htop) \n"
+  printf "top10 (ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 11) \n"
+  printf "dmesg10 (dmesg | tail -n 10) \n"
+  printf "uptime (uptime -p) \n"
+  printf "mkcd (mkdir -p $1 && cd $1) \n"
   printf "ll (ls -alh)  \n"
   printf "la (ls -A) \n"
   printf "l (ls) \n"
+  printf "lsa (ls -al) \n"
   printf "lsd (ls -a1F | grep /$) \n"
   printf "lt (la -lt)  \n"
   printf "~ (cd ~) \n"
@@ -103,6 +119,15 @@ function ttt() {
   printf ".... (cd ../../..) \n"
   printf ".4 (../../../../)\n"
   printf ".5 (../../../../..) \n"
+  printf "ga (git a) \n"
+  printf "gb (git b) \n"
+  printf "gbr (git br) \n"
+  printf "gc (git cam) \n"
+  printf "gcl (git cl) \n"
+  printf "gl (git l) \n"
+  printf "gll (git ll) \n"
+  printf "grr (git rr) \n"
+  printf "gs (git st) \n"
   printf "myip (get ip) \n"
   printf "ping (ping -c 5)  \n"
   printf "p4 (ping 4.2.2.2 -c 4)  \n"

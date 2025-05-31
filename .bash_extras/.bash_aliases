@@ -14,7 +14,8 @@ fi
 
 # set some defaults
 alias c='clear'
-alias c='clear'
+alias cls='clear && ls'
+alias clss='clear && lsa'
 alias h='history'
 alias j='jobs -l'
 alias x='exit'
@@ -22,11 +23,14 @@ alias v='vim'
 alias df='df -H'
 alias du='du -ch'
 alias top='htop'
+alias top10='ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 11'
+alias uptime='uptime -p'
 alias cp='cp -i'
 alias mv='timeout 8 mv -iv'
 alias rm='timeout 3 rm -Iv --one-file-system --preserve-root'
 alias ln='ln -i'
 alias mkdir='mkdir -pv'
+alias mkcd='mkdir -p $1 && cd $1'
 # Parenting changing perms on / #
 alias chown='chown --preserve-root'
 alias chmod='chmod --preserve-root'
@@ -40,6 +44,7 @@ alias ls='ls --color=auto'
 alias ll="ls -alh"
 alias la="ls -A"
 alias l="ls"
+alias lsa="ls -la"
 alias lsd="ls -a1F | grep /$"
 alias lt="la -lt"
 alias l.='ls -d .* --color=auto'
@@ -52,6 +57,18 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .4='cd ../../../../'
 alias .5='cd ../../../../..'
+
+# git
+alias ga='git a'
+alias gb='git b'
+alias gbr='git br'
+alias gc='git cam'
+alias gcl='git cl'
+alias gl="git l"
+alias gll="git ll"
+alias grr="git rr"
+alias gs='git st'
+
 
 ## grep
 alias grep='grep --color=auto'
@@ -102,8 +119,10 @@ if [[ "$(uname)" == "Darwin" ]]; then
   else
     alias diskspace="du -S | sort -n -r | more"
 fi
+alias dmesg10='dmesg | tail -n 10'
 alias folder="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
 alias path='echo -e ${PATH//:/\\n}'
+alias wc='wc -l -w -c'
 alias nowtime='date +"%T"'
 alias nowdate='date +"%d-%m-%Y"'
 

@@ -9,7 +9,7 @@ shopt -s dotglob nullglob  # enable dotfiles and skip empty globs
 mkdir -p "$HOME/.bash_extras"
 INIT_FILE="$HOME/.bash_extras/.bash_init"
 if [[ -f "$INIT_FILE" ]]; then
-    grep '^DOTFILE_DIR=' "$INIT_FILE" | cut -d'=' -f2-
+    DOTFILE_DIR=$(grep '^DOTFILE_DIR=' "$INIT_FILE" | cut -d'=' -f2-)
 else
   echo "[WARNING] No saved file found at $INIT_FILE"
 fi

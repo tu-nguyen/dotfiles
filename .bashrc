@@ -6,49 +6,45 @@
 set -o vi
 shopt -s dotglob nullglob  # enable dotfiles and skip empty globs
 
+mkdir -p "$HOME/.bash_extras"
 INIT_FILE="$HOME/.bash_extras/.bash_init"
-
-if [[ -n "${BASH_SOURCE[0]}" ]]; then
-  DOTFILE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-  mkdir -p "$HOME/.bash_extras"
-  echo "DOTFILE_DIR=$(pwd)" > "$INIT_FILE"
+if [[ -f "$INIT_FILE" ]]; then
+    grep '^DOTFILE_DIR=' "$INIT_FILE" | cut -d'=' -f2-
 else
-  CURRENT_DIR="$(pwd)"
-  if [[ "$CURRENT_DIR" != "$HOME" ]]; then
-    DOTFILE_DIR="$CURRENT_DIR"
-    mkdir -p "$HOME/.bash_extras"
-    echo "DOTFILE_DIR=$(pwd)" > "$INIT_FILE"
-  else
-    echo "[WARNING] Falling back logic for DOTFILE_DIR"
-    if [[ -f "$INIT_FILE" ]]; then
-      grep '^DOTFILE_DIR=' "$INIT_FILE" | cut -d'=' -f2-
-    else
-      echo "[WARNING] No saved directory found at $INIT_FILE"
-      echo "[WARNING] Hardcoding.."
-      DOTFILE_DIR="$HOME/workplace/repo/dotfiles" 
-    fi
-  fi
+  echo "[WARNING] No saved file found at $INIT_FILE"
 fi
+
+if [[ -z "$DOTFILE_DIR" ]]; then
+    CURRENT_DIR="$(pwd)"
+    if [[ "$CURRENT_DIR" != "$HOME" ]]; then
+        DOTFILE_DIR="$CURRENT_DIR"
+    else
+        echo "[WARNING] Hardcoding DOTFILE_DIR.."
+        DOTFILE_DIR="$HOME/workplace/repo/dotfiles" 
+    fi   
+else
+    echo "DOTFILE_DIR is set to: $DOTFILE_DIR"
+fi
+echo "DOTFILE_DIR=$DOTFILE_DIR" > "$INIT_FILE"
 
 EXTRAS_DIR="$DOTFILE_DIR/.bash_extras"
 INIT="$EXTRAS_DIR/init"
-
 if [ -n "$INIT/.bash_setup" ]; then
-  . "$INIT/.bash_setup"
+    . "$INIT/.bash_setup"
 fi
 
 if [ -n "$INIT/.bash_exports" ]; then
-  . "$INIT/.bash_exports"
+    . "$INIT/.bash_exports"
 fi
 
 if [ -n "$INIT/.bash_powerline" ]; then
-  . "$INIT/.bash_powerline"
+    . "$INIT/.bash_powerline"
 fi
 
 if [ -d "$EXTRAS_DIR" ]; then
-  for file in "$EXTRAS_DIR"/*; do
-    [ -f "$file" ] && . "$file"
-  done
+    for file in "$EXTRAS_DIR"/*; do
+        [ -f "$file" ] && . "$file"
+    done
 fi
 
 # PS1='[\u@\h \W]\$'

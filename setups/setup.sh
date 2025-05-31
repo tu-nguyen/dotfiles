@@ -38,12 +38,13 @@ if [[ "$(uname)" == "Darwin" ]]; then
   cd ..
   rm -rf fonts
 
-  # if brew list macvim &>/dev/null; then
-  #   echo "macvim is already installed."
-  # else
-  #   echo "Installing macvim..."
-  #   brew install macvim --env-std --with-override-system-vim
-  # fi
+  if brew list macvim &>/dev/null; then
+    echo "macvim is already installed."
+  else
+    echo "Installing macvim..."
+    brew unlink vim
+    brew install macvim
+  fi
 
 else
   install_linux_package python3-pip
@@ -51,24 +52,3 @@ else
   install_linux_package powerline
   install_linux_package fonts-powerline
 fi
-
-# # Font
-# wget https://github.com/Lokaltog/powerline/raw/develop/font/PowerlineSymbols.otf https://github.com/Lokaltog/powerline/raw/develop/font/10-powerline-symbols.conf
-# mkdir -p ~/.fonts/ && mv PowerlineSymbols.otf ~/.fonts/
-# fc-cache -vf ~/.fonts
-# mkdir -p ~/.config/fontconfig/conf.d/ && mv 10-powerline-symbols.conf ~/.config/fontconfig/conf.d/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

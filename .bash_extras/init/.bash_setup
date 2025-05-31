@@ -84,12 +84,23 @@ function reset_bashrc() {
     echo "[WARNING] For twork setup, be sure to create a .bash_twork file"
     mkdir ~/.bash_extras
   fi
+
+  if [[ -d "$HOME/.bash_extras/init" ]]; then
+    echo "[INFO] $HOME/.bash_extras/init exists, deleting stock .bash files within.."
+    rm ~/.bash_extras/.bash_setup
+    rm ~/.bash_extras/.bash_exports
+    rm ~/.bash_extras/.bash_powerline
+  else
+    echo "[WARNING] $HOME/.bash_extras/init does not exist, creating.."
+    mkdir ~/.bash_extras/init
+  fi
   
   echo "[INFO] linking .bash_extras files.."
-  ln -sv $(pwd)/.bash_extras/.bash_setup ~/.bash_extras/.bash_setup
+  ln -sv $(pwd)/.bash_extras/init/.bash_setup ~/.bash_extras/init/.bash_setup
+  ln -sv $(pwd)/.bash_extras/init/.bash_exports ~/.bash_extras/init/.bash_exports
+  ln -sv $(pwd)/.bash_extras/init/.bash_powerline ~/.bash_extras/init/.bash_powerline
   ln -sv $(pwd)/.bash_extras/.bash_aliases ~/.bash_extras/.bash_aliases
   ln -sv $(pwd)/.bash_extras/.bash_docker_functions ~/.bash_extras/.bash_docker_functions
-  ln -sv $(pwd)/.bash_extras/.bash_exports ~/.bash_extras/.bash_exports
   ln -sv $(pwd)/.bash_extras/.bash_functions ~/.bash_extras/.bash_functions
   ln -sv $(pwd)/.bash_extras/.bash_other ~/.bash_extras/.bash_other
   ln -sv $(pwd)/.bash_extras/.bash_tt ~/.bash_extras/.bash_tt
@@ -141,6 +152,8 @@ function r() {
 
   echo "Setup starting.."
   setup_setup
+
+  git pull
 
   echo "Resetting settings.."
   reset_bashrc

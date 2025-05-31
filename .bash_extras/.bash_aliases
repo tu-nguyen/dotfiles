@@ -14,6 +14,7 @@ fi
 
 # set some defaults
 alias c='clear'
+alias c='clear'
 alias h='history'
 alias j='jobs -l'
 alias x='exit'
@@ -73,18 +74,6 @@ alias myip="curl icanhazip.com"
 alias ping='ping -c 5'
 alias p4="ping 4.2.2.2 -c 4"
 alias fastping='ping -c 100 -s.2'
-if [[ "$(uname)" == "Darwin" ]]; then
-    alias diskspace="du | sort -n -r | more"
-  else
-    alias diskspace="du -S | sort -n -r | more"
-fi
-alias diskspace="du -S | sort -n -r | more"
-alias folder="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
-alias path='echo -e ${PATH//:/\\n}'
-alias now='date +"%T"'
-alias nowtime=now
-alias nowdate='date +"%d-%m-%Y"'
-
 alias ports='netstat -tulanp'
 ## shortcut  for iptables and pass it via sudo#
 alias ipt='sudo /sbin/iptables'
@@ -108,12 +97,33 @@ alias ethtool='ethtool eth1'
 # Only useful for laptop as all servers are without wireless interface
 alias iwconfig='iwconfig wlan0'
 
+if [[ "$(uname)" == "Darwin" ]]; then
+    alias diskspace="du | sort -n -r | more"
+  else
+    alias diskspace="du -S | sort -n -r | more"
+fi
+alias folder="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
+alias path='echo -e ${PATH//:/\\n}'
+alias now='date +"%T"'
+alias nowtime=now
+alias nowdate='date +"%d-%m-%Y"'
+
+
+
 ## other
 alias so0="cmatrix"
 
 # install  colordiff package
 # alias diff='colordiff'
 
+# Although this is a function, I have it here instead of .bash_functions so it won't print via tt
+cd() {
+  if [ -n "$1" ]; then
+    builtin cd "$@" && ls --group-directories-first
+  else
+    builtin cd ~ && ls --group-directories-first
+  fi
+}
 
 
 

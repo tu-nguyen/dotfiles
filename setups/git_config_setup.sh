@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # git config --global user.name "Tu Nguyen"
 # git config --global user.email "tu.t.nguyen93@gmail.com"
 

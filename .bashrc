@@ -30,7 +30,7 @@ BRIGHT_WHITE=$(tput setaf 15 2>/dev/null || echo -e '\033[1;37m')
 BOLD=$(tput bold 2>/dev/null || echo -e '\033[1m')
 UNDERLINE=$(tput smul 2>/dev/null || echo -e '\033[4m')
 RESET=$(tput sgr0 2>/dev/null || echo -e '\033[0m')
-NC=$RESET
+NC=$(tput sgr0 2>/dev/null || echo -e '\033[0m')
 
 # Example usage
 # echo "${RED}This is red text${RESET}"
@@ -63,19 +63,21 @@ t() {
       echo -e "${YELLOW}[WARNING]${NC} $message"
       ;;
     err|error|ERR|ERROR)
-      echo -e "${RED}[ERROR]${NC} $message"
+      echo -e "${RED}[ERROR] $message ${NC}"
       ;;
     success|ok|SUCCESS|OK)
-      echo -e "${GREEN}[SUCCESS]${NC} $message"
+      echo -e "${GREEN}[SUCCESS] $message ${NC}"
       ;;
     debug|DEBUG)
-      echo -e "${CYAN}[DEBUG]${NC} $message"
+      echo -e "${CYAN}[DEBUG] $message ${NC}"
       ;;
     *)
       echo -e "${NC}[UNKNOWN] $severity: $message"
       ;;
   esac
 }
+
+export t=$(t)
 
 mkdir -p "$HOME/.bash_extras/init"
 BASH_INIT_FILE="$HOME/.bash_extras/init/.bash_init"
@@ -132,23 +134,5 @@ if [ -d "$HOME/.bash_extras" ]; then
     done
 fi  
 
-# PS1='[\u@\h \W]\$'
-RED="\[$(tput setaf 1)\]"
-GREEN="\[$(tput setaf 2)\]"
-YELLOW="\[$(tput setaf 3)\]"
-BLUE="\[$(tput setaf 4)\]"
-MAGENTA="\[$(tput setaf 5)\]"
-CYAN="\[$(tput setaf 6)\]"
-WHITE="\[$(tput setaf 7)\]"
-GRAY="\[$(tput setaf 8)\]"
-BOLD="\[$(tput bold)\]"
-
-# Set colors/font-weights.
-CUSER=$MAGENTA
-CPATH=$CYAN
-BOLD=$BOLD
-RESET="\[$(tput sgr0)\]"
-CCOLOR=$YELLOW
-
 # Custom prompt.
-export PS1="${CUSER}\u@\h${RESET}:${CPATH}${BOLD}\w${RESET}#"
+# export PS1="${CUSER}\u@\h${RESET}:${CPATH}${BOLD}\w${RESET}#"

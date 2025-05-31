@@ -67,3 +67,10 @@ else
   install_linux_package powerline
   install_linux_package fonts-powerline
 fi
+
+if ! pip show powerline-gitstatus &>/dev/null; then
+  t "Installing Powerline Git Status via pip..."
+  pip install powerline-gitstatus
+else
+  t "Powerline Git Status is already installed (pip)."
+fi

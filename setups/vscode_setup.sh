@@ -6,5 +6,3 @@ if [[ "$(uname)" == "Darwin" ]]; then
 else
     t "TBD"
 fi
-
-t SUCCESS "Setting VSCode config completed!"

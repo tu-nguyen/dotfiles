@@ -29,6 +29,15 @@ if [[ "$(uname)" == "Darwin" ]]; then
     echo "Powerline is already installed (pip)."
   fi
 
+  # clone
+  git clone https://github.com/powerline/fonts.git --depth=1
+  # install
+  cd fonts
+  ./install.sh
+  # clean-up a bit
+  cd ..
+  rm -rf fonts
+
   # if brew list macvim &>/dev/null; then
   #   echo "macvim is already installed."
   # else

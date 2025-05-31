@@ -20,6 +20,7 @@ install_linux_package() {
 
 if [[ "$(uname)" == "Darwin" ]]; then
   install_mac_package coreutils
+  install_mac_package lesspipe
   install_mac_package python@3.12
 
   brew unlink python@3.12 && brew link python@3.12

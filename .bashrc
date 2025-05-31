@@ -10,6 +10,12 @@ mkdir -p "$HOME/.bash_extras"
 INIT_FILE="$HOME/.bash_extras/.bash_init"
 if [[ -f "$INIT_FILE" ]]; then
     DOTFILE_DIR=$(grep '^DOTFILE_DIR=' "$INIT_FILE" | cut -d'=' -f2-)
+    if [[ -d "$DOTFILE_DIR" ]]; then
+        echo "[INFO] Found saved DOTFILE_DIR: $DOTFILE_DIR"
+    else
+        echo "[WARNING] Saved DOTFILE_DIR does not exist: $DOTFILE_DIR"
+        DOTFILE_DIR=""
+    fi
 else
   echo "[WARNING] No saved file found at $INIT_FILE"
 fi
@@ -29,15 +35,15 @@ echo "DOTFILE_DIR=$DOTFILE_DIR" > "$INIT_FILE"
 
 EXTRAS_DIR="$DOTFILE_DIR/.bash_extras"
 INIT="$EXTRAS_DIR/init"
-if [ -n "$INIT/.bash_setup" ]; then
+if [ -f "$INIT/.bash_setup" ]; then
     . "$INIT/.bash_setup"
 fi
 
-if [ -n "$INIT/.bash_exports" ]; then
+if [ -f "$INIT/.bash_exports" ]; then
     . "$INIT/.bash_exports"
 fi
 
-if [ -n "$INIT/.bash_powerline" ]; then
+if [ -f "$INIT/.bash_powerline" ]; then
     . "$INIT/.bash_powerline"
 fi
 

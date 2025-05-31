@@ -1,12 +1,17 @@
 # 
 
-get_dotfile_pwd() {
-  if [[ -f "$INIT_FILE" ]]; then
-    grep '^DOTFILE_DIR=' "$INIT_FILE" | cut -d'=' -f2-
-  else
-    echo "[WARNING] No saved directory found at $INIT_FILE"
-    echo "[WARNING] Using $DOTFILE_DIR from .bashrc"
+function setup_setup() {
+  if [ -z "$FORCE_YES" ]; then
+    read -p "Are you sure you want to run setup? This will install packages, SKIP if you already ran this once! [y/N] " -n 1 -r
+    echo ""
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      echo "Exiting.."
+      return
+    fi
   fi
+  chmod +x $DOTFILE_DIR/setups/setup.sh
+  $DOTFILE_DIR/setups/setup.sh
+  echo "[INFO] Setup completed!"
 }
 
 function reset_vimrc() {
@@ -24,7 +29,7 @@ function reset_vimrc() {
   rm -rf ~/.vim/bundle
 
   echo "[INFO] linking .vimrc.."
-  ln -sv $(pwd)/.vimrc ~/.vimrc
+  ln -sv $DOTFILE_DIR/.vimrc ~/.vimrc
   echo "[INFO] linking successful!"
 
   echo "[INFO] installing Vundle and plugins.."
@@ -32,20 +37,6 @@ function reset_vimrc() {
   $DOTFILE_DIR/setups/vim_setup.sh
 
   echo "You are all set!"
-}
-
-function setup_setup() {
-  if [ -z "$FORCE_YES" ]; then
-    read -p "Are you sure you want to run setup? This will install packages, SKIP if you already ran this once! [y/N] " -n 1 -r
-    echo ""
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-      echo "Exiting.."
-      return
-    fi
-  fi
-  chmod +x $DOTFILE_DIR/setups/setup.sh
-  $DOTFILE_DIR/setups/setup.sh
-  echo "[INFO] Setup completed!"
 }
 
 function reset_bashrc() {
@@ -77,8 +68,8 @@ function reset_bashrc() {
   if [[ -d "$HOME/.bash_extras/init" ]]; then
     echo "[INFO] $HOME/.bash_extras/init exists, deleting stock .bash files within.."
     rm ~/.bash_extras/.bash_setup
-    rm ~/.bash_extras/.bash_exports
     rm ~/.bash_extras/.bash_powerline
+    rm ~/.bash_extras/.bash_exports
   else
     echo "[WARNING] $HOME/.bash_extras/init does not exist, creating.."
     mkdir ~/.bash_extras/init
@@ -86,8 +77,8 @@ function reset_bashrc() {
   
   echo "[INFO] linking .bash_extras files.."
   ln -sv $(pwd)/.bash_extras/init/.bash_setup ~/.bash_extras/init/.bash_setup
-  ln -sv $(pwd)/.bash_extras/init/.bash_exports ~/.bash_extras/init/.bash_exports
   ln -sv $(pwd)/.bash_extras/init/.bash_powerline ~/.bash_extras/init/.bash_powerline
+  ln -sv $(pwd)/.bash_extras/init/.bash_exports ~/.bash_extras/init/.bash_exports
   ln -sv $(pwd)/.bash_extras/.bash_aliases ~/.bash_extras/.bash_aliases
   ln -sv $(pwd)/.bash_extras/.bash_docker_functions ~/.bash_extras/.bash_docker_functions
   ln -sv $(pwd)/.bash_extras/.bash_functions ~/.bash_extras/.bash_functions
@@ -121,12 +112,10 @@ function setup_git_config() {
 
 function r() {
   if [[ "$(pwd)" == *"/dotfiles" ]]; then
-    save_dotfile_pwd
     IS_PROJECT_ROOT=true
     DOTFILE_DIR=$(pwd)
   else
     IS_PROJECT_ROOT=false
-    DOTFILE_DIR=$(get_dotfile_pwd)
   fi
 
   echo "[INFO] Resetting settings.."

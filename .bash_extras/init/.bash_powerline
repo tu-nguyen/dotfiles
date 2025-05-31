@@ -7,21 +7,22 @@ is_powerline_enabled() {
 }
 
 enable_powerline() {
-  POWERLINE_PATH=$(pip show powerline-status 2>/dev/null | grep '^Location:' | cut -d' ' -f2-)
-  if [[ -n "$POWERLINE_PATH" ]]; then
-    powerline-daemon -q
-    POWERLINE_BASH_CONTINUATION=1
-    POWERLINE_BASH_SELECT=1
-    source "$POWERLINE_PATH/powerline/bindings/bash/powerline.sh"
-    # echo "Restart the terminal to see powerline!"
-    if is_powerline_enabled; then
-        echo "Powerline is enabled"
-    else
-        echo "Restart the terminal to see powerline!"
+    POWERLINE_PATH=$(pip show powerline-status 2>/dev/null | grep '^Location:' | cut -d' ' -f2-)
+    if [[ -n "$POWERLINE_PATH" ]]; then
+        powerline-daemon -q
+        POWERLINE_BASH_CONTINUATION=1
+        POWERLINE_BASH_SELECT=1
+        source "$POWERLINE_PATH/powerline/bindings/bash/powerline.sh"
+        # echo "Restart the terminal to see powerline!"
+        if is_powerline_enabled; then
+            echo "Powerline is enabled"
+        else
+            echo "Restart the terminal to see powerline!"
+        fi
     fi
-  fi
 }
-
+export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH" 
+export PATH="$HOME/Library/Python/3.12/bin:$PATH"
 # Try to detect where powerline is installed
 if [[ "$(uname)" == "Darwin" ]]; then
     if pip show powerline-status &>/dev/null; then

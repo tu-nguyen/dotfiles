@@ -13,6 +13,9 @@ if [ -d "$EXTRAS_DIR" ]; then
   if [ -f "$$EXTRAS_DIR/.bash_setup" ]; then
     . "$$EXTRAS_DIR/.bash_setup"
   fi
+  if [ -f "$$EXTRAS_DIR/.bash_exports" ]; then
+    . "$$EXTRAS_DIR/.bash_exports"
+  fi
   for file in "$EXTRAS_DIR"/*; do
     [ -f "$file" ] && . "$file"
   done

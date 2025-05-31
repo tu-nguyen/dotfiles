@@ -35,6 +35,10 @@ echo "DOTFILE_DIR=$DOTFILE_DIR" > "$INIT_FILE"
 
 EXTRAS_DIR="$DOTFILE_DIR/.bash_extras"
 INIT="$EXTRAS_DIR/init"
+
+echo "DOTFILE_DIR: $DOTFILE_DIR"
+
+
 if [ -f "$INIT/.bash_setup" ]; then
     . "$INIT/.bash_setup"
 fi

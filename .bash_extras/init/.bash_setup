@@ -1,117 +1,10 @@
-# 
+#
 
-function setup_setup() {
-  if [ -z "$FORCE_YES" ]; then
-    read -p "Are you sure you want to run setup? This will install packages, SKIP if you already ran this once! [y/N] " -n 1 -r
-    echo ""
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-      echo "Exiting.."
-      return
-    fi
-  fi
-  chmod +x $DOTFILE_DIR/setups/setup.sh
-  $DOTFILE_DIR/setups/setup.sh
-  echo "[INFO] Setup completed!"
-}
+if [ -f "$DOTFILE_DIR/setups/setup.sh" ]; then
+    . "$DOTFILE_DIR/setups/setup.sh"
+fi
 
-function reset_vimrc() {
-  if [ -z "$FORCE_YES" ]; then
-    read -p "Are you sure you want to reset the .vimrc? This will erase existing data, might want to create a backup! [y/N] " -n 1 -r
-      echo ""
-      if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo "Exiting.."
-        return
-      fi
-  fi
-  echo "[WARNING] Deleting old .vimrc"
-  rm ~/.vimrc
-  echo "[WARNING] Deleting old .vim/bundle"
-  rm -rf ~/.vim/bundle
-
-  echo "[INFO] linking .vimrc.."
-  ln -sv $DOTFILE_DIR/.vimrc ~/.vimrc
-  echo "[INFO] linking successful!"
-
-  echo "[INFO] installing Vundle and plugins.."
-  chmod +x $DOTFILE_DIR/setups/setups/vim_setup.sh
-  $DOTFILE_DIR/setups/vim_setup.sh
-
-  echo "You are all set!"
-}
-
-function reset_bashrc() {
-  if [ -z "$FORCE_YES" ]; then
-    read -p "Are you sure you want to reset the .bashrc? This will erase existing data, might want to create a backup! [y/N] " -n 1 -r
-    echo ""
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-      echo "Exiting.."
-      return
-    fi
-  fi
-
-  echo "[WARNING] Deleting old .bashrc"
-  rm ~/.bashrc
-  if [[ -d "$HOME/.bash_extras" ]]; then
-    echo "[INFO] $HOME/.bash_extras exists, deleting stock .bash files within.."
-    rm ~/.bash_extras/.bash_aliases
-    rm ~/.bash_extras/.bash_docker_functions
-    rm ~/.bash_extras/.bash_exports
-    rm ~/.bash_extras/.bash_functions
-    rm ~/.bash_extras/.bash_other
-    rm ~/.bash_extras/.bash_tt
-  else
-    echo "[WARNING] $HOME/.bash_extras does not exist, creating.."
-    echo "[WARNING] For twork setup, be sure to create a .bash_twork file"
-    mkdir ~/.bash_extras
-  fi
-
-  if [[ -d "$HOME/.bash_extras/init" ]]; then
-    echo "[INFO] $HOME/.bash_extras/init exists, deleting stock .bash files within.."
-    rm ~/.bash_extras/.bash_setup
-    rm ~/.bash_extras/.bash_powerline
-    rm ~/.bash_extras/.bash_exports
-  else
-    echo "[WARNING] $HOME/.bash_extras/init does not exist, creating.."
-    mkdir ~/.bash_extras/init
-  fi
-  
-  echo "[INFO] linking .bash_extras files.."
-  ln -sv $(pwd)/.bash_extras/init/.bash_setup ~/.bash_extras/init/.bash_setup
-  ln -sv $(pwd)/.bash_extras/init/.bash_powerline ~/.bash_extras/init/.bash_powerline
-  ln -sv $(pwd)/.bash_extras/init/.bash_exports ~/.bash_extras/init/.bash_exports
-  ln -sv $(pwd)/.bash_extras/.bash_aliases ~/.bash_extras/.bash_aliases
-  ln -sv $(pwd)/.bash_extras/.bash_docker_functions ~/.bash_extras/.bash_docker_functions
-  ln -sv $(pwd)/.bash_extras/.bash_functions ~/.bash_extras/.bash_functions
-  ln -sv $(pwd)/.bash_extras/.bash_other ~/.bash_extras/.bash_other
-  ln -sv $(pwd)/.bash_extras/.bash_tt ~/.bash_extras/.bash_tt
-  echo "[INFO] linking .bashrc.."
-  ln -sv $(pwd)/.bashrc ~/.bashrc
-  echo "[INFO] linking successful, sourcing.."
-  source ~/.bashrc
-  if [[ ! -f "$HOME/.bash_extras/.bash_twork" ]]; then
-    printf "[WARNING].bash_twork does not exist inside .bash_extras, considering creating it!\n"
-  else
-    printf "[INFO].bash_twork exists!\n"
-    source ~/.bash_extras/.bash_twork
-  fi
-  echo "[INFO] Resetting .bashrc completed!"
-}
-
-function setup_git_config() {
-  if [ -z "$FORCE_YES" ]; then
-    read -p "Are you sure you want to set the git config? This will overwrite existing data, review git_config_setup.sh first! [y/N] " -n 1 -r
-    echo ""
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-      echo "Exiting.."
-      return
-    fi
-  fi
-  chmod +x $DOTFILE_DIR/setups/git_config_setup.sh
-  $DOTFILE_DIR/setups/git_config_setup.sh
-  echo "[INFO] Setting git config completed!"
-}
-
-function r() {
+r() {
   if [[ "$(pwd)" == *"/dotfiles" ]]; then
     IS_PROJECT_ROOT=true
     DOTFILE_DIR=$(pwd)
@@ -130,14 +23,16 @@ function r() {
   fi
 
   echo "Setup starting.."
-  setup_setup
+  pre_setup
 
   git pull
 
   echo "Resetting settings.."
   reset_bashrc
   reset_vimrc
-  setup_git_config
+  reset_git_config
+  reset_vscode_config
+ 
   if [ "$IS_PROJECT_ROOT" = false ]; then
     popd > /dev/null
   fi

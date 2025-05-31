@@ -4,7 +4,7 @@ install_mac_package() {
   if brew list "$1" &>/dev/null; then
     t "$1 is already installed via brew."
   else
-    t "Installing $1..."
+    t "Installing $1.."
     brew install "$@"
   fi
 }
@@ -13,7 +13,7 @@ install_linux_package() {
   if dpkg -s "$1" &>/dev/null; then
     t "$1 is already installed via apt."
   else
-    t "Installing $1..."
+    t "Installing $1.."
     sudo apt install -y "$@"
   fi
 }
@@ -30,7 +30,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
   export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH" 
   # Check if powerline is installed via pip
   if ! pip show powerline-status &>/dev/null; then
-    t "Installing Powerline via pip..."
+    t "Installing Powerline via pip.."
     # sudo rm -rf /usr/local/lib/python3.12/EXTERNALLY-MANAGED
     pip install powerline-status --user --break-system-packages
   else
@@ -44,12 +44,12 @@ if [[ "$(uname)" == "Darwin" ]]; then
   ./install.sh
   # clean-up a bit
   cd ..
-  rm -rf fonts
+  sudo rm -rf fonts
 
   # if brew list macvim &>/dev/null; then
   #   echo "macvim is already installed."
   # else
-  #   echo "Installing macvim..."
+  #   echo "Installing macvim.."
   #   brew unlink vim
   #   brew install macvim
   # fi
@@ -58,7 +58,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
   if brew list vim &>/dev/null; then
     t "vim is already installed."
   else
-    t "Installing vim..."
+    t "Installing vim.."
     brew link vim
   fi
 
@@ -71,8 +71,8 @@ else
 fi
 
 if ! pip show powerline-gitstatus &>/dev/null; then
-  t "Installing Powerline Git Status via pip..."
-  pip install powerline-gitstatus
+  t "Installing Powerline Git Status via pip.."
+  pip install powerline-gitstatus --user --break-system-packages
 else
   t "Powerline Git Status is already installed (pip)."
 fi

@@ -17,7 +17,7 @@ extract () {
            *.zip)       unzip $1       ;;
            *.Z)         uncompress $1  ;;
            *.7z)        7z x $1        ;;
-           *)           t ERROR "don't know how to extract '$1'..." ;;
+           *)           t ERROR "don't know how to extract '$1'.." ;;
        esac
    else
        t ERROR "'$1' is not a valid file!"

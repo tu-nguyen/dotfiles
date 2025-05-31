@@ -6,7 +6,7 @@ Typing up "clear" to clear the terminal? Nah, "c".
 
 ## install
 
-Um these are kinda personal and VERY tailored to me but if you want...
+Um these are kinda personal and VERY tailored to me but if you want..
 
 ```sh
 git clone https://github.com/tu-nguyen/dotfiles.git

@@ -51,7 +51,13 @@ if [ -d "$EXTRAS_DIR" ]; then
     for file in "$EXTRAS_DIR"/*; do
         [ -f "$file" ] && . "$file"
     done
-fi
+fi 
+
+if [ -d "$HOME/.bash_extras" ]; then
+    for file in "$HOME/.bash_extras"/*; do
+        [ -f "$file" ] && . "$file"
+    done
+fi  
 
 # PS1='[\u@\h \W]\$'
 RED="\[$(tput setaf 1)\]"

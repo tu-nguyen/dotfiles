@@ -12,6 +12,7 @@ Plugin 'VundleVim/Vundle.vim'
 
 "ADDED Powerline
 " Plugin 'powerline/powerline'
+Bundle 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}
 " ADDED Nerdtree
 Plugin 'scrooloose/nerdtree'
 " ADDED Nerdtree-Tab
@@ -170,8 +171,15 @@ let g:syntastic_check_on_wq = 0
 
 set rtp+="$POWERLINE_PATH/powerline/bindings/vim"
 
-" let g:powerline_pycmd="py3"  
-" let g:Powerline_symbols = 'fancy'
+let g:powerline_pycmd="py3"  
+let g:Powerline_symbols = 'fancy'
+
+let s:uname = system("uname")
+if s:uname == "Darwin\n"
+    set guifont=Inconsolata\ for\ Powerline:h15
+    set fillchars+=stl:\ ,stlnc:\
+endif
+
 python3 from powerline.vim import setup as powerline_setup
 python3 powerline_setup()
 python3 del powerline_setup

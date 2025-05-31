@@ -4,7 +4,7 @@ set -e
 
 VUNDLE_DIR="$HOME/.vim/bundle/Vundle.vim"
 
-if [-d "$VUNDLE_DIR" ]; then
+if [ -d "$VUNDLE_DIR" ]; then
     echo "[Info] Vundle is already installed at $VUNDLE_DIR"
 else
     echo "[INFO] Installed Vundle.."

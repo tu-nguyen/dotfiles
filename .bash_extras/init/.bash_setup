@@ -36,11 +36,9 @@ function reset_vimrc() {
   echo "[INFO] linking successful!"
 
   echo "[INFO] installing Vundle and plugins.."
-  chmod +x vim_setup.sh
-  ./vim_setup.sh
+  chmod +x $DOTFILE_DIR/setups/setups/vim_setup.sh
+  $DOTFILE_DIR/setups/vim_setup.sh
 
-#   echo "[INFO] Sourcing .vimrc.."
-#   source ~/.vimrc
   echo "You are all set!"
 }
 
@@ -53,8 +51,8 @@ function setup_setup() {
       return
     fi
   fi
-  chmod +x setup.sh
-  ./setup.sh
+  chmod +x $DOTFILE_DIR/setups/setup.sh
+  $DOTFILE_DIR/setups/setup.sh
   echo "[INFO] Setup completed!"
 }
 
@@ -72,7 +70,6 @@ function reset_bashrc() {
   rm ~/.bashrc
   if [[ -d "$HOME/.bash_extras" ]]; then
     echo "[INFO] $HOME/.bash_extras exists, deleting stock .bash files within.."
-    rm ~/.bash_extras/.bash_setup
     rm ~/.bash_extras/.bash_aliases
     rm ~/.bash_extras/.bash_docker_functions
     rm ~/.bash_extras/.bash_exports
@@ -125,8 +122,8 @@ function setup_git_config() {
       return
     fi
   fi
-  chmod +x git_config_setup.sh
-  ./git_config_setup.sh
+  chmod +x $DOTFILE_DIR/setups/git_config_setup.sh
+  $DOTFILE_DIR/setups/git_config_setup.sh
   echo "[INFO] Setting git config completed!"
 }
 

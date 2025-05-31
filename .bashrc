@@ -6,18 +6,20 @@
 set -o vi
 shopt -s dotglob nullglob  # enable dotfiles and skip empty globs
 
-BASHRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASHRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 EXTRAS_DIR="$BASHRC_DIR/.bash_extras"
 INIT="$EXTRAS_DIR/init"
 
-if [ -f "$$INIT/.bash_setup" ]; then
-  . "$$INIT/.bash_setup"
+if [ -n "$INIT/.bash_setup" ]; then
+  . "$INIT/.bash_setup"
 fi
-if [ -f "$$INIT/.bash_exports" ]; then
-  . "$$INIT/.bash_exports"
+
+if [ -n "$INIT/.bash_exports" ]; then
+  . "$INIT/.bash_exports"
 fi
-if [ -f "$$INIT/.bash_powerline" ]; then
-  . "$$INIT/.bash_powerline"
+
+if [ -n "$INIT/.bash_powerline" ]; then
+  . "$INIT/.bash_powerline"
 fi
 
 if [ -d "$EXTRAS_DIR" ]; then

@@ -63,3 +63,7 @@ printv() {
     cat "$env_file"
   fi
 }
+
+now() {
+  echo "$(date +"%d-%m-%Y") $(date +"%T")"
+}

@@ -104,11 +104,8 @@ if [[ "$(uname)" == "Darwin" ]]; then
 fi
 alias folder="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
 alias path='echo -e ${PATH//:/\\n}'
-alias now='date +"%T"'
-alias nowtime=now
+alias nowtime='date +"%T"'
 alias nowdate='date +"%d-%m-%Y"'
-
-
 
 ## other
 alias so0="cmatrix"

@@ -88,10 +88,11 @@ function reset_bashrc() {
   ln -sv $(pwd)/.bashrc ~/.bashrc
   echo "[INFO] linking successful, sourcing.."
   source ~/.bashrc
-  if [[ ! -f "$EXTRAS_DIR/.bash_twork" ]]; then
+  if [[ ! -f "$HOME/.bash_extras/.bash_twork" ]]; then
     printf "[WARNING].bash_twork does not exist inside .bash_extras, considering creating it!\n"
   else
     printf "[INFO].bash_twork exists!\n"
+    source ~/.bash_extras/.bash_twork
   fi
   echo "[INFO] Resetting .bashrc completed!"
 }

@@ -1,0 +1,45 @@
+# ========================================== #
+# 
+# #
+
+# TODO add comments later
+# ========================================== #
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+set -o vi
+
+shopt -s dotglob nullglob  # enable dotfiles
+shopt -s nullglob # skip empty globs
+
+#------------------------------------------
+# Greeting, motd, and colors
+#------------------------------------------
+# TODO
+
+#------------------------------------------
+# Load custom bash files
+#------------------------------------------
+# Load custom bash files from ~/.bash_extras
+if [[ -d "$HOME/.bash_extras" ]]; then
+    # Load the prep file if it exists
+    if [[ -f "$HOME/.bash_extras/.init"]]; then
+        . "$HOME/.bash_extras/.init"
+    fi
+    # Load all bash files in ~/.bash_extras
+    for file in "$HOME/.bash_extras"/.bash*; do
+        if [[ -f "$file" ]]; then
+        [ -f "$file" ] && . "$file"
+        fi
+    done
+fi
+
+
+function _update_ps1() {
+    PS1=$(powerline-shell $?)
+}
+
+if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
+    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+fi

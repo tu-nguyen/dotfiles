@@ -1,0 +1,31 @@
+# Text Colors (Foreground)
+BLACK=$(tput setaf 0 2>/dev/null || echo -e '\033[0;30m')
+RED=$(tput setaf 1 2>/dev/null || echo -e '\033[0;31m')
+GREEN=$(tput setaf 2 2>/dev/null || echo -e '\033[0;32m')
+YELLOW=$(tput setaf 3 2>/dev/null || echo -e '\033[0;33m')
+BLUE=$(tput setaf 4 2>/dev/null || echo -e '\033[0;34m')
+MAGENTA=$(tput setaf 5 2>/dev/null || echo -e '\033[0;35m')
+CYAN=$(tput setaf 6 2>/dev/null || echo -e '\033[0;36m')
+WHITE=$(tput setaf 7 2>/dev/null || echo -e '\033[0;37m')
+GRAY=$(tput setaf 8 2>/dev/null || echo -e '\033[0;90m')
+
+# Bright Colors (if your terminal supports them)
+BRIGHT_RED=$(tput setaf 9 2>/dev/null || echo -e '\033[1;31m')
+BRIGHT_GREEN=$(tput setaf 10 2>/dev/null || echo -e '\033[1;32m')
+BRIGHT_YELLOW=$(tput setaf 11 2>/dev/null || echo -e '\033[1;33m')
+BRIGHT_BLUE=$(tput setaf 12 2>/dev/null || echo -e '\033[1;34m')
+BRIGHT_MAGENTA=$(tput setaf 13 2>/dev/null || echo -e '\033[1;35m')
+BRIGHT_CYAN=$(tput setaf 14 2>/dev/null || echo -e '\033[1;36m')
+BRIGHT_WHITE=$(tput setaf 15 2>/dev/null || echo -e '\033[1;37m')
+
+# Text Formatting
+BOLD=$(tput bold 2>/dev/null || echo -e '\033[1m')
+UNDERLINE=$(tput smul 2>/dev/null || echo -e '\033[4m')
+
+# Reset all attributes
+RESET=$(tput sgr0 2>/dev/null || echo -e '\033[0m')
+NC=$(tput sgr0 2>/dev/null || echo -e '\033[0m')
+
+# Example usage
+# echo "${RED}This is red text${RESET}"
+# echo "${BOLD}${BLUE}This is bold blue text${RESET}"

@@ -68,6 +68,7 @@ else
   install_linux_package powerline
   install_linux_package fonts-powerline
   install_linux_package htop
+  # install_linux_package net-tools
 fi
 
 if ! pip show powerline-gitstatus &>/dev/null; then

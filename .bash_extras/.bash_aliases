@@ -90,7 +90,6 @@ alias y="yaourt"
 alias myip="curl icanhazip.com"
 alias ping='ping -c 5'
 alias p4="ping 4.2.2.2 -c 4"
-alias ports='netstat -tulanp'
 ## shortcut  for iptables and pass it via sudo#
 alias ipt='sudo /sbin/iptables'
 # display all rules #
@@ -115,8 +114,10 @@ alias iwconfig='iwconfig wlan0'
 
 if [[ "$(uname)" == "Darwin" ]]; then
     alias diskspace="du | sort -n -r | more"
+    alias ports='netstat -tulanp'
   else
     alias diskspace="du -S | sort -n -r | more"
+    alias ports='ss -tulanp'
 fi
 alias dmesg10='dmesg | tail -n 10'
 alias folder="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"

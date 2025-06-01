@@ -40,14 +40,14 @@ alias root='sudo -i'
 alias su='sudo -i'
 
 ## ls
-alias ls='ls --color=auto'
+alias ls='ls -G'
 alias ll="ls -alh"
 alias la="ls -A"
 alias l="ls"
 alias lsa="ls -la"
 alias lsd="ls -a1F | grep /$"
 alias lt="la -lt"
-alias l.='ls -d .* --color=auto'
+alias l.='ls -d .* -G'
 
 ## cd
 #alias c="cd" # was too annoying

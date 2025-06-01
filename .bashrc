@@ -84,9 +84,9 @@ BASH_INIT_FILE="$HOME/.bash_extras/init/.bash_init"
 if [[ -f "$BASH_INIT_FILE" ]]; then
     DOTFILE_PATH=$(grep '^DOTFILE_PATH=' "$BASH_INIT_FILE" | cut -d'=' -f2-)
     if [[ -d "$DOTFILE_PATH" ]]; then
-        t INFO "Found saved DOTFILE_PATH: $DOTFILE_PATH"
+        t INFO "DOTFILE_PATH loaded from $BASH_INIT_FILE"
     else
-        t WARNING "Saved DOTFILE_PATH does not exist: $DOTFILE_PATH"
+        t WARNING "Saved DOTFILE_PATH does not exist in $BASH_INIT_FILE"
         DOTFILE_PATH=""
     fi
 else
@@ -104,9 +104,9 @@ if [[ -z "$DOTFILE_PATH" ]]; then
 else
     t INFO "DOTFILE_PATH is set to: $DOTFILE_PATH"
 fi
+
 echo "DOTFILE_PATH=$DOTFILE_PATH" > "$BASH_INIT_FILE"
 export DOTFILE_PATH="$DOTFILE_PATH"
-
 export BASHRC_EXTRAS_PATH="$DOTFILE_PATH/.bash_extras"
 export BASHRC_INIT="$BASHRC_EXTRAS_PATH/init"
 
@@ -136,3 +136,11 @@ fi
 
 # Custom prompt.
 # export PS1="${CUSER}\u@\h${RESET}:${CPATH}${BOLD}\w${RESET}#"
+function _update_ps1() {
+    PS1=$(powerline-shell $?)
+}
+
+if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
+    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+fi
+

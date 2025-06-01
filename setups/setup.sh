@@ -142,3 +142,17 @@ reset_wsl_config() {
   bash -i $DOTFILE_PATH/setups/wsl_setup.sh $DOTFILE_PATH
   t SUCCESS "Setting wsl config completed!"
 }
+
+reset_wsl_config() {
+  if [ -z "$FORCE_YES" ]; then
+    read -p "Are you sure you want to ${GREEN}reset the powerline-shell config${NC}? This will ${RED}overwrite existing config${NC}, review powerline_shell_setup.sh first! [y/N] " -n 1 -r
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+      t "Exiting.."
+      return
+    fi
+  fi
+  echo ""
+  chmod +x $DOTFILE_PATH/setups/power_line_setup.sh
+  bash -i $DOTFILE_PATH/setups/power_line_setup.sh $DOTFILE_PATH
+  t SUCCESS "Setting power line config completed!"
+}

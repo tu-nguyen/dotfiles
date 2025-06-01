@@ -77,3 +77,10 @@ if ! pip show powerline-gitstatus &>/dev/null; then
 else
   t SUCCESS "Powerline Git Status is already installed (pip)."
 fi
+
+if ! pip show powerline-shell &>/dev/null; then
+  t "Installing Powerline Shell via pip.."
+  pip install powerline-shell --user --break-system-packages
+else
+  t SUCCESS "Powerline Shell is already installed (pip)."
+fi

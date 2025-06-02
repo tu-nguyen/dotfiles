@@ -33,5 +33,5 @@ if [[ "$(uname)" == "Darwin" ]]; then
   export PATH=/opt/homebrew/bin:$PATH
   # export PATH=/Users/$(whoami)/.local/bin:$PATH
   export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH" 
-  export PATH="$HOME/Library/Python/3.12/bin:$PATH"
+  # export PATH="$HOME/Library/Python/3.12/bin:$PATH"
 fi

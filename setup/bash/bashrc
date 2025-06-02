@@ -57,12 +57,12 @@ ORIGINAL_POWERLINE_PATH=$(pip show powerline-status 2>/dev/null | grep '^Locatio
 normalize_powerline_path() {
   local path="$1"
   if [[ "$path" == "$HOME"* ]]; then
-    echo "\$HOME${path#$HOME}"
+    echo "$HOME${path#$HOME}"
   else
     echo "$path"
   fi
 }
-POWERLINE_PATH=$(normalize_powerline_path "$POWERLINE_PATH")
+POWERLINE_PATH=$(normalize_powerline_path "$ORIGINAL_POWERLINE_PATH")
 export PATH="$POWERLINE_PATH:$PATH" 
 
 is_powerline_enabled() {

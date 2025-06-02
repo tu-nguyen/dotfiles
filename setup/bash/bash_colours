@@ -22,9 +22,22 @@ BRIGHT_WHITE=$(tput setaf 15 2>/dev/null || echo -e '\033[1;37m')
 BOLD=$(tput bold 2>/dev/null || echo -e '\033[1m')
 UNDERLINE=$(tput smul 2>/dev/null || echo -e '\033[4m')
 
+# Background
+ON_BLACK='\e[40m'
+ON_RED='\e[41m'
+ON_GREEN='\e[42m'
+ON_YELLOW='\e[43m'
+ON_BLUE='\e[44m'
+ON_PURPLE='\e[45m'
+ON_CYAN='\e[46m'
+ON_WHITE='\e[47m'
+
 # Reset all attributes
 RESET=$(tput sgr0 2>/dev/null || echo -e '\033[0m')
 NC=$(tput sgr0 2>/dev/null || echo -e '\033[0m')
+
+# Presets
+ALERT=${BWhite}${On_Red} # Bold White on red background
 
 # Example usage
 # echo "${RED}This is red text${RESET}"

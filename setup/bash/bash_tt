@@ -52,6 +52,7 @@ function dktt() {
 }
 
 function tt() {
+  # TODO: add chmod aliases
   printf "${BOLD}primary functions${NC}    → ttt (show all tt)            → j (jobs -l)\n"
   printf "                     → cls (clear and ls)           → df (df -H)\n"
   printf "                     → mkcd (mkdir then cd)         → du (du -ch)\n"
@@ -92,7 +93,7 @@ function tt() {
 }
 
 function ttt() {
-  printf "r (source .bashrc) \n"
+  printf "ttt (show all tt) \n"
   printf "c (clear) \n"
   printf "cls (clear && ls) \n"
   printf "clss (clear && lsa) \n"
@@ -107,12 +108,21 @@ function ttt() {
   printf "dmesg10 (dmesg | tail -n 10) \n"
   printf "uptime (uptime -p) \n"
   printf "mkcd (mkdir -p $1 && cd $1) \n"
+  printf "rmd (rm -rf)   \n"
+  printf "mx (chmod a+x)"
+  printf "000 (chmod -R 000)"
+  printf "644 (chmod -R 644)"
+  printf "666 (chmod -R 666)"
+  printf "755 (chmod -R 755)"
+  printf "777 (chmod -R 777)"
   printf "ll (ls -alh)  \n"
-  printf "la (ls -A) \n"
+  printf "la (ls -aAlh) \n"
   printf "l (ls) \n"
   printf "lsa (ls -al) \n"
   printf "lsd (ls -a1F | grep /$) \n"
   printf "lt (la -lt)  \n"
+  printf "l. (ls -d .* -G)  \n"
+  printf "home (cd ~) \n"
   printf "~ (cd ~) \n"
   printf ".. (cd ..) \n"
   printf "... (cd ../..) \n"
@@ -154,5 +164,15 @@ function ttt() {
   printf "now (source .bashrc) \n"
   printf "nowtime (source .bashrc) \n"
   printf "nowdate (source .bashrc) \n"
+  printf "ebcr (Edit .bashrc file) \n"
+  printf "tree (tree -CAhF --dirsfirst) \n"
+  printf "treed (tree -CAFd) \n"
+  printf "mountedinfo (df -hT) \n"
+  printf "mktar (tar -cvf) \n"
+  printf "mkbz2 (tar -cvjf) \n"
+  printf "mkgz (tar -cvzf) \n"
+  printf "untar (tar -xvf) \n"
+  printf "unbz2 (tar -xvjf) \n"
+  printf "ungz (tar -xvzf) \n"
   printf "so0 (cmatrix) \n"
 }

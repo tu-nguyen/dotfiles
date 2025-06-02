@@ -9,14 +9,29 @@
 [[ $- != *i* ]] && return
 
 set -o vi
+set -o ignoreeof
 
-shopt -s dotglob nullglob  # enable dotfiles
-shopt -s nullglob # skip empty globs
+shopt -s dotglob 
+shopt -s nullglob
+shopt -s checkwinsize
+shopt -s cdspell
+shopt -s cdable_vars
+shopt -s checkhash
+shopt -s sourcepath
+shopt -s no_empty_cmd_completion
+shopt -s cmdhist
+shopt -s histappend histreedit histverify
 
-#------------------------------------------
-# Greeting, motd, and colors
-#------------------------------------------
-# TODO
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
 
 #------------------------------------------
 # Load custom bash files
@@ -34,6 +49,15 @@ if [[ -d "$HOME/.bash_extras" ]]; then
         fi
     done
 fi
+
+#------------------------------------------
+# Greeting, motd, and colors
+#------------------------------------------
+# TODO
+echo -e "${BOLD}${CYAN}Hello, World! This is BASH ${BOLD}${RED}${BASH_VERSION%.*}${BOLD}${CYAN}\
+- TODO ${BOLD}${RED}..{NC}"
+date
+
 
 #------------------------------------------
 # Powerline settings

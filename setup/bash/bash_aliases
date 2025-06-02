@@ -20,6 +20,7 @@ alias h='history'
 alias j='jobs -l'
 alias x='exit'
 alias v='vim'
+alias ps='ps auxf'
 alias df='df -H'
 alias du='du -ch'
 alias top='htop'
@@ -28,9 +29,11 @@ alias uptime='uptime -p'
 alias cp='cp -i'
 alias mv='timeout 8 mv -iv'
 alias rm='timeout 3 rm -Iv --one-file-system --preserve-root'
+alias rmd='rm  --recursive --force --verbose '
 alias ln='ln -i'
 alias mkdir='mkdir -pv'
 alias mkcd='mkdir -p $1 && cd $1'
+alias less='less -R'
 # Parenting changing perms on / #
 alias chown='chown --preserve-root'
 alias chmod='chmod --preserve-root'
@@ -39,18 +42,30 @@ alias chgrp='chgrp --preserve-root'
 alias root='sudo -i'
 alias su='sudo -i'
 
+# chmod
+alias mx='chmod a+x'
+alias 000='chmod -R 000'
+alias 644='chmod -R 644'
+alias 666='chmod -R 666'
+alias 755='chmod -R 755'
+alias 777='chmod -R 777'
+
 ## ls
-alias ls='ls -G'
-alias ll="ls -alh"
-alias la="ls -A"
+alias ls='ls -Gl'
+alias ll="ls -Alh"  # show hidden files
+alias la='ls -aAlh'  # same as above, but no . or ..
 alias l="ls"
 alias lsa="ls -la"
 alias lsd="ls -a1F | grep /$"
 alias lt="la -lt"
-alias l.='ls -d .* -G'
+alias l.='ls -d .* -G'  # show only hidden files
+alias labc='ls -lap'  #alphabetical sort
+alias lf="ls -l | egrep -v '^d'"  # files only
+alias ldir="ls -l | egrep '^d'"  # directories only
 
-## cd
-#alias c="cd" # was too annoying
+# cd
+# alias c="cd" # was too annoying
+alias home="cd ~"
 alias ~="cd ~"
 alias ..="cd .."
 alias ...="cd ../.."
@@ -69,12 +84,12 @@ alias gll="git ll"
 alias grr="git rr"
 alias gs='git st'
 
-## grep
+# grep
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 
-## vim
+# vim
 alias vi=vim
 alias svi='sudo vi'
 alias vis='vim "+set si"'
@@ -88,7 +103,7 @@ alias y="yaourt"
 alias myip="curl icanhazip.com"
 alias ping='ping -c 5'
 alias p4="ping 4.2.2.2 -c 4"
-## shortcut  for iptables and pass it via sudo#
+# shortcut  for iptables and pass it via sudo#
 alias ipt='sudo /sbin/iptables'
 # display all rules #
 alias iptlist='sudo /sbin/iptables -L -n -v --line-numbers'
@@ -100,7 +115,7 @@ alias firewall=iptlist
 alias header='curl -I'
 # find out if remote server supports gzip / mod_deflate or not #
 alias headerc='curl -I --compress'
-## All of our servers eth1 is connected to the Internets via vlan / router etc  ##
+# All of our servers eth1 is connected to the Internets via vlan / router etc  ##
 alias dnstop='dnstop -l 5  eth1'
 alias vnstat='vnstat -i eth1'
 alias iftop='iftop -i eth1'
@@ -123,8 +138,20 @@ alias path='echo -e ${PATH//:/\\n}'
 alias wc='wc -l -w -c'
 alias nowtime='date +"%T"'
 alias nowdate='date +"%d-%m-%Y"'
+alias ebrc='edit ~/.bashrc'
+alias tree='tree -CAhF --dirsfirst'
+alias treed='tree -CAFd'
+alias mountedinfo='df -hT'
 
-## other
+# archives
+alias mktar='tar -cvf'
+alias mkbz2='tar -cvjf'
+alias mkgz='tar -cvzf'
+alias untar='tar -xvf'
+alias unbz2='tar -xvjf'
+alias ungz='tar -xvzf'
+
+# other
 alias so0="cmatrix"
 
 # install  colordiff package

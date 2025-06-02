@@ -28,7 +28,7 @@ if [[ -d "$HOME/.bash_extras" ]]; then
         . "$HOME/.bash_extras/.init"
     fi
     # Load all bash files in ~/.bash_extras
-    for file in "$HOME/.bash_extras"/.bash*"; do
+    for file in "$HOME/.bash_extras/.bash_"*; do
         if [[ -f "$file" ]]; then
         [ -f "$file" ] && . "$file"
         fi

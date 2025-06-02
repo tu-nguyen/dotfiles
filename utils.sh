@@ -101,7 +101,7 @@ install_packages() {
             t "Installing vim.."
             brew link vim
         fi
-    elif [[ "$OS" == "linux" ]]; then
+    elif [[ "$OS" == "linux" || "$OS" == "wsl" ]]; then
         if ! command -v apt &>/dev/null; then
             t ERROR "apt package manager not found. Please install it first."
             return 1
@@ -180,10 +180,16 @@ reset_vimrc() {
         return
     fi
 
-    t WARNING "Deleting old .vimrc"
-    rm ~/.vimrc
-    t WARNING "Deleting old .vim/bundle"
-    rm -rf ~/.vim/bundle
+    if [[ -f "$HOME/.vimrc" ]]; then
+        t WARNING "Deleting old .vimrc"
+        rm $HOME/.vimrc
+    fi
+
+    if [[ -d "$HOME/.vim/bundle" ]]; then
+        t WARNING "Deleting old .vim/bundle"
+        rm -rf $HOME/.vim/bundle
+    fi
+
 
     ln -sv  "$(pwd)/setup/vim/vimrc" "$HOME/.vimrc"
     t SUCCESS "Linked $(pwd)/setup/vim/vimrc to $HOME/.vimrc successfully."
@@ -220,7 +226,7 @@ reset_vscode_config() {
     fi
 
     chmod +x $DOTFILE_PATH/setup/vscode/vscode_config_setup.sh
-    bash -i $DOTFILE_PATH/setup/vscode/vscode_config_setup.sh $DOTFILE_PATH
+    bash -i $DOTFILE_PATH/setup/vscode/vscode_config_setup.sh
 
     t SUCCESS "VSCode configuration reset completed!"
 }

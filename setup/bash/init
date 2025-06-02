@@ -1,4 +1,7 @@
 
+# if [[ -f "$HOME/.bash_extras/.init" ]]; then
+#     . "$HOME/.bash_extras/.init"
+# fi
 
 t() {
   # t "System started"                  # [INFO] System started

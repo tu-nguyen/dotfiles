@@ -82,6 +82,7 @@ install_packages() {
         install_mac_package lesspipe
         install_mac_package python@3.12
         install_mac_package htop
+        install_mac_package vim
 
         brew unlink python@3.12 && brew link python@3.12
         export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH" 
@@ -102,14 +103,6 @@ install_packages() {
         # clean-up a bit
         cd ..
         sudo rm -rf fonts
-
-        brew install vim
-        if brew list vim &>/dev/null; then
-            t SUCCESS "vim is already installed."
-        else
-            t "Installing vim.."
-            brew link vim
-        fi
     elif [[ "$OS" == "linux" || "$OS" == "wsl" ]]; then
         if ! command -v apt &>/dev/null; then
             t ERROR "apt package manager not found. Please install it first."

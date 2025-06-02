@@ -42,4 +42,4 @@ fi
 # reset_post
 
 
-t SUCCESS "All done!"
+t SUCCESS "All done! You may need to exit and reopen!"

@@ -54,8 +54,8 @@ fi
 # Greeting, motd, and colors
 #------------------------------------------
 # TODO
-echo -e "${BOLD}${CYAN}Hello, World! This is BASH ${BOLD}${RED}${BASH_VERSION%.*}${BOLD}${CYAN}\
-- TODO ${BOLD}${RED}..{NC}"
+# echo -e "${BOLD}${CYAN}Hello, World! This is BASH ${BOLD}${RED}${BASH_VERSION%.*}${BOLD}${CYAN}\
+# - TODO ${BOLD}${RED}..{NC}"
 date
 
 

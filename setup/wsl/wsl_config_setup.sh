@@ -6,4 +6,4 @@ else
     t "Copying wsl.conf for WSL"
 fi
 
-sudo cp $1/setups/files/wsl.conf  /etc/wsl.conf
+sudo cp $1/setups/wsl/wsl.conf  /etc/wsl.conf

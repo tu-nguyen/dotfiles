@@ -1,3 +1,4 @@
+#!/bin/bash
 
 is_powerline_enabled() {
     pgrep -f powerline-daemon >/dev/null && return 0
@@ -20,10 +21,11 @@ enable_powerline() {
         fi
     fi
 }
-export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH" 
-export PATH="$HOME/Library/Python/3.12/bin:$PATH"
+
 # Try to detect where powerline is installed
 if [[ "$(uname)" == "Darwin" ]]; then
+    export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH" 
+    export PATH="$HOME/Library/Python/3.12/bin:$PATH"
     if pip show powerline-status &>/dev/null; then
         enable_powerline
     else

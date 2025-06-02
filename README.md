@@ -11,8 +11,8 @@ Um these are kinda personal and VERY tailored to me but if you want..
 ```sh
 git clone https://github.com/tu-nguyen/dotfiles.git
 cd dotfiles
-source .bashrc
-r
+chmod +x install.sh
+./install.sh
 ```
 
 i use arch btw

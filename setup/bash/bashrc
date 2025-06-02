@@ -24,11 +24,11 @@ shopt -s nullglob # skip empty globs
 # Load custom bash files from ~/.bash_extras
 if [[ -d "$HOME/.bash_extras" ]]; then
     # Load the prep file if it exists
-    if [[ -f "$HOME/.bash_extras/.init"]]; then
+    if [[ -f "$HOME/.bash_extras/.init" ]]; then
         . "$HOME/.bash_extras/.init"
     fi
     # Load all bash files in ~/.bash_extras
-    for file in "$HOME/.bash_extras"/.bash*; do
+    for file in "$HOME/.bash_extras"/.bash*"; do
         if [[ -f "$file" ]]; then
         [ -f "$file" ] && . "$file"
         fi

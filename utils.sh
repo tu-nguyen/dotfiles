@@ -44,7 +44,7 @@ link_and_source() {
     fi
 
     if [[ -f "$target" ]]; then
-        t "File $target exists. Removing it before linking."
+        t WARNING "File $target exists. Removing it before linking."
         rm "$target"
     fi
 
@@ -160,16 +160,95 @@ reset_bashrc() {
         return
     fi
 
-    link_and_source "$(pwd)/bash/bash_colours" "$HOME/.bash_extras/.bash_colours"
-    link_and_source "$(pwd)/bash/init" "$HOME/.bash_extras/.init"
+    link_and_source "$(pwd)/setup/bash/bash_colours" "$HOME/.bash_extras/.bash_colours"
+    link_and_source "$(pwd)/setup/bash/init" "$HOME/.bash_extras/.init"
 
-    link_and_source "$(pwd)/bash/bash_aliases" "$HOME/.bash_extras/.bash_aliases"
-    link_and_source "$(pwd)/bash/bash_docker_functions" "$HOME/.bash_extras/.bash_docker_functions"
-    link_and_source "$(pwd)/bash/bash_functions" "$HOME/.bash_extras/.bash_functions"
-    link_and_source "$(pwd)/bash/bash_other" "$HOME/.bash_extras/.bash_other"
-    link_and_source "$(pwd)/bash/bash_tt" "$HOME/.bash_extras/.bash_tt"
+    link_and_source "$(pwd)/setup/bash/bash_aliases" "$HOME/.bash_extras/.bash_aliases"
+    link_and_source "$(pwd)/setup/bash/bash_docker_functions" "$HOME/.bash_extras/.bash_docker_functions"
+    link_and_source "$(pwd)/setup/bash/bash_functions" "$HOME/.bash_extras/.bash_functions"
+    link_and_source "$(pwd)/setup/bash/bash_other" "$HOME/.bash_extras/.bash_other"
+    link_and_source "$(pwd)/setup/bash/bash_tt" "$HOME/.bash_extras/.bash_tt"
 
-    link_and_source "$(pwd)/.bashrc" "$HOME/.bashrc"
+    link_and_source "$(pwd)/setup/bash/bashrc" "$HOME/.bashrc"
+
+    t SUCCESS "Bash setup completed!"
 }
 
+reset_vimrc() {
+    prompt "reset the .vimrc"
+    if [[ $RETURN -ne 0 ]]; then
+        return
+    fi
+
+    t WARNING "Deleting old .vimrc"
+    rm ~/.vimrc
+    t WARNING "Deleting old .vim/bundle"
+    rm -rf ~/.vim/bundle
+
+    ln -sv  "$(pwd)/setup/vim/vimrc" "$HOME/.vimrc"
+    t SUCCESS "Linked $(pwd)/setup/vim/vimrc to $HOME/.vimrc successfully."
+
+    t "Installing Vundle and plugins.."
+    VUNDLE_PATH="$HOME/.vim/bundle/Vundle.vim"
+    sudo rm -rf "$VUNDLE_PATH"
+
+    t "Installed Vundle.."
+    git clone https://github.com/VundleVim/Vundle.vim.git "$VUNDLE_PATH"
+    t SUCCESS "Vundle installed at $VUNDLE_PATH"
+
+    vim +PluginInstall +qall
+
+    t SUCCESS "Vim setup completed!"
+}
+
+reset_git_config() {
+    prompt "reset the .gitconfig"
+    if [[ $RETURN -ne 0 ]]; then
+        return
+    fi
+
+    chmod +x $DOTFILE_PATH/setup/git/git_config_setup.sh
+    $DOTFILE_PATH/setup/git/git_config_setup.sh
+
+    t SUCCESS "Git configuration reset completed!"
+}
+
+reset_vscode_config() {
+    prompt "reset the VSCode configuration"
+    if [[ $RETURN -ne 0 ]]; then
+        return
+    fi
+
+    chmod +x $DOTFILE_PATH/setup/vscode/vscode_config_setup.sh
+    bash -i $DOTFILE_PATH/setup/vscode/vscode_config_setup.sh $DOTFILE_PATH
+
+    t SUCCESS "VSCode configuration reset completed!"
+}
+
+reset_wsl_config() {
+    prompt "reset the WSL configuration"
+    if [[ $RETURN -ne 0 ]]; then
+        return
+    fi
+
+    if [[ "$OS" != "wsl" ]]; then
+        t ERROR "This function is only for WSL. Skipping WSL configuration reset."
+        return
+    fi
+
+    chmod +x $DOTFILE_PATH/setup/wsl/wsl_config_setup.sh
+    bash -i $DOTFILE_PATH/setup/wsl/wsl_config_setup.sh
+    t SUCCESS "WSL configuration reset completed!"
+}
+
+reset_powerline_config() {
+    prompt "reset the Powerline configuration"
+    if [[ $RETURN -ne 0 ]]; then
+        return
+    fi
+
+    chmod +x $DOTFILE_PATH/setup/powerline/powerline_config_setup.sh
+    bash -i $DOTFILE_PATH/setup/powerline/powerline_config_setup.sh
+    t SUCCESS "Powerline configuration reset completed!"
+}
 

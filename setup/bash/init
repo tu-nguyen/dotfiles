@@ -1,7 +1,11 @@
 
-# if [[ -f "$HOME/.bash_extras/.init" ]]; then
-#     . "$HOME/.bash_extras/.init"
-# fi
+if [[ -f "$HOME/.bash_extras/.bash_colours" ]]; then
+    . "$HOME/.bash_extras/.bash_colours"
+elif [[ -f "$DOTFILE_PATH/bash/bash_colours" ]]; then
+    . "$DOTFILE_PATH/bash/bash_colours"
+else
+    echo "[WARNING] Failed to load colours"
+fi
 
 t() {
   # t "System started"                  # [INFO] System started

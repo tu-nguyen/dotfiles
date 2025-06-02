@@ -147,7 +147,7 @@ function gco() {
 }
 
 # Same as above but with fallback to create a branch
-function gco() {
+function gcob() {
     local branch=$1
     if [ -z "$branch" ]; then
         t "Usage: gsw <branch_name>"

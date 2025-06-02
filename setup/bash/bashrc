@@ -51,15 +51,6 @@ if [[ -d "$HOME/.bash_extras" ]]; then
 fi
 
 #------------------------------------------
-# Greeting, motd, and colors
-#------------------------------------------
-# TODO
-# echo -e "${BOLD}${CYAN}Hello, World! This is BASH ${BOLD}${RED}${BASH_VERSION%.*}${BOLD}${CYAN}\
-# - TODO ${BOLD}${RED}..{NC}"
-date
-
-
-#------------------------------------------
 # Powerline settings
 #------------------------------------------
 is_powerline_enabled() {
@@ -87,7 +78,7 @@ enable_powerline() {
 # Try to detect where powerline is installed
 if [[ "$(uname)" == "Darwin" ]]; then
     export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH" 
-    export PATH="$HOME/Library/Python/3.12/bin:$PATH"
+    # export PATH="$HOME/Library/Python/3.12/bin:$PATH"
     if pip show powerline-status &>/dev/null; then
         enable_powerline
     else
@@ -112,3 +103,11 @@ function _update_ps1() {
 if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
     PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
 fi
+
+#------------------------------------------
+# Greeting, motd, and colors
+#------------------------------------------
+# TODO
+# echo -e "${BOLD}${CYAN}Hello, World! This is BASH ${BOLD}${RED}${BASH_VERSION%.*}${BOLD}${CYAN}\
+# - TODO ${BOLD}${RED}..{NC}"
+date

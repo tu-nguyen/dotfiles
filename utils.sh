@@ -78,7 +78,6 @@ install_packages() {
     if [[ "$OS" == "macos" ]]; then
         install_mac_package coreutils
         install_mac_package make
-        export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
         install_mac_package lesspipe
         install_mac_package python@3.12
         install_mac_package htop
@@ -86,6 +85,7 @@ install_packages() {
 
         brew unlink python@3.12 && brew link python@3.12
         export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH" 
+        export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
         # Check if powerline is installed via pip
         if ! pip show powerline-status &>/dev/null; then
             t "Installing Powerline via pip.."
@@ -168,6 +168,7 @@ reset_bashrc() {
     cp_and_source "$(pwd)/setup/bash/bash_aliases" "$HOME/.bash_extras/.bash_aliases"
     cp_and_source "$(pwd)/setup/bash/bash_docker_functions" "$HOME/.bash_extras/.bash_docker_functions"
     cp_and_source "$(pwd)/setup/bash/bash_functions" "$HOME/.bash_extras/.bash_functions"
+    cp_and_source "$(pwd)/setup/bash/bash_exports" "$HOME/.bash_extras/.bash_exports"
     cp_and_source "$(pwd)/setup/bash/bash_other" "$HOME/.bash_extras/.bash_other"
     cp_and_source "$(pwd)/setup/bash/bash_tt" "$HOME/.bash_extras/.bash_tt"
 

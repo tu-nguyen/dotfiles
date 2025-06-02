@@ -30,8 +30,9 @@ export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
 
 if [[ "$(uname)" == "Darwin" ]]; then
-  export PATH=/opt/homebrew/bin:$PATH
+  export PATH="/opt/homebrew/bin:$PATH"
   # export PATH=/Users/$(whoami)/.local/bin:$PATH
-  export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH" 
+  export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH"
+  export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH" 
   # export PATH="$HOME/Library/Python/3.12/bin:$PATH"
 fi

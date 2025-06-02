@@ -66,6 +66,7 @@ alias ldir="ls -l | egrep '^d'"  # directories only
 # cd
 # alias c="cd" # was too annoying
 alias home="cd ~"
+alias cd~="cd ~"
 alias ~="cd ~"
 alias ..="cd .."
 alias ...="cd ../.."

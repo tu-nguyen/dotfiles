@@ -34,28 +34,28 @@ install_linux_package() {
     fi
 }
 
-link_and_source() {
+cp_and_source() {
     local file="$1"
     local target="$2"
 
     if [[ -z "$file" || -z "$target" ]]; then
-        echo "Usage: link <file> <target>"
+        echo "Usage: cp_and_source <file> <target>"
         return 1
     fi
 
     if [[ -f "$target" ]]; then
-        t WARNING "File $target exists. Removing it before linking."
+        t WARNING "File $target exists. Removing it before copying."
         rm "$target"
     fi
 
-    t "Linking $file to $target"
-    ln -sv "$file" "$target"
+    t "Copying $file to $target"
+    cp "$file" "$target"
 
     if [[ -f "$target" ]]; then
-        t SUCCESS "Linked $file to $target successfully."
+        t SUCCESS "Copied $file to $target successfully."
         source "$target"
     else
-        t ERROR "Failed to link $file to $target."
+        t ERROR "Failed to copy $file to $target."
     fi
 }
 
@@ -93,6 +93,15 @@ install_packages() {
         else
             t SUCCESS "Powerline is already installed (pip)."
         fi
+
+        # clone
+        git clone https://github.com/powerline/fonts.git --depth=1
+        # install
+        cd fonts
+        ./install.sh
+        # clean-up a bit
+        cd ..
+        sudo rm -rf fonts
 
         brew install vim
         if brew list vim &>/dev/null; then
@@ -160,16 +169,16 @@ reset_bashrc() {
         return
     fi
 
-    link_and_source "$(pwd)/setup/bash/bash_colours" "$HOME/.bash_extras/.bash_colours"
-    link_and_source "$(pwd)/setup/bash/init" "$HOME/.bash_extras/.init"
+    cp_and_source "$(pwd)/setup/bash/bash_colours" "$HOME/.bash_extras/.bash_colours"
+    cp_and_source "$(pwd)/setup/bash/init" "$HOME/.bash_extras/.init"
 
-    link_and_source "$(pwd)/setup/bash/bash_aliases" "$HOME/.bash_extras/.bash_aliases"
-    link_and_source "$(pwd)/setup/bash/bash_docker_functions" "$HOME/.bash_extras/.bash_docker_functions"
-    link_and_source "$(pwd)/setup/bash/bash_functions" "$HOME/.bash_extras/.bash_functions"
-    link_and_source "$(pwd)/setup/bash/bash_other" "$HOME/.bash_extras/.bash_other"
-    link_and_source "$(pwd)/setup/bash/bash_tt" "$HOME/.bash_extras/.bash_tt"
+    cp_and_source "$(pwd)/setup/bash/bash_aliases" "$HOME/.bash_extras/.bash_aliases"
+    cp_and_source "$(pwd)/setup/bash/bash_docker_functions" "$HOME/.bash_extras/.bash_docker_functions"
+    cp_and_source "$(pwd)/setup/bash/bash_functions" "$HOME/.bash_extras/.bash_functions"
+    cp_and_source "$(pwd)/setup/bash/bash_other" "$HOME/.bash_extras/.bash_other"
+    cp_and_source "$(pwd)/setup/bash/bash_tt" "$HOME/.bash_extras/.bash_tt"
 
-    link_and_source "$(pwd)/setup/bash/bashrc" "$HOME/.bashrc"
+    cp_and_source "$(pwd)/setup/bash/bashrc" "$HOME/.bashrc"
 
     t SUCCESS "Bash setup completed!"
 }
@@ -191,7 +200,7 @@ reset_vimrc() {
     fi
 
 
-    ln -sv  "$(pwd)/setup/vim/vimrc" "$HOME/.vimrc"
+    cp  "$(pwd)/setup/vim/vimrc" "$HOME/.vimrc"
     t SUCCESS "Linked $(pwd)/setup/vim/vimrc to $HOME/.vimrc successfully."
 
     t "Installing Vundle and plugins.."

@@ -48,8 +48,8 @@ t() {
   esac
 }
 
-mkdir -p "$HOME/.bash_extras/init"
-ORIGINAL_DOTFILE_CONFIG_FILE="$HOME/.bash_extras/init/.dotfile_config"
+mkdir -p "$HOME/.bash_extras"
+ORIGINAL_DOTFILE_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
 if [[ -f "$ORIGINAL_DOTFILE_CONFIG_FILE" ]]; then
     DOTFILE_PATH=$(grep '^DOTFILE_PATH=' "$ORIGINAL_DOTFILE_CONFIG_FILE" | cut -d'=' -f2-)
     if [[ -d "$DOTFILE_PATH" ]]; then

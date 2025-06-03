@@ -64,7 +64,7 @@ POWERLINE_PATH=$(pip show powerline-status 2>/dev/null | grep '^Location:' | cut
 # }
 # POWERLINE_PATH=$(normalize_powerline_path "$ORIGINAL_POWERLINE_PATH")
 # export PATH="$POWERLINE_PATH:$PATH"
-# export PATH="$HOME/Library/Python/3.12/bin:$PATH"  # tmp hardcode for macOS
+export PATH="$HOME/Library/Python/3.12/bin:$PATH"  # tmp hardcode for macOS
 
 is_powerline_enabled() {
     pgrep -f powerline-daemon >/dev/null && return 0

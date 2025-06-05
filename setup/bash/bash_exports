@@ -9,8 +9,8 @@ export HISTCONTROL=ignoredups:ignorespace
 export HISTFILESIZE=10000
 export HISTSIZE=500
 
-export PATH=$PATH:$HOME/.local/bin
-export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH
+# export PATH=$PATH:$HOME/.local/bin
+# export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH
 export PYTHONPATH="$(which python3):$PYTHONPATH"
 export JAVA_HOME="/usr/"
 export ANDROID_HOME=/opt/android-sdk

@@ -34,6 +34,15 @@ install_linux_package() {
     fi
 }
 
+install_pip_package() {
+    if ! pip3 show "$1" &>/dev/null; then
+        t SUCCESS "$1 is already installed via pip."
+    else
+        t "Installing $1.."
+        pip3 install "$@" --user --break-system-packages 
+    fi
+}
+
 cp_and_source() {
     local file="$1"
     local target="$2"
@@ -86,14 +95,7 @@ install_packages() {
         brew unlink python@3.12 && brew link python@3.12
         export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH" 
         export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
-        # Check if powerline is installed via pip
-        if ! pip show powerline-status &>/dev/null; then
-            t "Installing Powerline via pip.."
-            # sudo rm -rf /usr/local/lib/python3.12/EXTERNALLY-MANAGED
-            pip install powerline-status --user --break-system-packages
-        else
-            t SUCCESS "Powerline is already installed (pip)."
-        fi
+        install_pip_package powerline-status
 
         # clone
         git clone https://github.com/powerline/fonts.git --depth=1
@@ -127,19 +129,9 @@ install_packages() {
         return 1
     fi
 
-    if ! pip show powerline-gitstatus &>/dev/null; then
-        t "Installing Powerline Git Status via pip.."
-        pip install powerline-gitstatus --user --break-system-packages
-    else
-        t SUCCESS "Powerline Git Status is already installed (pip)."
-    fi
-
-    if ! pip show powerline-shell &>/dev/null; then
-        t "Installing Powerline Shell via pip.."
-        pip install powerline-shell --user --break-system-packages
-    else
-        t SUCCESS "Powerline Shell is already installed (pip)."
-    fi
+    install_pip_package powerline-gitstatus
+    # install_pip_package powerline-shell
+    install_pip_package powerline-status
 
     t SUCCESS "All required packages installed successfully."
     return

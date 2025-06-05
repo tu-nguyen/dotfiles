@@ -70,18 +70,19 @@ enable_powerline() {
         POWERLINE_BASH_SELECT=1
         if [[ -f "$POWERLINE_PATH/powerline/bindings/bash/powerline.sh" ]]; then
             source "$POWERLINE_PATH/powerline/bindings/bash/powerline.sh"
-        elif [[ -f "$POWERLINE_PATH/powerline/bindings/config.py" ]]; then
-            python3 "$POWERLINE_PATH/powerline/bindings/config.py"
+        # elif [[ -f "$POWERLINE_PATH/powerline/bindings/config.py" ]]; then
+        #     python3 "$POWERLINE_PATH/powerline/bindings/config.py"
         fi
     fi
 }
 
-function _update_ps1() {
-    PS1=$(powerline-shell $?)
-}
+# function _update_ps1() {
+#     PS1=$(powerline-shell $?)
+# }
 
 if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
-    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+    # PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+    enable_powerline
     if is_powerline_enabled; then
         t SUCCESS "Powerline is enabled"
     else

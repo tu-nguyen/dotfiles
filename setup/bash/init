@@ -39,6 +39,9 @@ t() {
     success|ok|SUCCESS|OK)
       echo -e "${GREEN}[SUCCESS] $message ${NC}"
       ;;
+    todo|TODO)
+      echo -e "${BRIGHT_MAGENTA}[TODO] $message ${NC}"
+      ;;
     debug|DEBUG)
       echo -e "${CYAN}[DEBUG] $message ${NC}"
       ;;

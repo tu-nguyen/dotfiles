@@ -96,4 +96,7 @@ fi
 # TODO
 # echo -e "${BOLD}${CYAN}Hello, World! This is BASH ${BOLD}${RED}${BASH_VERSION%.*}${BOLD}${CYAN}\
 # - TODO ${BOLD}${RED}..{NC}"
+if twork_motd &>/dev/null; then
+    t TODO "Add twork motd"
+fi
 date

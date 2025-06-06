@@ -104,6 +104,5 @@ else
 fi
 
 if twork_motd &>/dev/null; then
-    t TODO "Add twork motd"
     twork_motd
 fi

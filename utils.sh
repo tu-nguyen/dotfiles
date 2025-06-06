@@ -97,14 +97,19 @@ install_packages() {
         export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
         install_pip_package powerline-status
 
-        # clone
-        git clone https://github.com/powerline/fonts.git --depth=1
-        # install
-        cd fonts
-        ./install.sh
-        # clean-up a bit
-        cd ..
-        sudo rm -rf fonts
+        # Check if Powerline font is already installed
+        if [[ -f "$HOME/Library/Fonts/DejaVu Sans Mono for Powerline.ttf" ]]; then
+            t SUCCESS "Powerline fonts already installed."
+        else
+            # clone
+            git clone https://github.com/powerline/fonts.git --depth=1
+            # install
+            cd fonts
+            ./install.sh
+            # clean-up a bit
+            cd ..
+            sudo rm -rf fonts
+        fi
     elif [[ "$OS" == "linux" || "$OS" == "wsl" ]]; then
         if ! command -v apt &>/dev/null; then
             t ERROR "apt package manager not found. Please install it first."

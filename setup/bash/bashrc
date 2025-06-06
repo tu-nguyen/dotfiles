@@ -98,5 +98,6 @@ fi
 # - TODO ${BOLD}${RED}..{NC}"
 if twork_motd &>/dev/null; then
     t TODO "Add twork motd"
+    twork_motd
 fi
 date

@@ -166,6 +166,7 @@ reset_bashrc() {
     cp_and_source "$(pwd)/setup/bash/bash_docker_functions" "$HOME/.bash_extras/.bash_docker_functions"
     cp_and_source "$(pwd)/setup/bash/bash_functions" "$HOME/.bash_extras/.bash_functions"
     cp_and_source "$(pwd)/setup/bash/bash_exports" "$HOME/.bash_extras/.bash_exports"
+    cp_and_source "$(pwd)/setup/bash/bash_motd" "$HOME/.bash_extras/.bash_motd"
     cp_and_source "$(pwd)/setup/bash/bash_other" "$HOME/.bash_extras/.bash_other"
     cp_and_source "$(pwd)/setup/bash/bash_tt" "$HOME/.bash_extras/.bash_tt"
 

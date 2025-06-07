@@ -124,11 +124,8 @@ cpp()
 }
 
 # Find a file with a pattern in name:
-ff() { find . -type f -iname '*'"$*"'*' -ls ; }
-
-# Display date and time
-function now() {
-  echo "$(date +"%d-%m-%Y") $(date +"%T")"
+ff() {
+  find . -type f -iname '*'"$*"'*' -ls ;
 }
 
 # Function to print all defined colors for testing
@@ -140,6 +137,38 @@ colours_test() {
     echo -e "${ON_BLACK}ON_BLACK${NC} ${ON_RED}ON_RED${NC} ${ON_GREEN}ON_GREEN${NC} ${ON_YELLOW}ON_YELLOW${NC} ${ON_BLUE}ON_BLUE${NC} ${ON_PURPLE}ON_PURPLE${NC} ${ON_CYAN}ON_CYAN${NC} ${ON_WHITE}ON_WHITE${NC}"
 }
 
+# Helper functions
+
+# general
+# Display date and time
+function now() {
+  echo "$(date +"%d-%m-%Y") $(date +"%T")"
+}
+
+# Truncate text to a maximum length
+function truncate_text() {
+    local text="$1"
+    local maxlen="${2:-60}"
+    if (( ${#text} > maxlen )); then
+        echo "${text:0:maxlen}.."
+    else
+        echo "$text"
+    fi
+}
+
+# Helper: get color for a status
+function status_colour() {
+    local status="$1"
+    case "$status" in
+        "To Do"|"New") echo "$BLUE" ;;
+        "In Progress"|"Active") echo "$YELLOW" ;;
+        "Done"|"Closed"|"Completed"|"Resolved") echo "$GREEN" ;;
+        "Blocked") echo "$RED" ;;
+        *) echo "$WHITE" ;;
+    esac
+}
+
+# github related functions
 # Switch to a specified Git branch with confirmation
 function gco() {
     local branch=$1
@@ -173,4 +202,132 @@ function gcob() {
             t ERROR "Failed to create and switch branch"
         fi
     fi
+}
+
+# azure related functions
+# Clear the Azure CLI cache
+ function azr() {
+    AZ_HTTP_CACHE_BIN="$HOME/.azure/msal_http_cache.bin"
+    if [ -f $AZ_HTTP_CACHE_BIN ]; then
+        t WARNING "Deleting..."
+        sudo rm $HOME/.azure/msal_http_cache.bin
+    else
+        t "Nothing to delete."
+    fi
+ }
+
+# Print current Azure DevOps iteration details and tasks assigned to the user
+function print_current_iteration() {
+    if [[ $# -lt 4 ]]; then
+        echo "Usage: print_current_iteration <ORG> <PROJECT> <TEAM> <AZDO_PAT>"
+        return 1
+    fi
+
+    local ORG="$1"
+    local PROJECT="$2"
+    local TEAM="$3"
+    local AZDO_PAT="$4"
+
+    # Get current iteration path
+    local ITERATION_API="https://dev.azure.com/$ORG/$PROJECT/$TEAM/_apis/work/teamsettings/iterations?\$timeframe=current&api-version=7.0"
+    local ITERATION_PATH
+    ITERATION_PATH=$(curl -s -u ":$AZDO_PAT" "$ITERATION_API" | jq -r '.value[0].path')
+    if [[ -z "$ITERATION_PATH" || "$ITERATION_PATH" == "null" ]]; then
+        echo "Could not determine current sprint/iteration."
+        return 1
+    fi
+
+    # Get current iteration info
+    local ITERATION_INFO
+    ITERATION_INFO=$(curl -s -u ":$AZDO_PAT" "$ITERATION_API" | jq '.value[0]')
+    local ITERATION_NAME
+    ITERATION_NAME=$(echo "$ITERATION_INFO" | jq -r '.name')
+    local ITERATION_START
+    ITERATION_START=$(echo "$ITERATION_INFO" | jq -r '.attributes.startDate' | cut -d'T' -f1)
+    local ITERATION_END
+    ITERATION_END=$(echo "$ITERATION_INFO" | jq -r '.attributes.finishDate' | cut -d'T' -f1)
+
+    # Calculate time remaining
+    local NOW
+    NOW=$(date +%s)
+    local END
+    END=$(date -j -f "%Y-%m-%d" "$ITERATION_END" +%s 2>/dev/null || date -d "$ITERATION_END" +%s)
+    local SECS_LEFT=$((END - NOW))
+    local TIME_REMAINING
+    if (( SECS_LEFT > 0 )); then
+        local DAYS=$((SECS_LEFT / 86400))
+        local HOURS=$(( (SECS_LEFT % 86400) / 3600 ))
+        local MINS=$(( (SECS_LEFT % 3600) / 60 ))
+        TIME_REMAINING="Time remaining: ${DAYS} days and ${HOURS} hours ${MINS} minutes"
+    else
+        TIME_REMAINING="Time remaining: Ended"
+    fi
+
+    # Print header with time remaining
+    echo -e "\n${BOLD}${CYAN}Current Twork Iteration: $ITERATION_NAME ($ITERATION_START → $ITERATION_END)${NC}"
+    echo "$TIME_REMAINING"
+
+    # Query all tasks/chores assigned to you in current iteration
+    local WIQL="SELECT [System.Id], [System.Title], [System.WorkItemType], [System.Parent], [System.State] FROM WorkItems WHERE [System.IterationPath] = '$ITERATION_PATH' AND [System.AssignedTo] = @Me AND [System.WorkItemType] IN ('Task', 'Chore')"
+    local WIQL_JSON
+    WIQL_JSON=$(jq -n --arg q "$WIQL" '{query: $q}')
+    local WIQL_API="https://dev.azure.com/$ORG/$PROJECT/_apis/wit/wiql?api-version=7.0"
+    local WIQL_RESPONSE
+    WIQL_RESPONSE=$(curl -s -u ":$AZDO_PAT" -H "Content-Type: application/json" -d "$WIQL_JSON" "$WIQL_API")
+
+    local TASK_IDS
+    TASK_IDS=$(echo "$WIQL_RESPONSE" | jq -r '.workItems[]?.id' | paste -sd, -)
+
+    if [[ -z "$TASK_IDS" ]]; then
+        echo "No tasks or chores found for you in the current sprint."
+        return 0
+    fi
+
+    # Get details for all tasks/chores
+    local DETAILS_API="https://dev.azure.com/$ORG/$PROJECT/_apis/wit/workitems?ids=$TASK_IDS&fields=System.Id,System.Title,System.WorkItemType,System.Parent,System.State&api-version=7.0"
+    local TASKS_JSON
+    TASKS_JSON=$(curl -s -u ":$AZDO_PAT" "$DETAILS_API")
+
+    # Collect unique parent IDs
+    local PARENT_IDS
+    PARENT_IDS=$(echo "$TASKS_JSON" | jq -r '.value[] | .fields."System.Parent"? ' | sort -u | paste -sd, -)
+
+    declare -A PARENTS
+
+    # Build associative array: id -> "type|state|title"
+    if [[ -n "$PARENT_IDS" ]]; then
+        local PARENT_API="https://dev.azure.com/$ORG/$PROJECT/_apis/wit/workitems?ids=$PARENT_IDS&fields=System.Id,System.Title,System.WorkItemType,System.State&api-version=7.0"
+        local PARENTS_JSON
+        PARENTS_JSON=$(curl -s -u ":$AZDO_PAT" "$PARENT_API")
+        while IFS='|' read -r id type state title; do
+            PARENTS["$id"]="$type|$state|$title"
+        done < <(echo "$PARENTS_JSON" | jq -r '.value[] | "\(.fields."System.Id")|\(.fields."System.WorkItemType")|\(.fields."System.State")|\(.fields."System.Title" | gsub("[\n\r]"; " "))"')
+    fi
+
+    for pid in $(echo "$PARENT_IDS" | tr ',' ' '); do
+        [[ -z "$pid" ]] && continue
+        IFS='|' read -r ptype pstate ptitle <<< "${PARENTS[$pid]}"
+        pcolor=$(status_colour "$pstate")
+        short_title=$(truncate_text "$ptitle" 60)
+        printf "${BOLD}%s %s [%b%s%b]: %s${NC}\n" "$pid" "$ptype" "$pcolor" "$pstate" "$NC" "$short_title"
+        echo "$TASKS_JSON" | jq -r --arg pid "$pid" '
+            .value[] | select(.fields."System.Parent" == ($pid|tonumber)) |
+            "\(.fields."System.Id")|\(.fields."System.WorkItemType")|\(.fields."System.State")|\(.fields."System.Title")"' |
+        while IFS='|' read -r cid ctype cstate ctitle; do
+            ccolor=$(status_colour "$cstate")
+            cshort_title=$(truncate_text "$ctitle" 60)
+            printf -- " * %s %s [%b%s%b]: %s\n" "$cid" "$ctype" "$ccolor" "$cstate" "$NC" "$cshort_title"
+        done
+    done
+
+    # Orphan tasks/chores
+    echo "$TASKS_JSON" | jq -r '
+        .value[] | select(.fields."System.Parent" == null) |
+        "\(.fields."System.Id")|\(.fields."System.WorkItemType")|\(.fields."System.State")|\(.fields."System.Title")"' |
+    while IFS='|' read -r cid ctype cstate ctitle; do
+        ccolor=$(status_colour "$cstate")
+        cshort_title=$(truncate_text "$ctitle" 60)
+        printf "%s %s [%b%s%b]: %s\n" "$cid" "$ctype" "$ccolor" "$cstate" "$NC" "$cshort_title"
+    done
+    echo
 }

@@ -73,13 +73,13 @@ prompt() {
     local config="$1"
 
     if [ -z "$FORCE_YES" ]; then
-    read -p "Are you sure you want to ${GREEN}$config${NC}? This will ${RED}erase existing data${NC}, might want to create a backup! [y/N] " -n 1 -r
-      if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        t "Exiting.."
-        RETURN=1
-        return 
-      fi
-  fi
+        read -p "Are you sure you want to ${GREEN}$config${NC}? This will ${RED}erase existing data${NC}, might want to create a backup! [y/N] " -n 1 -r
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            t "Exiting.."
+            RETURN=1
+            return 
+        fi
+    fi
   echo ""
 }
 

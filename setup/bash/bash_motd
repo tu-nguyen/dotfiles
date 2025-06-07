@@ -5,7 +5,7 @@
 #-------------------------------------------
 motd() {
     # Print date in "Friday, 2025-06-05" format
-    echo "$(date '+%A, %Y-%m-%d')"
+    echo "${PINK}Date:${NC} $(date '+%A, %Y-%m-%d')${NC}"
     # Print time in "Time: 17:32:08" format
-    echo "Time: $(date '+%H:%M:%S')"
+    echo "${PINK}Time:${NC} $(date '+%H:%M:%S')${NC}"
 }

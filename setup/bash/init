@@ -28,7 +28,7 @@ t() {
   # Determine color and label
   case "$severity" in
     info|INFO)
-      echo -e "${BRIGHT_BLUE}[INFO]${NC} $message"
+      echo -e "${PINK}[INFO]${NC} $message"
       ;;
     warn|warning|WARNING)
       echo -e "${YELLOW}[WARNING]${NC} $message"
@@ -56,9 +56,9 @@ ORIGINAL_DOTFILE_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
 if [[ -f "$ORIGINAL_DOTFILE_CONFIG_FILE" ]]; then
     DOTFILE_PATH=$(grep '^DOTFILE_PATH=' "$ORIGINAL_DOTFILE_CONFIG_FILE" | cut -d'=' -f2-)
     if [[ -d "$DOTFILE_PATH" ]]; then
-        t INFO "DOTFILE_PATH loaded from $ORIGINAL_DOTFILE_CONFIG_FILE"
+        t INFO "DOTFILE_PATH loaded from ${H}$ORIGINAL_DOTFILE_CONFIG_FILE${NC}"
     else
-        t WARNING "Saved DOTFILE_PATH does not exist in $ORIGINAL_DOTFILE_CONFIG_FILE"
+        t WARNING "Saved DOTFILE_PATH does not exist in ${H}$ORIGINAL_DOTFILE_CONFIG_FILE${NC}"
         DOTFILE_PATH=""
     fi
 else
@@ -74,7 +74,7 @@ if [[ -z "$DOTFILE_PATH" ]]; then
         DOTFILE_PATH="$HOME/workplace/repo/dotfiles" 
     fi   
 else
-    t INFO "DOTFILE_PATH is set to: $DOTFILE_PATH"
+    t INFO "DOTFILE_PATH is set to: ${H}$DOTFILE_PATH${NC}"
 fi
 
 echo "DOTFILE_PATH=$DOTFILE_PATH" > "$ORIGINAL_DOTFILE_CONFIG_FILE"

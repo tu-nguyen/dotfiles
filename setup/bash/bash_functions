@@ -131,6 +131,15 @@ function now() {
   echo "$(date +"%d-%m-%Y") $(date +"%T")"
 }
 
+# Function to print all defined colors for testing
+colours_test() {
+    echo -e "${BLACK}BLACK${NC} ${RED}RED${NC} ${GREEN}GREEN${NC} ${YELLOW}YELLOW${NC} ${BLUE}BLUE${NC} ${MAGENTA}MAGENTA${NC} ${CYAN}CYAN${NC} ${WHITE}WHITE${NC} ${GRAY}GRAY${NC}"
+    echo -e "${BRIGHT_RED}BRIGHT_RED${NC} ${BRIGHT_GREEN}BRIGHT_GREEN${NC} ${BRIGHT_YELLOW}BRIGHT_YELLOW${NC} ${BRIGHT_BLUE}BRIGHT_BLUE${NC} ${BRIGHT_MAGENTA}BRIGHT_MAGENTA${NC} ${BRIGHT_CYAN}BRIGHT_CYAN${NC} ${BRIGHT_WHITE}BRIGHT_WHITE${NC}"
+    echo -e "${PINK_256}PINK_256${NC} ${PINK_TRUE}PINK_TRUE${NC}"
+    echo -e "${BOLD}BOLD${NC} ${UNDERLINE}UNDERLINE${NC}"
+    echo -e "${ON_BLACK}ON_BLACK${NC} ${ON_RED}ON_RED${NC} ${ON_GREEN}ON_GREEN${NC} ${ON_YELLOW}ON_YELLOW${NC} ${ON_BLUE}ON_BLUE${NC} ${ON_PURPLE}ON_PURPLE${NC} ${ON_CYAN}ON_CYAN${NC} ${ON_WHITE}ON_WHITE${NC}"
+}
+
 # Switch to a specified Git branch with confirmation
 function gco() {
     local branch=$1

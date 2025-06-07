@@ -160,8 +160,8 @@ function truncate_text() {
 function status_colour() {
     local status="$1"
     case "$status" in
-        "To Do"|"New") echo "$BLUE" ;;
-        "In Progress"|"Active") echo "$YELLOW" ;;
+        "To Do"|"New") echo "$PINK" ;;
+        "In Progress"|"Active") echo "$CYAN" ;;
         "Done"|"Closed"|"Completed"|"Resolved") echo "$GREEN" ;;
         "Blocked") echo "$RED" ;;
         *) echo "$WHITE" ;;
@@ -314,14 +314,14 @@ function print_current_iteration() {
         IFS='|' read -r ptype pstate ptitle <<< "${PARENTS[$pid]}"
         pcolor=$(status_colour "$pstate")
         short_title=$(truncate_text "$ptitle" 60)
-        printf "${BOLD}%s %s [%b%s%b${BOLD}]: %s${NC}\n" "$pid" "$ptype" "$pcolor" "$pstate" "$NC" "$short_title"
+        printf "${BOLD} - %s %s [%b%s%b${BOLD}]: %s${NC}\n" "$pid" "$ptype" "$pcolor" "$pstate" "$NC" "$short_title"
         echo "$TASKS_JSON" | jq -r --arg pid "$pid" '
             .value[] | select(.fields."System.Parent" == ($pid|tonumber)) |
             "\(.fields."System.Id")|\(.fields."System.WorkItemType")|\(.fields."System.State")|\(.fields."System.Title")"' |
         while IFS='|' read -r cid ctype cstate ctitle; do
             ccolor=$(status_colour "$cstate")
             cshort_title=$(truncate_text "$ctitle" 60)
-            printf -- " * ${BOLD}${H}%s${NC} %s [%b%s%b]: %s\n" "$cid" "$ctype" "$ccolor" "$cstate" "$NC" "$cshort_title"
+            printf -- "   * ${BOLD}${H}%s${NC} %s [%b%s%b]: %s\n" "$cid" "$ctype" "$ccolor" "$cstate" "$NC" "$cshort_title"
         done
     done
 
@@ -334,5 +334,4 @@ function print_current_iteration() {
         cshort_title=$(truncate_text "$ctitle" 60)
         printf "${BOLD}${H}%s${NC} %s [%b%s%b]: %s\n" "$cid" "$ctype" "$ccolor" "$cstate" "$NC" "$cshort_title"
     done
-    echo
 }

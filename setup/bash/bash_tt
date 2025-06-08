@@ -16,7 +16,7 @@ function print_tt() {
     /^[a-zA-Z_][a-zA-Z0-9_]* *\(\) *\{/ {
         gsub(/^# *|^## */, "", comment)
         sub(/ *\(\) *\{/, "", $0)
-        printf "%-20s → %s\n", $0, comment
+        printf "  %-18s → %s\n", $0, comment
         comment=""
     }' "$file"
 }
@@ -52,15 +52,15 @@ function tt() {
   # other other
   printf "%s\n" "$br"
   printf "${H2}other tt${NC}      \n"
-  printf "btt                  → to view bash cheatsheet\n"
-  printf "vtt                  → to view vim cheatsheet\n"
-  printf "gtt                  → to view git aliases\n"
-  printf "dktt                 → to view docker stuff\n"
+  printf "  btt                → to view bash cheatsheet\n"
+  printf "  vtt                → to view vim cheatsheet\n"
+  printf "  gtt                → to view git aliases\n"
+  printf "  dktt               → to view docker stuff\n"
 
   if [[ ! -f "$HOME/.bash_extras/.bash_twork" ]]; then
-    printf "tworktt              → .bash_twork ${RED}does not exist${NC} inside $HOME/.bash_extras/.bash_extras\n"
+    printf "  tworktt            → .bash_twork ${RED}does not exist${NC} inside $HOME/.bash_extras/.bash_extras\n"
   else
-    printf "tworktt              → to view twork stuff\n"
+    printf "  tworktt            → to view twork stuff\n"
   fi
   printf "%s\n" "$br"
 }
@@ -170,10 +170,10 @@ function gtt() {
   printf "                     → m (commit -m)                → ${H2}la${NC} (to ALL git config)\n" 
   printf "%s\n" "$br"
   printf "${H2}git functions${NC}      \n"
-  printf "gpull                → Git pull with rebase and autostash\n"
-  printf "gpush                → Git push with set-upstream\n"
-  printf "gco                  → Switch to a specified Git branch with confirmation\n"
-  printf "gcob                 → Same as above but with fallback to create a branch\n"
+  printf "  gpull              → Git pull with rebase and autostash\n"
+  printf "  gpush              → Git push with set-upstream\n"
+  printf "  gco                → Switch to a specified Git branch with confirmation\n"
+  printf "  gcob               → Same as above but with fallback to create a branch\n"
   printf "%s\n" "$br"
 }
 

@@ -7,6 +7,63 @@ else
     echo "[WARNING] Failed to load colours"
 fi
 
+# center_label() {
+#     local label="$1"
+#     local width=11
+#     local pad_left=$(( (width - ${#label}) / 2 ))
+#     local pad_right=$(( width - ${#label} - pad_left ))
+#     printf "%*s%s%*s" "$pad_left" "" "$label" "$pad_right" ""
+# }
+
+# t() {
+#   local severity message label color padded_label
+
+#   if [[ $# -eq 0 ]]; then
+#     echo -e "${GREEN}Hello world${NC}"
+#     return
+#   elif [[ $# -eq 1 ]]; then
+#     severity="INFO"
+#     message="$1"
+#   else
+#     severity="${1^^}"
+#     message="$2"
+#   fi
+
+#   case "$severity" in
+#     info|INFO)
+#       label="[INFO]"
+#       color="${BOLD}${PINK}"
+#       ;;
+#     warn|warning|WARNING)
+#       label="[WARNING]"
+#       color="${BOLD}${YELLOW}"
+#       ;;
+#     err|error|ERR|ERROR)
+#       label="[ERROR]"
+#       color="${BOLD}${RED}"
+#       ;;
+#     success|ok|SUCCESS|OK)
+#       label="[SUCCESS]"
+#       color="${BOLD}${GREEN}"
+#       ;;
+#     todo|TODO)
+#       label="[TODO]"
+#       color="${BOLD}${BRIGHT_MAGENTA}"
+#       ;;
+#     debug|DEBUG)
+#       label="[DEBUG]"
+#       color="${BOLD}${CYAN}"
+#       ;;
+#     *)
+#       label="[UNKNOWN]"
+#       color="${BOLD}"
+#       ;;
+#   esac
+
+#   padded_label=$(center_label "$label")
+#   echo -e "${color}${padded_label}${NC} $message"
+# }
+
 t() {
   # t "System started"                  # [INFO] System started
   # t WARNING "Disk space low"          # [WARNING] Disk space low
@@ -28,25 +85,25 @@ t() {
   # Determine color and label
   case "$severity" in
     info|INFO)
-      echo -e "${PINK}[INFO]${NC} $message"
+      echo -e "${BOLD}${PINK}[INFO]${NC} $message ${NC}"
       ;;
     warn|warning|WARNING)
-      echo -e "${YELLOW}[WARNING]${NC} $message"
+      echo -e "${BOLD}${YELLOW}[WARNING]${NC} $message ${NC}"
       ;;
     err|error|ERR|ERROR)
-      echo -e "${RED}[ERROR] $message ${NC}"
+      echo -e "${BOLD}${RED}[ERROR]${NC} $message ${NC} ${NC}"
       ;;
     success|ok|SUCCESS|OK)
-      echo -e "${GREEN}[SUCCESS] $message ${NC}"
+      echo -e "${BOLD}${GREEN}[SUCCESS]${NC} $message ${NC}"
       ;;
     todo|TODO)
-      echo -e "${BRIGHT_MAGENTA}[TODO] $message ${NC}"
+      echo -e "${BOLD}${BRIGHT_MAGENTA}[TODO]${NC} $message ${NC}"
       ;;
     debug|DEBUG)
-      echo -e "${CYAN}[DEBUG] $message ${NC}"
+      echo -e "${BOLD}${CYAN}[DEBUG]${NC} $message ${NC}"
       ;;
     *)
-      echo -e "${NC}[UNKNOWN] $severity: $message"
+      echo -e "${BOLD}[UNKNOWN]${NC} $severity: $message ${NC}"
       ;;
   esac
 }

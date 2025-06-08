@@ -20,11 +20,19 @@ alias h='history'
 alias j='jobs -l'
 alias x='exit'
 alias v='vim'
-alias ps='ps auxf'
+if [[ "$(uname)" == "Darwin" ]]; then
+    alias ps='ps aux'
+else
+    alias ps='ps auxf'
+fi
 alias df='df -H'
 alias du='du -ch'
 alias top='htop'
-alias top10='ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 11'
+if [[ "$(uname)" == "Darwin" ]]; then
+    alias top10='ps -arcwwwxo pid,comm,%cpu,%mem | head -n 11'
+else
+    alias top10='ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 11'
+fi
 alias uptime='uptime -p'
 alias cp='cp -i'
 alias mv='timeout 8 mv -iv'
@@ -133,7 +141,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
     alias diskspace="du -S | sort -n -r | more"
     alias ports='ss -tulanp'
 fi
-alias dmesg10='dmesg | tail -n 10'
+alias dmesg10='sudo dmesg | tail -n 10'
 alias folder="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
 alias path='echo -e ${PATH//:/\\n}'
 alias wc='wc -l -w -c'

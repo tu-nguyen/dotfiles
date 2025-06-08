@@ -169,6 +169,14 @@ function status_colour() {
 }
 
 # github related functions
+function gpull() {
+    git pull origin $(git rev-parse --abbrev-ref HEAD)
+}
+
+function gpush() {
+    git push origin $(git rev-parse --abbrev-ref HEAD)
+}
+
 # Switch to a specified Git branch with confirmation
 function gco() {
     local branch=$1
@@ -217,7 +225,7 @@ function gcob() {
  }
 
 # Print current Azure DevOps iteration details and tasks assigned to the user
-function print_current_iteration() {
+function print_curr_iter() {
     if [[ $# -lt 4 ]]; then
         echo "Usage: print_current_iteration <ORG> <PROJECT> <TEAM> <AZDO_PAT>"
         return 1

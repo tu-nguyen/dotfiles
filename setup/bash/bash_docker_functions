@@ -1,16 +1,4 @@
-#
-
-function dktt_ref() {
-  printf "${BOLD}docker${NC}               → dk (docker)\n"
-  printf "                     → dkps (list running containers)\n"
-  printf "                     → dkc (list all docker containers)\n"
-  printf "                     → dki (list docker images)\n"
-  printf "                     → dkdf (run docker system df)\n"
-  printf "                     → dkl (run docker logs <requires at least 1 argument CONTAINER>)\n"
-  printf "                     → dklf (docker logs -f <requires at least 1 argument CONTAINER>)\n"
-  printf "                     → dks (docker service <require COMMAND ie create, inspect, logs etc>)\n"
-  printf "                     → dkrm (docker rm <requires at least 1 argument CONTAINER>)\n"
-}
+# ~/.bash_extras/.bash_docker_functions
 
 alias dk="docker"
 alias dkps="docker ps --format '{{.ID}} - {{.Names}} - {{.Image}} - {{.Status}}'"

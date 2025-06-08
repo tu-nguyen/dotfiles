@@ -103,6 +103,6 @@ else
     t WARNING "MOTD file not found at $HOME/.bash_extras/.bash_motd\n"
 fi
 
-if [[ $- == *i* ]] && [ -t 0 ]; then
+if [[ $- == *i* ]] && [ -t 0 ] && command -v twork_motd >/dev/null; then
     twork_motd
 fi

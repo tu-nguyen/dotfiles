@@ -88,14 +88,16 @@ install_packages() {
         install_mac_package coreutils
         install_mac_package make
         install_mac_package lesspipe
-        install_mac_package python@3.12
         install_mac_package htop
         install_mac_package vim
 
-        brew unlink python@3.12 && brew link python@3.12
-        export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH" 
-        export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
-        install_pip_package powerline-status
+        # Check for python3, but do NOT install it
+        if ! command -v python3 &>/dev/null; then
+            t ERROR "python3 is required but not installed. Please install Python 3 manually."
+            exit 1
+        else
+            t SUCCESS "python3 is already installed."
+        fi
 
         # Check if Powerline font is already installed
         if [[ -f "$HOME/Library/Fonts/DejaVu Sans Mono for Powerline.ttf" ]]; then
@@ -115,27 +117,32 @@ install_packages() {
             t ERROR "apt package manager not found. Please install it first."
             return 1
         fi
+
         install_linux_package coreutils
         install_linux_package make
         install_linux_package less
-        install_linux_package python3
         install_linux_package htop
-        install_linux_package python3-pip
         install_linux_package vim
+
+        # Check for python3, but do NOT install it
+        if ! command -v python3 &>/dev/null; then
+            t ERROR "python3 is required but not installed. Please install Python 3 manually."
+            exit 1
+        fi
+
+        install_linux_package python3-pip
         install_linux_package powerline
         install_linux_package fonts-powerline
         install_linux_package git
         install_linux_package curl
         install_linux_package wget
         install_linux_package tree
-        # install_linux_package net-tools
     else
         t ERROR "Unsupported OS: $OS. Please install the required packages manually."
         return 1
     fi
 
     install_pip_package powerline-gitstatus
-    # install_pip_package powerline-shell
     install_pip_package powerline-status
 
     t SUCCESS "All required packages installed successfully."
@@ -190,7 +197,6 @@ reset_vimrc() {
         t WARNING "Deleting old .vim/bundle"
         rm -rf $HOME/.vim/bundle
     fi
-
 
     cp  "$(pwd)/setup/vim/vimrc" "$HOME/.vimrc"
     t SUCCESS "Linked $(pwd)/setup/vim/vimrc to $HOME/.vimrc successfully."

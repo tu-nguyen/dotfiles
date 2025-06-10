@@ -1,21 +1,58 @@
 {
-  "segments": [
-    "virtual_env",
-    "aws_profile",
-    "battery",
-    "ssh",
-    "cwd",
-    "git",
-    "git_stash",
-    "jobs",
-    "set_term_title",
-    "svn",
-    "newline",
-    "root"
-  ],
-  "mode": "flat",
-  "cwd": {
-    "mode": "plain"
-  },
-  "theme": "solarized_dark"
+  "segments": {
+    "left": [
+      {
+        "function": "powerline.segments.shell.mode"
+      },
+      {
+        "function": "powerline.segments.common.net.hostname",
+        "args": {
+          "shorten": true
+        },
+        "priority": 10
+      },
+      {
+        "function": "powerline.segments.common.env.user",
+        "priority": 30
+      },
+      {
+        "function": "powerline.segments.common.env.virtualenv",
+        "priority": 50
+      },
+      {
+        "function": "powerline.segments.common.env.cwd",
+        "args": {
+          "max_depth": 2,
+          "truncate": true
+        },
+        "priority": 10
+      },
+      {
+        "function": "powerline.segments.shell.jobnum",
+        "priority": 20
+      }
+    ],
+    "right": [
+      {
+        "function": "powerline.segments.common.env.cwd",
+        "args": {
+          "max_depth": 2,
+          "truncate": true
+        },
+        "priority": 10
+      },
+      {
+        "function": "powerline.segments.shell.last_pipe_status",
+        "priority": 20
+      },
+      {
+        "function": "powerline.segments.common.vcs.stash",
+        "priority": 50
+      },
+      {
+        "function": "powerline.segments.common.vcs.branch",
+        "priority": 40
+      }
+    ]
+  }
 }

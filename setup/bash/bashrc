@@ -70,8 +70,8 @@ enable_powerline() {
         POWERLINE_BASH_SELECT=1
         if [[ -f "$POWERLINE_PATH/powerline/bindings/bash/powerline.sh" ]]; then
             source "$POWERLINE_PATH/powerline/bindings/bash/powerline.sh"
-        # elif [[ -f "$POWERLINE_PATH/powerline/bindings/config.py" ]]; then
-        #     python3 "$POWERLINE_PATH/powerline/bindings/config.py"
+        elif [[ -f "$POWERLINE_PATH/powerline/bindings/config.py" ]]; then
+            python3 "$POWERLINE_PATH/powerline/bindings/config.py"
         fi
     fi
 }

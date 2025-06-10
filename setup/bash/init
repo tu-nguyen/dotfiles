@@ -78,7 +78,7 @@ t() {
     severity="INFO"
     message="$1"
   else
-    severity="${1^^}"  # Convert to uppercase
+    severity="${1}"  # Convert to uppercase
     message="$2"
   fi
 

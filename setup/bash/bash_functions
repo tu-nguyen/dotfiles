@@ -253,11 +253,13 @@ function print_curr_iter() {
     local ITERATION_START
     ITERATION_START=$(echo "$ITERATION_INFO" | jq -r '.attributes.startDate' | cut -d'T' -f1)
     local ITERATION_END
-    ITERATION_END=$(echo "$ITERATION_INFO" | jq -r '.attributes.finishDate' | cut -d'T' -f1)
+    ITERATION_END=$(echo "$ITERATION_INFO" | jq -r '.attributes.finishDate')
 
-    # Cross-platform date parsing for END
-    if date -j -f "%Y-%m-%d" "$ITERATION_END" +%s >/dev/null 2>&1; then
-        END=$(date -j -f "%Y-%m-%d" "$ITERATION_END" +%s)
+    # Remove trailing Z if present (macOS date doesn't like it)
+    local ITERATION_END_CLEAN=${ITERATION_END%Z}
+
+    if date -j -f "%Y-%m-%dT%H:%M:%S" "$ITERATION_END_CLEAN" +%s >/dev/null 2>&1; then
+        END=$(date -j -f "%Y-%m-%dT%H:%M:%S" "$ITERATION_END_CLEAN" +%s)
     else
         END=$(date -d "$ITERATION_END" +%s)
     fi
@@ -268,16 +270,19 @@ function print_curr_iter() {
     local SECS_LEFT=$((END - NOW))
     local TIME_REMAINING
     if (( SECS_LEFT > 0 )); then
-        local DAYS=$((SECS_LEFT / 86400))
+        local DAYS=$(( SECS_LEFT / 86400 ))
         local HOURS=$(( (SECS_LEFT % 86400) / 3600 ))
         local MINS=$(( (SECS_LEFT % 3600) / 60 ))
+
         TIME_REMAINING="Time remaining: ${H}${DAYS}${NC} days and ${H}${HOURS}${NC} hours ${H}${MINS}${NC} minutes"
     else
         TIME_REMAINING="Time remaining: Ended"
     fi
 
     # Print header with time remaining
-    echo -e "\n${BOLD}${CYAN}Current Twork Iteration: $ITERATION_NAME ($ITERATION_START → $ITERATION_END)${NC}"
+    local ITERATION_END_DATE="${ITERATION_END%%T*}"
+
+    echo -e "\n${BOLD}${CYAN}Current Twork Iteration: $ITERATION_NAME ($ITERATION_START → $ITERATION_END_DATE)${NC}"
     echo "$TIME_REMAINING"
 
     # Query all tasks/chores assigned to you in current iteration

@@ -326,14 +326,14 @@ function print_curr_iter() {
         [[ -z "$pid" ]] && continue
         IFS='|' read -r ptype pstate ptitle <<< "${PARENTS[$pid]}"
         pcolor=$(status_colour "$pstate")
-        short_title=$(truncate_text "$ptitle" 60)
-        printf "${BOLD} - %s %s [%b%s%b${BOLD}]: %s${NC}\n" "$pid" "$ptype" "$pcolor" "$pstate" "$NC" "$short_title"
+        short_title=$(truncate_text "$ptitle" 42)
+        printf "${BOLD}  -- %s %s [%b%s%b${BOLD}]: %s${NC}\n" "$pid" "$ptype" "$pcolor" "$pstate" "$NC" "$short_title"
         echo "$TASKS_JSON" | jq -r --arg pid "$pid" '
             .value[] | select(.fields."System.Parent" == ($pid|tonumber)) |
             "\(.fields."System.Id")|\(.fields."System.WorkItemType")|\(.fields."System.State")|\(.fields."System.Title")"' |
         while IFS='|' read -r cid ctype cstate ctitle; do
             ccolor=$(status_colour "$cstate")
-            cshort_title=$(truncate_text "$ctitle" 60)
+            cshort_title=$(truncate_text "$ctitle" 42)
             printf -- "   * ${BOLD}${H}%s${NC} %s [%b%s%b]: %s\n" "$cid" "$ctype" "$ccolor" "$cstate" "$NC" "$cshort_title"
         done
     done
@@ -344,7 +344,7 @@ function print_curr_iter() {
         "\(.fields."System.Id")|\(.fields."System.WorkItemType")|\(.fields."System.State")|\(.fields."System.Title")"' |
     while IFS='|' read -r cid ctype cstate ctitle; do
         ccolor=$(status_colour "$cstate")
-        cshort_title=$(truncate_text "$ctitle" 60)
+        cshort_title=$(truncate_text "$ctitle" 42)
         printf "${BOLD}${H}%s${NC} %s [%b%s%b]: %s\n" "$cid" "$ctype" "$ccolor" "$cstate" "$NC" "$cshort_title"
     done
 }

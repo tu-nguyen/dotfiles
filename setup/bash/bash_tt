@@ -87,6 +87,7 @@ function btt() {
   printf "%s\n" "$br"
   printf "${H2}search:${NC}\n"
   printf "  grep PATTERN file    → Search in file\n"
+  printf "  tail -f file        → Follow file changes\n"
   printf "  find . -name '*.sh'  → Find files\n"
   printf "%s\n" "$br"
   printf "${H2}process:${NC}\n"

@@ -9,7 +9,7 @@ else
     # Define default values if .env is not present and variables are not set externally
     # IMPORTANT: If you don't use a .env file, you MUST set DOTFILES_REPO here.
     : "${DOTFILES_REPO:="https://github.com/YOUR_USERNAME/YOUR_DOTFILES_REPO.git"}"
-    : "${DOTFILES_DIR:="/home/user/path/to/dotfiles"}"
+    : "${DOTFILE_DIR:="/home/user/path/to/dotfiles"}"
     # : "${GITSTATUS_DIR:="$HOME/.gitstatus"}"
 fi
 

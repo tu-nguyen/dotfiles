@@ -163,17 +163,17 @@ prompt() {
 # Function to clone or pull dotfiles repository
 clone_or_pull_dotfiles() {
     t "Managing dotfiles repository..."
-    if [ -d "$DOTFILES_DIR/.git" ]; then
-        t "  Dotfiles directory '$DOTFILES_DIR' already exists. Pulling latest changes..."
-        cd "$DOTFILES_DIR"
+    if [ -d "$DOTFILE_DIR/.git" ]; then
+        t "  Dotfiles directory '$DOTFILE_DIR' already exists. Pulling latest changes..."
+        cd "$DOTFILE_DIR"
         if ! git pull origin $(git rev-parse --abbrev-ref HEAD); then
             t Error "Failed to pull dotfiles from '$DOTFILES_REPO'. Please check your network or repository access."
             exit 1
         fi
     else
-        t "  Cloning dotfiles repository '$DOTFILES_REPO' to '$DOTFILES_DIR'..."
-        mkdir -p "$DOTFILES_DIR" # Ensure parent directory exists
-        if ! git clone "$DOTFILES_REPO" "$DOTFILES_DIR"; then
+        t "  Cloning dotfiles repository '$DOTFILES_REPO' to '$DOTFILE_DIR'..."
+        mkdir -p "$DOTFILE_DIR" # Ensure parent directory exists
+        if ! git clone "$DOTFILES_REPO" "$DOTFILE_DIR"; then
             t Error "Failed to clone dotfiles from '$DOTFILES_REPO'. Please check the URL and your network."
             exit 1
         fi
@@ -243,18 +243,18 @@ reset_bashrc() {
         return
     fi
 
-    cp_and_source "$DOTFILES_DIR/setup/bash/bash_colours" "$HOME/.bash_extras/.bash_colours"
-    cp_and_source "$DOTFILES_DIR/setup/bash/init" "$HOME/.bash_extras/.init"
+    cp_and_source "$DOTFILE_PATH/setup/bash/bash_colours" "$HOME/.bash_extras/.bash_colours"
+    cp_and_source "$DOTFILE_DIR/setup/bash/init" "$HOME/.bash_extras/.init"
 
-    cp_and_source "$DOTFILES_DIR/setup/bash/bash_aliases" "$HOME/.bash_extras/.bash_aliases"
-    cp_and_source "$DOTFILES_DIR/setup/bash/bash_docker_functions" "$HOME/.bash_extras/.bash_docker_functions"
-    cp_and_source "$DOTFILES_DIR/setup/bash/bash_functions" "$HOME/.bash_extras/.bash_functions"
-    cp_and_source "$DOTFILES_DIR/setup/bash/bash_exports" "$HOME/.bash_extras/.bash_exports"
-    cp_and_source "$DOTFILES_DIR/setup/bash/bash_motd" "$HOME/.bash_extras/.bash_motd"
-    cp_and_source "$DOTFILES_DIR/setup/bash/bash_other" "$HOME/.bash_extras/.bash_other"
-    cp_and_source "$DOTFILES_DIR/setup/bash/bash_tt" "$HOME/.bash_extras/.bash_tt"
+    cp_and_source "$DOTFILE_DIR/setup/bash/bash_aliases" "$HOME/.bash_extras/.bash_aliases"
+    cp_and_source "$DOTFILE_DIR/setup/bash/bash_docker_functions" "$HOME/.bash_extras/.bash_docker_functions"
+    cp_and_source "$DOTFILE_DIR/setup/bash/bash_functions" "$HOME/.bash_extras/.bash_functions"
+    cp_and_source "$DOTFILE_DIR/setup/bash/bash_exports" "$HOME/.bash_extras/.bash_exports"
+    cp_and_source "$DOTFILE_DIR/setup/bash/bash_motd" "$HOME/.bash_extras/.bash_motd"
+    cp_and_source "$DOTFILE_DIR/setup/bash/bash_other" "$HOME/.bash_extras/.bash_other"
+    cp_and_source "$DOTFILE_DIR/setup/bash/bash_tt" "$HOME/.bash_extras/.bash_tt"
 
-    cp_and_source "$DOTFILES_DIR/setup/bash/bashrc" "$HOME/.bashrc"
+    cp_and_source "$DOTFILE_DIR/setup/bash/bashrc" "$HOME/.bashrc"
 
     t SUCCESS "Bash setup completed!"
 }
@@ -275,8 +275,8 @@ reset_vimrc() {
         rm -rf $HOME/.vim/bundle
     fi
 
-    cp  "$DOTFILES_DIR/setup/vim/vimrc" "$HOME/.vimrc"
-    t SUCCESS "Linked $DOTFILES_DIR/setup/vim/vimrc to $HOME/.vimrc successfully."
+    cp  "$DOTFILE_DIR/setup/vim/vimrc" "$HOME/.vimrc"
+    t SUCCESS "Linked $DOTFILE_DIR/setup/vim/vimrc to $HOME/.vimrc successfully."
 
     t "Installing Vundle and plugins.."
     VUNDLE_PATH="$HOME/.vim/bundle/Vundle.vim"

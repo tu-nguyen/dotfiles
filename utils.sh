@@ -243,18 +243,18 @@ reset_bashrc() {
         return
     fi
 
-    cp_and_source "$(pwd)/setup/bash/bash_colours" "$HOME/.bash_extras/.bash_colours"
-    cp_and_source "$(pwd)/setup/bash/init" "$HOME/.bash_extras/.init"
+    cp_and_source "$DOTFILES_DIR/setup/bash/bash_colours" "$HOME/.bash_extras/.bash_colours"
+    cp_and_source "$DOTFILES_DIR/setup/bash/init" "$HOME/.bash_extras/.init"
 
-    cp_and_source "$(pwd)/setup/bash/bash_aliases" "$HOME/.bash_extras/.bash_aliases"
-    cp_and_source "$(pwd)/setup/bash/bash_docker_functions" "$HOME/.bash_extras/.bash_docker_functions"
-    cp_and_source "$(pwd)/setup/bash/bash_functions" "$HOME/.bash_extras/.bash_functions"
-    cp_and_source "$(pwd)/setup/bash/bash_exports" "$HOME/.bash_extras/.bash_exports"
-    cp_and_source "$(pwd)/setup/bash/bash_motd" "$HOME/.bash_extras/.bash_motd"
-    cp_and_source "$(pwd)/setup/bash/bash_other" "$HOME/.bash_extras/.bash_other"
-    cp_and_source "$(pwd)/setup/bash/bash_tt" "$HOME/.bash_extras/.bash_tt"
+    cp_and_source "$DOTFILES_DIR/setup/bash/bash_aliases" "$HOME/.bash_extras/.bash_aliases"
+    cp_and_source "$DOTFILES_DIR/setup/bash/bash_docker_functions" "$HOME/.bash_extras/.bash_docker_functions"
+    cp_and_source "$DOTFILES_DIR/setup/bash/bash_functions" "$HOME/.bash_extras/.bash_functions"
+    cp_and_source "$DOTFILES_DIR/setup/bash/bash_exports" "$HOME/.bash_extras/.bash_exports"
+    cp_and_source "$DOTFILES_DIR/setup/bash/bash_motd" "$HOME/.bash_extras/.bash_motd"
+    cp_and_source "$DOTFILES_DIR/setup/bash/bash_other" "$HOME/.bash_extras/.bash_other"
+    cp_and_source "$DOTFILES_DIR/setup/bash/bash_tt" "$HOME/.bash_extras/.bash_tt"
 
-    cp_and_source "$(pwd)/setup/bash/bashrc" "$HOME/.bashrc"
+    cp_and_source "$DOTFILES_DIR/setup/bash/bashrc" "$HOME/.bashrc"
 
     t SUCCESS "Bash setup completed!"
 }
@@ -275,8 +275,8 @@ reset_vimrc() {
         rm -rf $HOME/.vim/bundle
     fi
 
-    cp  "$(pwd)/setup/vim/vimrc" "$HOME/.vimrc"
-    t SUCCESS "Linked $(pwd)/setup/vim/vimrc to $HOME/.vimrc successfully."
+    cp  "$DOTFILES_DIR/setup/vim/vimrc" "$HOME/.vimrc"
+    t SUCCESS "Linked $DOTFILES_DIR/setup/vim/vimrc to $HOME/.vimrc successfully."
 
     t "Installing Vundle and plugins.."
     VUNDLE_PATH="$HOME/.vim/bundle/Vundle.vim"

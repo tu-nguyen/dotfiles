@@ -89,7 +89,7 @@ install_powerline_fonts() {
         exit 1
     fi
 
-    log_message "  Running font installation script..."
+    t "  Running font installation script..."
     if ! "$fonts_temp_dir/install.sh"; then
         t "Warning: Powerline font installation script failed. You might need to install fonts manually or update font cache."
     fi
@@ -102,22 +102,22 @@ install_powerline_fonts() {
 
 # Function to install Gitstatus
 install_gitstatus() {
-    log_message "Installing Gitstatus..."
+    t "Installing Gitstatus..."
     if [ -d "$GITSTATUS_DIR/.git" ]; then
-        log_message "  Gitstatus directory '$GITSTATUS_DIR' already exists. Pulling latest changes..."
+        t "  Gitstatus directory '$GITSTATUS_DIR' already exists. Pulling latest changes..."
         cd "$GITSTATUS_DIR"
         if ! git pull origin master; then
-            log_message "Warning: Failed to pull Gitstatus. Using existing version."
+            t Warning "Failed to pull Gitstatus. Using existing version."
         fi
     else
-        log_message "  Cloning Gitstatus repository to '$GITSTATUS_DIR'..."
+        t "  Cloning Gitstatus repository to '$GITSTATUS_DIR'..."
         if ! git clone https://github.com/romkatv/gitstatus.git "$GITSTATUS_DIR"; then
-            log_message "Error: Failed to clone Gitstatus repository."
+            t Error" Failed to clone Gitstatus repository."
             exit 1
         fi
     fi
     cd "$HOME" # Return to home directory
-    log_message "Gitstatus installed/updated successfully."
+    t "Gitstatus installed/updated successfully."
 }
 
 cp_and_source() {

@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+# Function to check for sudo availability
+check_sudo() {
+    if ! command -v sudo &> /dev/null; then
+        t Error "sudo is not installed. Please install sudo or run as root."
+        exit 1
+    fi
+}
+
+# Function to detect the OS
 detect_os() {
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         if grep -qi microsoft /proc/version; then
@@ -10,22 +19,14 @@ detect_os() {
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         OS="macos"
     else
-        echo "Unsupported OS: $OSTYPE"
+        t ERROR "Unsupported OS: $OSTYPE"
         exit 1
     fi
-    echo "Detected OS: $OS"
-}
-
-install_mac_package() {
-    if brew list "$1" &>/dev/null; then
-        t SUCCESS "$1 is already installed via brew."
-    else
-        t "Installing $1.."
-        brew install "$@"
-    fi
+    t "Detected OS: $OS"
 }
 
 install_linux_package() {
+    check_sudo
     if dpkg -s "$1" &>/dev/null; then
         t SUCCESS "$1 is already installed via apt."
     else
@@ -34,13 +35,89 @@ install_linux_package() {
     fi
 }
 
+install_mac_package() {
+    if ! command -v brew &> /dev/null; then
+        t WARNING "Homebrew not found. Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        # Add Homebrew to PATH for current session
+        eval "$(/opt/homebrew/bin/brew shellenv)" || eval "$(brew shellenv)"
+    fi
+
+    if brew list "$1" &>/dev/null; then
+        t SUCCESS "$1 is already installed via brew."
+    else
+        t "Installing $1.."
+        brew install "$@"
+    fi
+}
+
 install_pip_package() {
     if ! pip3 show "$1" &>/dev/null; then
         t SUCCESS "$1 is already installed via pip."
     else
         t "Installing $1.."
-        pip3 install "$@" --user --break-system-packages 
+        pip3 install "$@" --user
     fi
+}
+
+# Function to install packages based on OS
+install_package() {
+    local package_name="$1"
+    t "Installing $package_name..."
+    if [[ "$OS" == "Linux" || "$OS" == "WSL" ]]; then
+        install_linux_package "$package_name"
+    elif [[ "$OS" == "macOS" ]]; then
+        if ! command -v brew &> /dev/null; then
+            t WARNING "Homebrew not found. Installing Homebrew..."
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+            # Add Homebrew to PATH for current session
+            eval "$(/opt/homebrew/bin/brew shellenv)" || eval "$(brew shellenv)"
+        fi
+        if ! brew install "$package_name"; then
+            t Warning "Failed to install $package_name using brew. Trying to continue."
+        fi
+    fi
+}
+
+# Function to install Powerline fonts
+install_powerline_fonts() {
+    t "Installing Powerline fonts..."
+    local fonts_temp_dir=$(mktemp -d -t powerline-fonts-XXXXXX)
+    if ! git clone https://github.com/powerline/fonts.git "$fonts_temp_dir"; then
+        t "Error" "Failed to clone Powerline fonts repository."
+        rm -rf "$fonts_temp_dir"
+        exit 1
+    fi
+
+    log_message "  Running font installation script..."
+    if ! "$fonts_temp_dir/install.sh"; then
+        t "Warning: Powerline font installation script failed. You might need to install fonts manually or update font cache."
+    fi
+
+    t "Cleaning up temporary font directory..."
+    rm -rf "$fonts_temp_dir"
+    t "Powerline fonts installation attempted."
+    t "NOTE: You may need to configure your terminal emulator to use a Powerline-compatible font (e.g., 'Meslo LG S DZ Regular for Powerline')."
+}
+
+# Function to install Gitstatus
+install_gitstatus() {
+    log_message "Installing Gitstatus..."
+    if [ -d "$GITSTATUS_DIR/.git" ]; then
+        log_message "  Gitstatus directory '$GITSTATUS_DIR' already exists. Pulling latest changes..."
+        cd "$GITSTATUS_DIR"
+        if ! git pull origin master; then
+            log_message "Warning: Failed to pull Gitstatus. Using existing version."
+        fi
+    else
+        log_message "  Cloning Gitstatus repository to '$GITSTATUS_DIR'..."
+        if ! git clone https://github.com/romkatv/gitstatus.git "$GITSTATUS_DIR"; then
+            log_message "Error: Failed to clone Gitstatus repository."
+            exit 1
+        fi
+    fi
+    cd "$HOME" # Return to home directory
+    log_message "Gitstatus installed/updated successfully."
 }
 
 cp_and_source() {
@@ -48,7 +125,7 @@ cp_and_source() {
     local target="$2"
 
     if [[ -z "$file" || -z "$target" ]]; then
-        echo "Usage: cp_and_source <file> <target>"
+        t ERROR "Usage: cp_and_source <file> <target>"
         return 1
     fi
 
@@ -83,13 +160,54 @@ prompt() {
   echo ""
 }
 
+# Function to clone or pull dotfiles repository
+clone_or_pull_dotfiles() {
+    t "Managing dotfiles repository..."
+    if [ -d "$DOTFILES_DIR/.git" ]; then
+        t "  Dotfiles directory '$DOTFILES_DIR' already exists. Pulling latest changes..."
+        cd "$DOTFILES_DIR"
+        if ! git pull origin $(git rev-parse --abbrev-ref HEAD); then
+            t Error "Failed to pull dotfiles from '$DOTFILES_REPO'. Please check your network or repository access."
+            exit 1
+        fi
+    else
+        t "  Cloning dotfiles repository '$DOTFILES_REPO' to '$DOTFILES_DIR'..."
+        mkdir -p "$DOTFILES_DIR" # Ensure parent directory exists
+        if ! git clone "$DOTFILES_REPO" "$DOTFILES_DIR"; then
+            t Error "Failed to clone dotfiles from '$DOTFILES_REPO'. Please check the URL and your network."
+            exit 1
+        fi
+    fi
+    cd "$HOME" # Return to home directory
+}
+
 install_packages() {
-    if [[ "$OS" == "macos" ]]; then
-        install_mac_package coreutils
-        install_mac_package make
+    install_package git
+    install_package curl
+    install_package vim
+    install_package python3
+    install_package python3-pip
+    install_package make
+    install_pip_package powerline-status
+
+    install_powerline_fonts
+    install_gitstatus
+
+    if [[ "$OS" == "linux" || "$OS" == "wsl" ]]; then
+        if ! command -v apt &>/dev/null; then
+            t ERROR "apt package manager not found. Please install it first."
+            return 1
+        fi
+
+        install_linux_package coreutils
+        install_linux_package less
+        install_linux_package htop
+        install_linux_package powerline
+        install_linux_package wget
+        install_linux_package tree
+    elif [[ "$OS" == "macos" ]]; then
         install_mac_package lesspipe
         install_mac_package htop
-        install_mac_package vim
 
         # Check for python3, but do NOT install it
         if ! command -v python3 &>/dev/null; then
@@ -99,51 +217,10 @@ install_packages() {
             t SUCCESS "python3 is already installed."
         fi
 
-        # Check if Powerline font is already installed
-        if [[ -f "$HOME/Library/Fonts/DejaVu Sans Mono for Powerline.ttf" ]]; then
-            t SUCCESS "Powerline fonts already installed."
-        else
-            # clone
-            git clone https://github.com/powerline/fonts.git --depth=1
-            # install
-            cd fonts
-            ./install.sh
-            # clean-up a bit
-            cd ..
-            sudo rm -rf fonts
-        fi
-    elif [[ "$OS" == "linux" || "$OS" == "wsl" ]]; then
-        if ! command -v apt &>/dev/null; then
-            t ERROR "apt package manager not found. Please install it first."
-            return 1
-        fi
-
-        install_linux_package coreutils
-        install_linux_package make
-        install_linux_package less
-        install_linux_package htop
-        install_linux_package vim
-
-        # Check for python3, but do NOT install it
-        if ! command -v python3 &>/dev/null; then
-            t ERROR "python3 is required but not installed. Please install Python 3 manually."
-            exit 1
-        fi
-
-        install_linux_package python3-pip
-        install_linux_package powerline
-        install_linux_package fonts-powerline
-        install_linux_package git
-        install_linux_package curl
-        install_linux_package wget
-        install_linux_package tree
     else
         t ERROR "Unsupported OS: $OS. Please install the required packages manually."
         return 1
     fi
-
-    install_pip_package powerline-gitstatus
-    install_pip_package powerline-status
 
     t SUCCESS "All required packages installed successfully."
     return

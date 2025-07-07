@@ -7,63 +7,6 @@ else
     echo "[WARNING] Failed to load colours"
 fi
 
-# center_label() {
-#     local label="$1"
-#     local width=11
-#     local pad_left=$(( (width - ${#label}) / 2 ))
-#     local pad_right=$(( width - ${#label} - pad_left ))
-#     printf "%*s%s%*s" "$pad_left" "" "$label" "$pad_right" ""
-# }
-
-# t() {
-#   local severity message label color padded_label
-
-#   if [[ $# -eq 0 ]]; then
-#     echo -e "${GREEN}Hello world${NC}"
-#     return
-#   elif [[ $# -eq 1 ]]; then
-#     severity="INFO"
-#     message="$1"
-#   else
-#     severity="${1^^}"
-#     message="$2"
-#   fi
-
-#   case "$severity" in
-#     info|INFO)
-#       label="[INFO]"
-#       color="${BOLD}${PINK}"
-#       ;;
-#     warn|warning|WARNING)
-#       label="[WARNING]"
-#       color="${BOLD}${YELLOW}"
-#       ;;
-#     err|error|ERR|ERROR)
-#       label="[ERROR]"
-#       color="${BOLD}${RED}"
-#       ;;
-#     success|ok|SUCCESS|OK)
-#       label="[SUCCESS]"
-#       color="${BOLD}${GREEN}"
-#       ;;
-#     todo|TODO)
-#       label="[TODO]"
-#       color="${BOLD}${BRIGHT_MAGENTA}"
-#       ;;
-#     debug|DEBUG)
-#       label="[DEBUG]"
-#       color="${BOLD}${CYAN}"
-#       ;;
-#     *)
-#       label="[UNKNOWN]"
-#       color="${BOLD}"
-#       ;;
-#   esac
-
-#   padded_label=$(center_label "$label")
-#   echo -e "${color}${padded_label}${NC} $message"
-# }
-
 t() {
   # t "System started"                  # [INFO] System started
   # t WARNING "Disk space low"          # [WARNING] Disk space low
@@ -107,34 +50,3 @@ t() {
       ;;
   esac
 }
-
-mkdir -p "$HOME/.bash_extras"
-ORIGINAL_DOTFILE_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
-if [[ -f "$ORIGINAL_DOTFILE_CONFIG_FILE" ]]; then
-    DOTFILE_PATH=$(grep '^DOTFILE_PATH=' "$ORIGINAL_DOTFILE_CONFIG_FILE" | cut -d'=' -f2-)
-    if [[ -d "$DOTFILE_PATH" ]]; then
-        t INFO "DOTFILE_PATH loaded from ${H}$ORIGINAL_DOTFILE_CONFIG_FILE${NC}"
-    else
-        t WARNING "Saved DOTFILE_PATH does not exist in ${H}$ORIGINAL_DOTFILE_CONFIG_FILE${NC}"
-        DOTFILE_PATH=""
-    fi
-else
-  t WARNING "No saved file found at $ORIGINAL_DOTFILE_CONFIG_FILE"
-fi
-
-if [[ -z "$DOTFILE_PATH" ]]; then
-    CURRENT_PATH="$(pwd)"
-    if [[ "$CURRENT_PATH" != "$HOME" ]]; then
-        DOTFILE_PATH="$CURRENT_PATH"
-    else
-        t WARNING "Hardcoding DOTFILE_PATH.."
-        DOTFILE_PATH="$HOME/workplace/repo/dotfiles" 
-    fi   
-else
-    t INFO "DOTFILE_PATH is set to: ${H}$DOTFILE_PATH${NC}"
-fi
-
-echo "DOTFILE_PATH=$DOTFILE_PATH" > "$ORIGINAL_DOTFILE_CONFIG_FILE"
-export DOTFILE_PATH="$DOTFILE_PATH"
-export BASHRC_EXTRAS_PATH="$DOTFILE_PATH/.bash_extras"
-export BASHRC_INIT="$BASHRC_EXTRAS_PATH/init"

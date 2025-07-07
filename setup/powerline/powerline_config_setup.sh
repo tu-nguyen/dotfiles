@@ -7,4 +7,4 @@ else
 fi
 
 mkdir -p $HOME/.config/powerline
-cp $DOTFILE_PATH/setup/powerline/powerline-shell-config.json  $HOME/.config/powerline/themes/shell/default.json
+cp $DOTFILE_DIR/setup/powerline/powerline-shell-config.json  $HOME/.config/powerline/themes/shell/default.json

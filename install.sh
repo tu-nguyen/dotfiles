@@ -21,15 +21,15 @@ if [ -z "$DOTFILES_REPO" ] || [ "$DOTFILES_REPO" == "https://github.com/YOUR_USE
     exit 1
 fi
 
-# Check if DOTFILE_PATH is set after sourcing .env or from defaults
-if [ -z "$DOTFILE_PATH" ] || [ "$DOTFILE_PATH" == "/home/user/path/to/dotfiles" ]; then
-    echo "ERROR: Please set the 'DOTFILE_PATH' variable in your .env file or directly in the script."
+# Check if DOTFILE_DIR is set after sourcing .env or from defaults
+if [ -z "$DOTFILE_DIR" ] || [ "$DOTFILE_DIR" == "/home/user/path/to/dotfiles" ]; then
+    echo "ERROR: Please set the 'DOTFILE_DIR' variable in your .env file or directly in the script."
     if [[ -f "$DOTFILE_CONFIG_FILE" ]]; then
-        DOTFILE_PATH=$(grep '^DOTFILE_PATH=' "$DOTFILE_CONFIG_FILE" | cut -d'=' -f2-)
-        if [[ -d "$DOTFILE_PATH" ]]; then
-            echo "DOTFILE_PATH loaded from $DOTFILE_CONFIG_FILE"
+        DOTFILE_DIR=$(grep '^DOTFILE_DIR=' "$DOTFILE_CONFIG_FILE" | cut -d'=' -f2-)
+        if [[ -d "$DOTFILE_DIR" ]]; then
+            echo "DOTFILE_DIR loaded from $DOTFILE_CONFIG_FILE"
         else
-            echo "ERROR: Saved DOTFILE_PATH does not exist in $DOTFILE_CONFIG_FILE"
+            echo "ERROR: Saved DOTFILE_DIR does not exist in $DOTFILE_CONFIG_FILE"
             exit 1
         fi
     else
@@ -37,24 +37,24 @@ if [ -z "$DOTFILE_PATH" ] || [ "$DOTFILE_PATH" == "/home/user/path/to/dotfiles" 
         exit 1
     fi
 else
-    echo "DOTFILE_PATH set to $DOTFILE_PATH"
+    echo "DOTFILE_DIR set to $DOTFILE_DIR"
 fi
 
-echo "DOTFILE_PATH=$DOTFILE_PATH" > "$DOTFILE_CONFIG_FILE"
+echo "DOTFILE_DIR=$DOTFILE_DIR" > "$DOTFILE_CONFIG_FILE"
 echo "DOTFILES_REPO=$DOTFILES_REPO" >> "$DOTFILE_CONFIG_FILE"
-export DOTFILE_PATH="$DOTFILE_PATH"
-export BASHRC_EXTRAS_PATH="$DOTFILE_PATH/.bash_extras"
+export DOTFILE_DIR="$DOTFILE_DIR"
+export BASHRC_EXTRAS_PATH="$DOTFILE_DIR/.bash_extras"
 export BASHRC_INIT="$BASHRC_EXTRAS_PATH/init"
 
-source "$DOTFILE_PATH/setup/bash/bash_colours" || {
+source "$DOTFILE_DIR/setup/bash/bash_colours" || {
     echo "Error: Could not source bash_colours.sh"
     exit 1
 }
-source "$DOTFILE_PATH/setup/bash/init" || {
+source "$DOTFILE_DIR/setup/bash/init" || {
     echo "Error: Could not source init.sh"
     exit 1
 }
-source "$DOTFILE_PATH/utils.sh" || {
+source "$DOTFILE_DIR/utils.sh" || {
     echo "Error: Could not source utils.sh"
     exit 1
 }

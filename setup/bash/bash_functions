@@ -4,15 +4,15 @@
 r() {
     if [[ "$(pwd)" == *"/dotfiles" ]]; then
       IS_PROJECT_ROOT=true
-      DOTFILE_PATH=$(pwd)
+      DOTFILE_DIR=$(pwd)
     else
       IS_PROJECT_ROOT=false
     fi
 
     echo "[INFO] Resetting settings.."
     if [ "$IS_PROJECT_ROOT" = false ]; then
-      if [[ -n "$DOTFILE_PATH" ]]; then
-        pushd $DOTFILE_PATH > /dev/null
+      if [[ -n "$DOTFILE_DIR" ]]; then
+        pushd $DOTFILE_DIR > /dev/null
       else
         echo "[ERROR] You are not in the root of the dotfile project! DOTFILE_DIR is not set. Exiting.."
         return 1

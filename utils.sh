@@ -243,7 +243,7 @@ reset_bashrc() {
         return
     fi
 
-    cp_and_source "$DOTFILE_PATH/setup/bash/bash_colours" "$HOME/.bash_extras/.bash_colours"
+    cp_and_source "$DOTFILE_DIR/setup/bash/bash_colours" "$HOME/.bash_extras/.bash_colours"
     cp_and_source "$DOTFILE_DIR/setup/bash/init" "$HOME/.bash_extras/.init"
 
     cp_and_source "$DOTFILE_DIR/setup/bash/bash_aliases" "$HOME/.bash_extras/.bash_aliases"
@@ -297,8 +297,8 @@ reset_git_config() {
         return
     fi
 
-    chmod +x $DOTFILE_PATH/setup/git/git_config_setup.sh
-    $DOTFILE_PATH/setup/git/git_config_setup.sh
+    chmod +x $DOTFILE_DIR/setup/git/git_config_setup.sh
+    $DOTFILE_DIR/setup/git/git_config_setup.sh
 
     t SUCCESS "Git configuration reset completed!"
 }
@@ -309,8 +309,8 @@ reset_vscode_config() {
         return
     fi
 
-    chmod +x $DOTFILE_PATH/setup/vscode/vscode_config_setup.sh
-    bash -i $DOTFILE_PATH/setup/vscode/vscode_config_setup.sh
+    chmod +x $DOTFILE_DIR/setup/vscode/vscode_config_setup.sh
+    bash -i $DOTFILE_DIR/setup/vscode/vscode_config_setup.sh
 
     t SUCCESS "VSCode configuration reset completed!"
 }
@@ -326,8 +326,8 @@ reset_wsl_config() {
         return
     fi
 
-    chmod +x $DOTFILE_PATH/setup/wsl/wsl_config_setup.sh
-    bash -i $DOTFILE_PATH/setup/wsl/wsl_config_setup.sh
+    chmod +x $DOTFILE_DIR/setup/wsl/wsl_config_setup.sh
+    bash -i $DOTFILE_DIR/setup/wsl/wsl_config_setup.sh
     t SUCCESS "WSL configuration reset completed!"
 }
 
@@ -337,8 +337,8 @@ reset_powerline_config() {
         return
     fi
 
-    chmod +x $DOTFILE_PATH/setup/powerline/powerline_config_setup.sh
-    bash -i $DOTFILE_PATH/setup/powerline/powerline_config_setup.sh
+    chmod +x $DOTFILE_DIR/setup/powerline/powerline_config_setup.sh
+    bash -i $DOTFILE_DIR/setup/powerline/powerline_config_setup.sh
     t SUCCESS "Powerline configuration reset completed!"
 }
 

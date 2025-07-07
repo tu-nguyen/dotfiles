@@ -61,11 +61,18 @@ function tt() {
   printf "  dktt                 → to view docker stuff\n"
   printf "  vtt                  → to view vim cheatsheet\n"
 
+  if [[ ! -f "$HOME/.bash_extras/.bash_personal" ]]; then
+    printf "  ptt                  → .bash_personal ${RED}does not exist${NC} inside $HOME/.bash_extras\n"
+  else
+    printf "  ptt                  → to view personal stuff\n"
+  fi
+
   if [[ ! -f "$HOME/.bash_extras/.bash_twork" ]]; then
-    printf "  tworktt              → .bash_twork ${RED}does not exist${NC} inside $HOME/.bash_extras/.bash_extras\n"
+    printf "  tworktt              → .bash_twork ${RED}does not exist${NC} inside $HOME/.bash_extras\n"
   else
     printf "  tworktt              → to view twork stuff\n"
   fi
+
   printf "%s\n" "$br"
 }
 

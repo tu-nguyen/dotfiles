@@ -16,13 +16,13 @@ fi
 DOTFILE_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
 
 # Check if DOTFILES_REPO is set after sourcing .env or from defaults
-if [ -z "$DOTFILES_REPO" ] || [ "$DOTFILES_REPO" == "/home/user/path/to/dotfiles" ]; then
+if [ -z "$DOTFILES_REPO" ] || [ "$DOTFILES_REPO" == "https://github.com/YOUR_USERNAME/YOUR_DOTFILES_REPO.git" ]; then
     echo "ERROR: Please set the 'DOTFILES_REPO' variable in your .env file or directly in the script."
     exit 1
 fi
 
 # Check if DOTFILE_PATH is set after sourcing .env or from defaults
-if [ -z "$DOTFILE_PATH" ] || [ "$DOTFILE_PATH" == "https://github.com/YOUR_USERNAME/YOUR_DOTFILES_REPO.git" ]; then
+if [ -z "$DOTFILE_PATH" ] || [ "$DOTFILE_PATH" == "/home/user/path/to/dotfiles" ]; then
     echo "ERROR: Please set the 'DOTFILE_PATH' variable in your .env file or directly in the script."
     if [[ -f "$DOTFILE_CONFIG_FILE" ]]; then
         DOTFILE_PATH=$(grep '^DOTFILE_PATH=' "$DOTFILE_CONFIG_FILE" | cut -d'=' -f2-)

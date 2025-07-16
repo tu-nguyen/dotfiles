@@ -3,36 +3,32 @@
 /* - - - userChrome.css - - - */
 #tabbrowser-tabs {
   visibility: collapse;
-}
-#navigator-toolbox {
-  display: block;
-  /* display: flex; */
-  /* flex-flow: row wrap; */
-  align-items: end;
-
-}
-#titlebar {
+} 
+#navigator-toolbox[inFullscreen="true"] #titlebar {
+  visibility: collapse;
+} 
+/* #titlebar {
   order: 1;
   background-color: rgb(0, 0, 0);
   margin-right: 0%;
   /* padding-left: calc(100% - 146px); */
-  height: 1.8em;
+  /* height: 1.8em;
   align-items: end;
-}
+} */ */
 /* #titlebar #TabsToolbar .titlebar-spacer[type="pre-tabs"] {
   display: none;
 } */
-#nav-bar {
-  order: 0;
+/* #nav-bar {
+  order: 0; */
   /* width: calc(100% - 10px); */
-}
+/* }
 #PersonalToolbar {
   order: 2;
-}
-/* Update - Hides the new Firefox home + tab dropdown. If you want to keep/customize those buttons. remove the CSS below and adjust the widths above to get everything fitting in one line */
-/* #TabsToolbar .toolbar-items {
-display: none;
 } */
+/* Update - Hides the new Firefox home + tab dropdown. If you want to keep/customize those buttons. remove the CSS below and adjust the widths above to get everything fitting in one line */
+#TabsToolbar .toolbar-items {
+display: none;
+}
 
 
 

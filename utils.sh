@@ -113,7 +113,6 @@ install_gitstatus() {
         t "  Cloning Gitstatus repository to '$GITSTATUS_DIR'.."
         if ! git clone https://github.com/romkatv/gitstatus.git "$GITSTATUS_DIR"; then
             t Error" Failed to clone Gitstatus repository."
-            exit 1
         fi
     fi
     cd "$HOME" # Return to home directory

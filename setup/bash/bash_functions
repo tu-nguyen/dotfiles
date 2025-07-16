@@ -217,7 +217,7 @@ function gcob() {
  function azr() {
     AZ_HTTP_CACHE_BIN="$HOME/.azure/msal_http_cache.bin"
     if [ -f $AZ_HTTP_CACHE_BIN ]; then
-        t WARNING "Deleting..."
+        t WARNING "Deleting.."
         sudo rm $HOME/.azure/msal_http_cache.bin
     else
         t "Nothing to delete."

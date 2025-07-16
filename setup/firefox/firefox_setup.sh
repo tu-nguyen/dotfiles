@@ -13,6 +13,7 @@ find_firefox_profile() {
     case "$system" in
         Linux*)
             profile_base_path="$HOME/.mozilla/firefox"
+            profile_base_path_snap="$HOME/snap/firefox/common/.mozilla/firefox" # Snap path
             ;;
         Darwin*) # macOS
             profile_base_path="$HOME/Library/Application Support/Firefox/Profiles"
@@ -33,37 +34,55 @@ find_firefox_profile() {
             ;;
     esac
 
-    if [ ! -d "$profile_base_path" ]; then
-        echo "Firefox profiles directory not found at: $profile_base_path" >&2
+    # Function to check a given base path for a Firefox profile
+    check_base_path() {
+        local current_base_path="$1"
+        if [ ! -d "$current_base_path" ]; then
+            return 1 # Path does not exist
+        fi
+
+        local profiles_ini="$current_base_path/profiles.ini"
+        if [ -f "$profiles_ini" ]; then
+            local default_profile_dir=$(grep -A 5 "\[Profile" "$profiles_ini" | grep "Default=1" -B 3 | grep "Path=" | cut -d '=' -f 2)
+            
+            if [ -n "$default_profile_dir" ]; then
+                local full_profile_path="$current_base_path/$default_profile_dir"
+                if [ -d "$full_profile_path" ]; then
+                    echo "$full_profile_path"
+                    return 0
+                fi
+            fi
+        fi
+
+        # Fallback: If profiles.ini parsing fails, try to find a common default profile name
+        for profile_dir in "$current_base_path"/*; do
+            if [[ "$profile_dir" =~ \.default-release$ || "$profile_dir" =~ \.default$ ]]; then
+                if [ -d "$profile_dir" ]; then
+                    echo "$profile_dir"
+                    return 0
+                fi
+            fi
+        done
         return 1
-    fi
+    }
 
-    # Attempt to find the default profile by looking for 'profiles.ini'
-    # and parsing it for the default profile path.
-    # This is more robust than just listing directories.
-    local profiles_ini="$profile_base_path/profiles.ini"
-    if [ -f "$profiles_ini" ]; then
-        # Find the path to the default profile (IsRelative=1 means it's relative to profile_base_path)
-        local default_profile_dir=$(grep -A 5 "\[Profile" "$profiles_ini" | grep "Default=1" -B 3 | grep "Path=" | cut -d '=' -f 2)
-        
-        if [ -n "$default_profile_dir" ]; then
-            local full_profile_path="$profile_base_path/$default_profile_dir"
-            if [ -d "$full_profile_path" ]; then
-                echo "$full_profile_path"
-                return 0
-            fi
+    # Try standard path first
+    if [ -n "$profile_base_path" ]; then
+        found_profile=$(check_base_path "$profile_base_path")
+        if [ $? -eq 0 ] && [ -n "$found_profile" ]; then
+            echo "$found_profile"
+            return 0
         fi
     fi
 
-    # Fallback: If profiles.ini parsing fails, try to find a common default profile name
-    for profile_dir in "$profile_base_path"/*; do
-        if [[ "$profile_dir" =~ \.default-release$ || "$profile_dir" =~ \.default$ ]]; then
-            if [ -d "$profile_dir" ]; then
-                echo "$profile_dir"
-                return 0
-            fi
+    # If not found in standard path, try Snap path (if applicable)
+    if [ "$system" == "Linux" ] && [ -n "$profile_base_path_snap" ]; then
+        found_profile=$(check_base_path "$profile_base_path_snap")
+        if [ $? -eq 0 ] && [ -n "$found_profile" ]; then
+            echo "$found_profile"
+            return 0
         fi
-    done
+    fi
 
     echo "Could not find a default Firefox profile. Please ensure Firefox has been run at least once." >&2
     return 1

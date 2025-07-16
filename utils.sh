@@ -344,3 +344,14 @@ reset_powerline_config() {
     t SUCCESS "Powerline configuration reset completed!"
 }
 
+reset_firefox() {
+    prompt "reset the Firefox configuration"
+    if [[ $RETURN -ne 0 ]]; then
+        return
+    fi
+
+    chmod +x $DOTFILE_DIR/setup/firefox/firefox_setup.sh
+    bash -i $DOTFILE_DIR/setup/firefox/firefox_setup.sh
+    t SUCCESS "Firefox configuration reset completed!"
+}
+

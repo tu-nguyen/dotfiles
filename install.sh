@@ -69,6 +69,7 @@ reset_vimrc
 reset_git_config
 reset_vscode_config
 reset_powerline_config
+reset_firefox
 
 if [[ "$OS" == "linux" ]]; then
     t "Setting up Linux specific configurations.."

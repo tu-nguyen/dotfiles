@@ -1,38 +1,30 @@
-/* Tree Style Tabs */
+/* Hide main tabs toolbar */
+#TabsToolbar {
+    visibility: collapse;
+}
 
-/* - - - userChrome.css - - - */
 #tabbrowser-tabs {
   visibility: collapse;
-} 
-#navigator-toolbox[inFullscreen="true"] #titlebar {
-  visibility: collapse;
-} 
-/* #titlebar {
+}
+#navigator-toolbox {
+  display: block;
+  align-items: end;
+}
+
+#titlebar {
   order: 1;
   background-color: rgb(0, 0, 0);
   margin-right: 0%;
   /* padding-left: calc(100% - 146px); */
-  /* height: 1.8em;
+  height: 1.8em;
   align-items: end;
-} */ */
-/* #titlebar #TabsToolbar .titlebar-spacer[type="pre-tabs"] {
-  display: none;
-} */
-/* #nav-bar {
-  order: 0; */
-  /* width: calc(100% - 10px); */
-/* }
+}
+#nav-bar {
+  order: 0;
+}
 #PersonalToolbar {
   order: 2;
-} */
-/* Update - Hides the new Firefox home + tab dropdown. If you want to keep/customize those buttons. remove the CSS below and adjust the widths above to get everything fitting in one line */
-#TabsToolbar .toolbar-items {
-display: none;
 }
-
-
-
-/* - - - tree style tabs preferences "extra rules" - - - */
 
 /* Hide border on tab bar, force its state to 'scroll', adjust margin-left for width of scrollbar. */
 #tabbar {

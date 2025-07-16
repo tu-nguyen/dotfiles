@@ -338,9 +338,11 @@ reset_powerline_config() {
         return
     fi
 
-    chmod +x $DOTFILE_DIR/setup/powerline/powerline_config_setup.sh
-    bash -i $DOTFILE_DIR/setup/powerline/powerline_config_setup.sh
-    t SUCCESS "Powerline configuration reset completed!"
+    t "tmp disabled"
+
+    # chmod +x $DOTFILE_DIR/setup/powerline/powerline_config_setup.sh
+    # bash -i $DOTFILE_DIR/setup/powerline/powerline_config_setup.sh
+    # t SUCCESS "Powerline configuration reset completed!"
 }
 
 reset_firefox() {

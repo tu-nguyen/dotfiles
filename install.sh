@@ -2,7 +2,7 @@
 set -e
 
 if [ -f .env ]; then
-    echo "Sourcing .env file for configuration..."
+    echo "Sourcing .env file for configuration.."
     source .env
 else
     echo "Warning: .env file not found. Script will rely on environment variables or defaults."
@@ -10,10 +10,11 @@ else
     # IMPORTANT: If you don't use a .env file, you MUST set DOTFILES_REPO here.
     : "${DOTFILES_REPO:="https://github.com/YOUR_USERNAME/YOUR_DOTFILES_REPO.git"}"
     : "${DOTFILE_DIR:="/home/user/path/to/dotfiles"}"
-    # : "${GITSTATUS_DIR:="$HOME/.gitstatus"}"
+    : "${GITSTATUS_DIR:="$HOME/.gitstatus"}"
 fi
 
 DOTFILE_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
+GITSTATUS_DIR="$HOME/.gitstatus"
 
 # Check if DOTFILES_REPO is set after sourcing .env or from defaults
 if [ -z "$DOTFILES_REPO" ] || [ "$DOTFILES_REPO" == "https://github.com/YOUR_USERNAME/YOUR_DOTFILES_REPO.git" ]; then

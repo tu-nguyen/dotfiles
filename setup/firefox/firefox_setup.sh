@@ -115,7 +115,7 @@ setup_userchrome_css() {
 }
 
 # Main execution
-echo "Attempting to set up userChrome.css for Firefox..."
+echo "Attempting to set up userChrome.css for Firefox.."
 PROFILE_PATH=$(find_firefox_profile)
 
 if [ $? -eq 0 ] && [ -n "$PROFILE_PATH" ]; then

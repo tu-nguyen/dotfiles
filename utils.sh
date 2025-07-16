@@ -225,7 +225,7 @@ install_packages() {
     return
 }
 
-clone_or_pull_dotfiles
+# clone_or_pull_dotfiles
 
 reset_pre() {
     prompt "pre_setup"

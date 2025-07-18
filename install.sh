@@ -43,7 +43,7 @@ DEFAULT_DOTFILES_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
 DEFAULT_OS_TYPE=$(get_os_type)
 GITSTATUS_DIR="$HOME/.gitstatus"
 
-if [[ "$ENV_LOADED" == "false" ]]
+if [[ "$ENV_LOADED" == "false" ]]; then
     echo "[WARNING] .env and .dotfile_config files not found. Script will rely on defaults."
     : "${DOTFILES_REPO:="$DEFAULT_DOTFILES_REPO"}"
     : "${DOTFILES_REPO_DIR:="$DEFAULT_DOTFILES_REPO_DIR"}"

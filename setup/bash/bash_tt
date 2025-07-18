@@ -177,6 +177,8 @@ function gtt() {
   printf "  gpush                → Git push with set-upstream\n"
   printf "  gco                  → Switch to a specified Git branch with confirmation\n"
   printf "  gcob                 → Same as above but with fallback to create a branch\n"
+  printf "  greset               → Hard reset on current branch\n"
+  printf "  gclean               → Hard reset and removes untracked files\n"
   printf "%s\n" "$br"
 }
 

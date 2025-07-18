@@ -92,6 +92,8 @@ alias gl="git l"
 alias gll="git ll"
 alias grr="git rr"
 alias gs='git st'
+alias greset='git reset --hard HEAD'
+alias gclean='git clean -f'
 
 # grep
 alias grep='grep --color=auto'

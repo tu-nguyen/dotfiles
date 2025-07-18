@@ -97,7 +97,7 @@ check_base_path() {
             if [ -d "$full_profile_path" ]; then
                 # Check file count
                 local file_count=$(find "$full_profile_path" -maxdepth 1 -type f | wc -l)
-                if [[ file_count -gt 4 ]]; then
+                if [ file_count -gt 4 ]; then
                     echo "$full_profile_path"
                     return 0 # Found and returned
                 fi

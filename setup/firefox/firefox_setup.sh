@@ -22,7 +22,7 @@ find_firefox_path() {
     local profile_base_path=""
 
     if  [[ "$OS_TYPE" == "linux" ]]; then
-        if [ -d "$HOME/.mozilla/firefox" ];
+        if [ -d "$HOME/.mozilla/firefox" ]; then
             profile_base_path="$HOME/.mozilla/firefox"
         else
             profile_base_path="$HOME/snap/firefox/common/.mozilla/firefox" # Snap path

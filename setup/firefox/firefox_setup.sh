@@ -10,7 +10,7 @@ DOTFILE_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
 if [ -f "$DOTFILE_CONFIG_FILE" ]; then
     source "$DOTFILE_CONFIG_FILE"
     echo "Configuration loaded from $DOTFILE_CONFIG_FILE"
-    echo "DOTFILE_DIR: $DOTFILE_DIR"
+    echo "DOTFILE_REPO_DIR: $DOTFILE_REPO_DIR"
     echo "OS_TYPE: $OS_TYPE"
 else
     echo "Error: Configuration file not found at $DOTFILE_CONFIG_FILE" >&2
@@ -23,10 +23,10 @@ find_firefox_profile() {
 
     echo "$OS_TYPE"
 
-    if  [[ "$OS" == "linux" ]]; then
+    if  [[ "$OS_TYPE" == "linux" ]]; then
         profile_base_path="$HOME/.mozilla/firefox"
         profile_base_path_snap="$HOME/snap/firefox/common/.mozilla/firefox" # Snap path
-    elif [[ "$OS" == "wsl" ]]; then
+    elif [[ "$OS_TYPE" == "wsl" ]]; then
         WIN_APPDATA=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:APPDATA" | tr -d '\r')
         WIN_USERPROFILE=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:USERPROFILE" | tr -d '\r')
 
@@ -38,7 +38,7 @@ find_firefox_profile() {
             echo "Error: Could not determine Windows APPDATA or USERPROFILE paths." >&2
             exit 1
         fi
-    elif [[ "$OS" == "macos" ]]; then
+    elif [[ "$OS_TYPE" == "macos" ]]; then
         echo "33333333333333333333"
         profile_base_path="$HOME/Library/Application Support/Firefox/Profiles"
     fi
@@ -102,7 +102,7 @@ find_firefox_profile() {
 # Function to set up userChrome.css by copying from a source
 setup_userchrome_css() {
     local profile_path="$1"
-    local source_css_path="$DOTFILE_DIR/setup/firefox/userChrome.css"
+    local source_css_path="$DOTFILE_REPO_DIR/setup/firefox/userChrome.css"
 
     if [ -z "$profile_path" ]; then
         echo "Cannot set up userChrome.css: Firefox profile path not provided." >2

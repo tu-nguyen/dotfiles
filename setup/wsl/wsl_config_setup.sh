@@ -6,4 +6,4 @@ else
     t "Copying wsl.conf for WSL"
 fi
 
-sudo cp $DOTFILE_DIR/setup/wsl/wsl.conf  /etc/wsl.conf
+sudo cp $DOTFILE_REPO_DIR/setup/wsl/wsl.conf  /etc/wsl.conf

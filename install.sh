@@ -9,7 +9,7 @@ else
     # Define default values if .env is not present and variables are not set externally
     # IMPORTANT: If you don't use a .env file, you MUST set DOTFILES_REPO here.
     : "${DOTFILES_REPO:="https://github.com/YOUR_USERNAME/YOUR_DOTFILES_REPO.git"}"
-    : "${DOTFILE_DIR:="/home/user/path/to/dotfiles"}"
+    : "${DOTFILE_REPO_DIR:="/home/user/path/to/dotfiles/repo"}"
     : "${GITSTATUS_DIR:="$HOME/.gitstatus"}"
     : "${OS_TYPE:="wsl"}"
 fi
@@ -23,23 +23,17 @@ if [ -z "$DOTFILES_REPO" ] || [ "$DOTFILES_REPO" == "https://github.com/YOUR_USE
     exit 1
 fi
 
-# Check if DOTFILE_DIR is set after sourcing .env or from defaults
-if [ -z "$DOTFILE_DIR" ] || [ "$DOTFILE_DIR" == "/home/user/path/to/dotfiles" ]; then
-    echo "ERROR: Please set the 'DOTFILE_DIR' variable in your .env file or directly in the script."
+# Check if DOTFILE_REPO_DIR is set after sourcing .env or from defaults
+if [ -z "$DOTFILE_REPO_DIR" ] || [ "$DOTFILE_REPO_DIR" == "/home/user/path/to/dotfiles/repo" ]; then
+    echo "ERROR: Please set the 'DOTFILE_REPO_DIR' variable in your .env file or directly in the script."
     if [[ -f "$DOTFILE_CONFIG_FILE" ]]; then
-        DOTFILE_DIR=$(grep '^DOTFILE_DIR=' "$DOTFILE_CONFIG_FILE" | cut -d'=' -f2-)
-        if [[ -d "$DOTFILE_DIR" ]]; then
-            echo "DOTFILE_DIR loaded from $DOTFILE_CONFIG_FILE"
-        else
-            echo "ERROR: Saved DOTFILE_DIR does not exist in $DOTFILE_CONFIG_FILE"
-            exit 1
-        fi
+        echo "DOTFILE_CONFIG_FILE set to $DOTFILE_CONFIG_FILE"
     else
         echo "WARNING: No saved file found at $DOTFILE_CONFIG_FILE"
         exit 1
     fi
 else
-    echo "DOTFILE_DIR set to $DOTFILE_DIR"
+    echo "DOTFILE_REPO_DIR set to $DOTFILE_REPO_DIR"
 fi
 
 # Check if OS_TYPE is set after sourcing .env or from defaults
@@ -59,24 +53,24 @@ if [ -z "$OS_TYPE" ]; then
     fi
 fi
 
-echo "$OS_TYPE"
+echo "OS_TYPE set to $OS_TYPE"
 
-echo "DOTFILE_DIR=$DOTFILE_DIR" > "$DOTFILE_CONFIG_FILE"
+echo "DOTFILE_REPO_DIR=$DOTFILE_REPO_DIR" > "$DOTFILE_CONFIG_FILE"
 echo "DOTFILES_REPO=$DOTFILES_REPO" >> "$DOTFILE_CONFIG_FILE"
 echo "OS_TYPE=$OS_TYPE" >> "$DOTFILE_CONFIG_FILE"
-export DOTFILE_DIR="$DOTFILE_DIR"
-export BASHRC_EXTRAS_PATH="$DOTFILE_DIR/.bash_extras"
+export DOTFILE_REPO_DIR="$DOTFILE_REPO_DIR"
+export BASHRC_EXTRAS_PATH="$DOTFILE_REPO_DIR/.bash_extras"
 export BASHRC_INIT="$BASHRC_EXTRAS_PATH/init"
 
-source "$DOTFILE_DIR/setup/bash/bash_colours" || {
+source "$DOTFILE_REPO_DIR/setup/bash/bash_colours" || {
     echo "Error: Could not source bash_colours.sh"
     exit 1
 }
-source "$DOTFILE_DIR/setup/bash/init" || {
+source "$DOTFILE_REPO_DIR/setup/bash/init" || {
     echo "Error: Could not source init.sh"
     exit 1
 }
-source "$DOTFILE_DIR/utils.sh" || {
+source "$DOTFILE_REPO_DIR/utils.sh" || {
     echo "Error: Could not source utils.sh"
     exit 1
 }

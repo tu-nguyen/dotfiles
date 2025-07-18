@@ -145,10 +145,10 @@ prompt() {
 # Function to clone or pull dotfiles repository
 clone_or_pull_dotfiles() {
     t "Managing dotfiles repository.."
-    if [ -d "$DOTFILE_DIR/.git" ]; then
-        t "  Dotfiles directory '$DOTFILE_DIR' already exists."
+    if [ -d "$DOTFILE_REPO_DIR/.git" ]; then
+        t "  Dotfiles directory '$DOTFILE_REPO_DIR' already exists."
         # Navigate to the dotfiles directory
-        cd "$DOTFILE_DIR" || { t Error "Failed to change directory to $DOTFILE_DIR. Aborting."; exit 1; }
+        cd "$DOTFILE_REPO_DIR" || { t Error "Failed to change directory to $DOTFILE_REPO_DIR. Aborting."; exit 1; }
 
         local stashed_changes=false
         # Check if there are any uncommitted changes (staged or unstaged)
@@ -188,14 +188,14 @@ clone_or_pull_dotfiles() {
             if git stash pop; then
                 t "  Stashed changes applied successfully."
             else
-                t Warning "Failed to pop stash. You may have conflicts to resolve manually in '$DOTFILE_DIR'."
+                t Warning "Failed to pop stash. You may have conflicts to resolve manually in '$DOTFILE_REPO_DIR'."
             fi
         fi
         
     else # Repository does not exist, clone it
-        t "  Cloning dotfiles repository '$DOTFILES_REPO' to '$DOTFILE_DIR'.."
-        mkdir -p "$DOTFILE_DIR" # Ensure parent directory exists
-        if ! git clone "$DOTFILES_REPO" "$DOTFILE_DIR"; then
+        t "  Cloning dotfiles repository '$DOTFILES_REPO' to '$DOTFILE_REPO_DIR'.."
+        mkdir -p "$DOTFILE_REPO_DIR" # Ensure parent directory exists
+        if ! git clone "$DOTFILES_REPO" "$DOTFILE_REPO_DIR"; then
             t Error "Failed to clone dotfiles from '$DOTFILES_REPO'. Please check the URL and your network."
             exit 1
         fi
@@ -216,7 +216,7 @@ install_packages() {
     install_powerline_fonts
     install_gitstatus
 
-    if [[ "$OS_TYPE" == "linux" || "$OS" == "wsl" ]]; then
+    if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         if ! command -v apt &>/dev/null; then
             t ERROR "apt package manager not found. Please install it first."
             return 1
@@ -268,18 +268,18 @@ reset_bashrc() {
         return
     fi
 
-    cp_and_source "$DOTFILE_DIR/setup/bash/bash_colours" "$HOME/.bash_extras/.bash_colours"
-    cp_and_source "$DOTFILE_DIR/setup/bash/init" "$HOME/.bash_extras/.init"
+    cp_and_source "$DOTFILE_REPO_DIR/setup/bash/bash_colours" "$HOME/.bash_extras/.bash_colours"
+    cp_and_source "$DOTFILE_REPO_DIR/setup/bash/init" "$HOME/.bash_extras/.init"
 
-    cp_and_source "$DOTFILE_DIR/setup/bash/bash_aliases" "$HOME/.bash_extras/.bash_aliases"
-    cp_and_source "$DOTFILE_DIR/setup/bash/bash_docker_functions" "$HOME/.bash_extras/.bash_docker_functions"
-    cp_and_source "$DOTFILE_DIR/setup/bash/bash_functions" "$HOME/.bash_extras/.bash_functions"
-    cp_and_source "$DOTFILE_DIR/setup/bash/bash_exports" "$HOME/.bash_extras/.bash_exports"
-    cp_and_source "$DOTFILE_DIR/setup/bash/bash_motd" "$HOME/.bash_extras/.bash_motd"
-    cp_and_source "$DOTFILE_DIR/setup/bash/bash_other" "$HOME/.bash_extras/.bash_other"
-    cp_and_source "$DOTFILE_DIR/setup/bash/bash_tt" "$HOME/.bash_extras/.bash_tt"
+    cp_and_source "$DOTFILE_REPO_DIR/setup/bash/bash_aliases" "$HOME/.bash_extras/.bash_aliases"
+    cp_and_source "$DOTFILE_REPO_DIR/setup/bash/bash_docker_functions" "$HOME/.bash_extras/.bash_docker_functions"
+    cp_and_source "$DOTFILE_REPO_DIR/setup/bash/bash_functions" "$HOME/.bash_extras/.bash_functions"
+    cp_and_source "$DOTFILE_REPO_DIR/setup/bash/bash_exports" "$HOME/.bash_extras/.bash_exports"
+    cp_and_source "$DOTFILE_REPO_DIR/setup/bash/bash_motd" "$HOME/.bash_extras/.bash_motd"
+    cp_and_source "$DOTFILE_REPO_DIR/setup/bash/bash_other" "$HOME/.bash_extras/.bash_other"
+    cp_and_source "$DOTFILE_REPO_DIR/setup/bash/bash_tt" "$HOME/.bash_extras/.bash_tt"
 
-    cp_and_source "$DOTFILE_DIR/setup/bash/bashrc" "$HOME/.bashrc"
+    cp_and_source "$DOTFILE_REPO_DIR/setup/bash/bashrc" "$HOME/.bashrc"
 
     t SUCCESS "Bash setup completed!"
 }
@@ -300,8 +300,8 @@ reset_vimrc() {
         rm -rf $HOME/.vim/bundle
     fi
 
-    cp  "$DOTFILE_DIR/setup/vim/vimrc" "$HOME/.vimrc"
-    t SUCCESS "Linked $DOTFILE_DIR/setup/vim/vimrc to $HOME/.vimrc successfully."
+    cp  "$DOTFILE_REPO_DIR/setup/vim/vimrc" "$HOME/.vimrc"
+    t SUCCESS "Linked $DOTFILE_REPO_DIR/setup/vim/vimrc to $HOME/.vimrc successfully."
 
     t "Installing Vundle and plugins.."
     VUNDLE_PATH="$HOME/.vim/bundle/Vundle.vim"
@@ -322,8 +322,8 @@ reset_git_config() {
         return
     fi
 
-    chmod +x $DOTFILE_DIR/setup/git/git_config_setup.sh
-    $DOTFILE_DIR/setup/git/git_config_setup.sh
+    chmod +x $DOTFILE_REPO_DIR/setup/git/git_config_setup.sh
+    $DOTFILE_REPO_DIR/setup/git/git_config_setup.sh
 
     t SUCCESS "Git configuration reset completed!"
 }
@@ -334,8 +334,8 @@ reset_vscode_config() {
         return
     fi
 
-    chmod +x $DOTFILE_DIR/setup/vscode/vscode_config_setup.sh
-    bash -i $DOTFILE_DIR/setup/vscode/vscode_config_setup.sh
+    chmod +x $DOTFILE_REPO_DIR/setup/vscode/vscode_config_setup.sh
+    bash -i $DOTFILE_REPO_DIR/setup/vscode/vscode_config_setup.sh
 
     t SUCCESS "VSCode configuration reset completed!"
 }
@@ -351,8 +351,8 @@ reset_wsl_config() {
         return
     fi
 
-    chmod +x $DOTFILE_DIR/setup/wsl/wsl_config_setup.sh
-    bash -i $DOTFILE_DIR/setup/wsl/wsl_config_setup.sh
+    chmod +x $DOTFILE_REPO_DIR/setup/wsl/wsl_config_setup.sh
+    bash -i $DOTFILE_REPO_DIR/setup/wsl/wsl_config_setup.sh
     t SUCCESS "WSL configuration reset completed!"
 }
 
@@ -364,8 +364,8 @@ reset_powerline_config() {
 
     t "tmp disabled"
 
-    # chmod +x $DOTFILE_DIR/setup/powerline/powerline_config_setup.sh
-    # bash -i $DOTFILE_DIR/setup/powerline/powerline_config_setup.sh
+    # chmod +x $DOTFILE_REPO_DIR/setup/powerline/powerline_config_setup.sh
+    # bash -i $DOTFILE_REPO_DIR/setup/powerline/powerline_config_setup.sh
     # t SUCCESS "Powerline configuration reset completed!"
 }
 
@@ -375,7 +375,7 @@ reset_firefox() {
         return
     fi
 
-    chmod +x $DOTFILE_DIR/setup/firefox/firefox_setup.sh
-    bash -i $DOTFILE_DIR/setup/firefox/firefox_setup.sh
+    chmod +x $DOTFILE_REPO_DIR/setup/firefox/firefox_setup.sh
+    bash -i $DOTFILE_REPO_DIR/setup/firefox/firefox_setup.sh
     t SUCCESS "Firefox configuration reset completed!"
 }

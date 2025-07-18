@@ -95,8 +95,15 @@ check_base_path() {
         if [ -n "$default_profile_dir" ]; then
             local full_profile_path="$FF_PATH/$default_profile_dir"
             if [ -d "$full_profile_path" ]; then
-                echo "$full_profile_path"
-                return 0
+                # Check file count
+                local file_count=$(find "$full_profile_path" -maxdepth 1 -type f | wc -l)
+                echo "DEBUG: Found $file_count files in '$full_profile_path'."
+                if (( file_count >= 4 )); then
+                    echo "$full_profile_path"
+                    return 0 # Found and returned
+                else
+                    echo "DEBUG: Profile '$full_profile_path' has only $file_count files, which is less than $MIN_FILES_REQUIRED. Skipping." >&2
+                fi
             fi
         fi
     fi

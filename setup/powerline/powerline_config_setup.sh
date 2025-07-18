@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # --- Load Configuration ---
-# DOTFILES_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
-# if [ -f "$DOTFILES_CONFIG_FILE" ]; then
-#     source "$DOTFILES_CONFIG_FILE"
-# else
-#     t Error "Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
-#     exit 1
-# fi
+DOTFILES_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
+if [ -f "$DOTFILES_CONFIG_FILE" ]; then
+    source "$DOTFILES_CONFIG_FILE"
+else
+    t Error "Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
+    exit 1
+fi
 
 if [[ -f "$HOME/.config/powerline/config.json" ]]; then
     t "Replacing config.json for powerline-shell"

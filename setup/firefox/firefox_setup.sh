@@ -10,7 +10,7 @@ DOTFILE_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
 if [ -f "$DOTFILE_CONFIG_FILE" ]; then
     source "$DOTFILE_CONFIG_FILE"
     echo "Configuration loaded from $DOTFILE_CONFIG_FILE"
-    echo "DOTFILE_REPO_DIR: $DOTFILE_REPO_DIR"
+    echo "DOTFILES_REPO_DIR: $DOTFILES_REPO_DIR"
     echo "OS_TYPE: $OS_TYPE"
 else
     echo "Error: Configuration file not found at $DOTFILE_CONFIG_FILE" >&2
@@ -104,7 +104,7 @@ check_base_path() {
 
 # Function to set up userChrome.css by copying from a source
 setup_userchrome_css() {
-    local source_css_path="$DOTFILE_REPO_DIR/setup/firefox/userChrome.css"
+    local source_css_path="$DOTFILES_REPO_DIR/setup/firefox/userChrome.css"
 
     if [ -z "$FF_PROFILE" ]; then
         echo "Cannot set up userChrome.css: Firefox profile path not provided." >2

@@ -1,27 +1,133 @@
 {
-    "git.autofetch": true,
-    "terminal.integrated.profiles.linux": {
+    // --- Editor Settings ---
+    "editor.fontSize": 14, // Adjust to your preference
+    // "editor.lineHeight": 20, // Adjust for better readability
+    "editor.fontFamily": "Fira Code, Consolas, 'Courier New', monospace", // Recommended: Fira Code with ligatures
+    "editor.fontLigatures": true, // Enable font ligatures for better code aesthetics (if using Fira Code, etc.)
+    "editor.renderLineHighlight": "gutter", // Highlight only the line number in the gutter
+    "editor.tabSize": 4, // **Python standard is 4 spaces**
+    "editor.insertSpaces": true, // Use spaces instead of tabs
+    "editor.detectIndentation": true, // Automatically detect indentation from file
+    "editor.renderWhitespace": "all", // Show all whitespace characters (spaces, tabs, newlines)
+    "editor.rulers": [79, 120], // **PEP 8 (79 chars) and common soft wrap (120 chars)**
+    "editor.wordWrap": "off", // Usually off for code, prefer horizontal scrolling or formatters
+    "editor.formatOnSave": true, // Auto-format code on save (requires formatters like Black)
+    "editor.defaultFormatter": "ms-python.black-formatter", // **Set Black as the default formatter for Python**
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit", // Auto-organize imports (e.g., isort via Ruff or Pylance)
+        "source.fixAll.eslint": "explicit", // For JavaScript/frontend parts
+        "source.fixAll.ruff": "explicit", // **For Python linting fixes**
+        "source.fixAll": "explicit" // General fix-all
+    },
+    "editor.minimap.enabled": true, // Show minimap (code overview)
+    "editor.stickyScroll.enabled": true, // Keeps relevant scope (function/class headers) visible at the top
+    "editor.scrollBeyondLastLine": false, // Don't scroll past the last line
+    "editor.linkedEditing": true, // Enable linked editing (rename HTML tags, etc.)
+    "editor.bracketPairColorization.enabled": true, // Colorize matching brackets for better readability
+    "editor.guides.bracketPairs": "active", // Show guides for active bracket pairs
+    "editor.smoothScrolling": true, // Smooth scroll animation
+    "editor.cursorBlinking": "smooth", // Smooth cursor blinking
+    "editor.multiCursorModifier": "ctrlCmd", // Use Ctrl/Cmd for multiple cursors
 
-        "bash": {
-            "path": "bash",
-            "icon": "terminal-bash",
-            "args": [
-                "-l"
-            ]
-        },
-        "zsh": {
-            "path": "zsh"
-        },
-        "fish": {
-            "path": "fish"
-        },
-        "tmux": {
-            "path": "tmux",
-            "icon": "terminal-tmux"
-        },
-        "pwsh": {
-            "path": "pwsh",
+    // --- Files & Folders ---
+    // "files.eol": "\n", // Use LF (Unix/Linux) as the default end of line character
+    // "files.autoSave": "afterDelay", // Auto save after a delay
+    // "files.autoSaveDelay": 1000, // 1 second delay
+    "files.trimTrailingWhitespace": true, // Remove trailing whitespace on save
+    "files.insertFinalNewline": true, // Ensure a final newline at the end of files on save
+    "files.associations": {
+        "*.html": "html",
+        "*.js": "javascript",
+        "*.json": "json",
+        "*.css": "css",
+        "*.scss": "scss",
+        "*.py": "python",
+        "*.pyi": "python",
+        "*.toml": "toml",
+        "*.ini": "ini",
+        "*.env": "env",
+        "*.yaml": "yaml",
+        "*.yml": "yaml",
+        "**/templates/**/*.html": "django-html", // **Django HTML templates**
+        "**/templates/**/*.txt": "django-txt",
+        "**/templates/**/*.xml": "django-xml",
+        "**/static/**/*.html": "html",
+        "**/requirements.txt": "pip-requirements" // For better syntax highlighting
+    },
+
+    // --- Workbench & UI ---
+    "workbench.colorTheme": "Default Dark Modern",
+    "workbench.iconTheme": "vscode-icons", // Recommended: VSCode Icons (install extension)
+    "workbench.statusBar.visible": true,
+    "workbench.editor.limit.enabled": true, // Limit the number of open editors
+    "workbench.editor.limit.value": 9, // Max 9 open editors
+    "workbench.editor.untitled.labelFormat": "simple", // Simple label for untitled files
+    "workbench.tree.indent": 12, // Indent in file explorer tree
+    "workbench.enableExperiments": false, // Disable experimental features
+    "workbench.settings.editor": "json", // Always open settings in JSON editor (or "ui" for UI editor)
+    "workbench.startupEditor": "none", // Open VS Code to an empty window
+    // "workbench.view.releaseNotes": false, // Don't show release notes on update
+
+    // --- Terminal Settings ---
+    "terminal.integrated.fontSize": 13, // Adjust to match editor font size
+    "terminal.integrated.cursorBlinking": true,
+    "terminal.integrated.defaultProfile.linux": "bash", // Or "zsh", "fish", etc.
+    "terminal.integrated.defaultProfile.windows": "Git Bash", // Or "Git Bash", "CMD", "WSL"
+    "terminal.integrated.profiles.windows": { // Define profiles for Windows
+        "PowerShell": {
+            "source": "PowerShell",
             "icon": "terminal-powershell"
+        },
+        "Command Prompt": {
+            "path": [
+                "${env:windir}\\System32\\cmd.exe"
+            ],
+            "icon": "terminal-cmd"
+        },
+        "Git Bash": {
+            "path": [
+                "C:\\Program Files\\Git\\bin\\bash.exe" // Adjust path if Git Bash is elsewhere
+            ],
+            "icon": "terminal-bash"
+        },
+        "WSL": {
+            "path": "C:\\Windows\\System32\\wsl.exe",
+            "icon": "terminal-wsl"
         }
+    },
+    "terminal.integrated.shellIntegration.enabled": true, // Enable shell integration for better terminal features
+    "terminal.integrated.enableMultiLinePasteWarning": false, // Disable warning for multi-line paste
+    "python.terminal.activateEnvironment": true, // **Automatically activate Python environment in new terminals**
+
+    // TODO
+    "security.allowedUNCHosts": [
+        "dumpster"
+    ],
+    "security.workspace.trust.untrustedFiles": "open",
+    "http.proxyAuthorization": null,
+    "http.proxySupport": "fallback",
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[javascriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "jupyter.askForKernelRestart": false,
+    "pylint.args": [
+        "\"load-plugins=pylint_django\""
+    ],
+
+    "emmet.includeLanguages": {
+        "django-html": "html"
+    },
+    "makefile.configureOnOpen": true,
+    "chat.instructionsFilesLocations": {
+        ".github/instructions": true,
+        "C:\\Users\\valcr\\AppData\\Local\\Temp\\postman-http-request-post-response.instructions.md": true,
+        "C:\\Users\\valcr\\AppData\\Local\\Temp\\postman-http-request-pre-request.instructions.md": true,
+        "C:\\Users\\valcr\\AppData\\Local\\Temp\\postman-collections-post-response.instructions.md": true,
+        "C:\\Users\\valcr\\AppData\\Local\\Temp\\postman-collections-pre-request.instructions.md": true,
+        "C:\\Users\\valcr\\AppData\\Local\\Temp\\postman-folder-post-response.instructions.md": true,
+        "C:\\Users\\valcr\\AppData\\Local\\Temp\\postman-folder-pre-request.instructions.md": true
     }
 }

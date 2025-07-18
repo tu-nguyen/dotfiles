@@ -18,93 +18,92 @@ else
 fi
 
 # Function to find the Firefox profile directory
-find_firefox_profile() {
+find_firefox_path() {
     local profile_base_path=""
-
-    echo "$OS_TYPE"
 
     if  [[ "$OS_TYPE" == "linux" ]]; then
         profile_base_path="$HOME/.mozilla/firefox"
         profile_base_path_snap="$HOME/snap/firefox/common/.mozilla/firefox" # Snap path
     elif [[ "$OS_TYPE" == "wsl" ]]; then
-        WIN_APPDATA=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:APPDATA" | tr -d '\r')
-        WIN_USERPROFILE=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:USERPROFILE" | tr -d '\r')
-
-        if [ -n "$WIN_APPDATA" ]; then
-            profile_base_path=$(echo "$WIN_APPDATA" | sed 's/\\/\//g')/Mozilla/Firefox/Profiles
-        elif [ -n "$WIN_USERPROFILE" ]; then
-            profile_base_path=$(echo "$WIN_USERPROFILE" | sed 's/\\/\//g')/AppData/Roaming/Mozilla/Firefox/Profiles
+        local raw_win_appdata=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:APPDATA" | tr -d '\r\n')
+        local raw_win_userprofile=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:USERPROFILE" | tr -d '\r\n')
+            
+        if [ -n "$raw_win_appdata" ]; then
+            profile_base_path=$(wslpath -u "$raw_win_appdata")/Mozilla/Firefox
+        elif [ -n "$raw_win_userprofile" ]; then
+            profile_base_path=$(wslpath -u "$raw_win_userprofile")/AppData/Roaming/Mozilla/Firefox
         else
             echo "Error: Could not determine Windows APPDATA or USERPROFILE paths." >&2
             exit 1
         fi
     elif [[ "$OS_TYPE" == "macos" ]]; then
-        echo "33333333333333333333"
-        profile_base_path="$HOME/Library/Application Support/Firefox/Profiles"
+        profile_base_path="$HOME/Library/Application Support/Firefox"
     fi
 
-    echo "44444444444444444"
+    echo $profile_base_path
+}
 
-    # Function to check a given base path for a Firefox profile
-    check_base_path() {
-        local current_base_path="$1"
-        if [ ! -d "$current_base_path" ]; then
-            return 1 # Path does not exist
-        fi
-
-        local profiles_ini="$current_base_path/profiles.ini"
-        if [ -f "$profiles_ini" ]; then
-            local default_profile_dir=$(grep -A 5 "\[Profile" "$profiles_ini" | grep "Default=1" -B 3 | grep "Path=" | cut -d '=' -f 2)
-            
-            if [ -n "$default_profile_dir" ]; then
-                local full_profile_path="$current_base_path/$default_profile_dir"
-                if [ -d "$full_profile_path" ]; then
-                    echo "$full_profile_path"
-                    return 0
-                fi
+# Function to check a given base path for a Firefox profile
+check_base_path() {
+    local profiles_ini="$FF_PATH/profiles.ini"
+    if [ -f "$profiles_ini" ]; then
+        local default_profile_dir=$(grep -A 5 "\[Profile" "$profiles_ini" | grep "Default=1" -B 3 | grep "Path=" | cut -d '=' -f 2)
+        if [ -n "$default_profile_dir" ]; then
+            local full_profile_path="$FF_PATH/$default_profile_dir"
+            if [ -d "$full_profile_path" ]; then
+                echo "$full_profile_path"
+                return 0
             fi
         fi
+    fi
 
-        # Fallback: If profiles.ini parsing fails, try to find a common default profile name
-        for profile_dir in "$current_base_path"/*; do
-            if [[ "$profile_dir" =~ \.default-release$ || "$profile_dir" =~ \.default$ ]]; then
-                if [ -d "$profile_dir" ]; then
-                    echo "$profile_dir"
-                    return 0
-                fi
+    # Fallback: If profiles.ini parsing fails, try to find a common default profile name
+    local latest_profile=""
+    local latest_mtime=0
+    for profile_dir in "$FF_PATH"/Profiles/*; do
+        # Check if it's a directory and matches the naming pattern
+        if [ -d "$profile_dir" ]; then
+            # Get the modification time of the directory
+            # For GNU systems (Linux, WSL), use stat -c %Y
+            # For macOS/BSD, use stat -f %m
+            local mtime=""
+            if command -v stat >/dev/null 2>&1 && stat -c %Y "$profile_dir" >/dev/null 2>&1; then
+                # GNU stat (Linux, WSL)
+                mtime=$(stat -c %Y "$profile_dir")
+            elif command -v stat >/dev/null 2>&1 && stat -f %m "$profile_dir" >/dev/null 2>&1; then
+                # BSD stat (macOS)
+                mtime=$(stat -f %m "$profile_dir")
+            else
+                # Fallback if stat isn't robust or portable enough, or just skip mtime check
+                # You might need to adjust this if stat fails frequently.
+                # For this specific scenario, given we expect stat, it's fine.
+                echo "Warning: 'stat' command not behaving as expected for modification time check. Skipping time comparison for '$profile_dir'." >&2
+                continue # Skip to the next directory
             fi
-        done
-        return 1
-    }
 
-    # Try standard path first
-    if [ -n "$profile_base_path" ]; then
-        found_profile=$(check_base_path "$profile_base_path")
-        if [ $? -eq 0 ] && [ -n "$found_profile" ]; then
-            echo "$found_profile"
-            return 0
+            # Check if this profile is newer than the current latest
+            if [ -n "$mtime" ] && (( mtime > latest_mtime )); then
+                latest_mtime="$mtime"
+                latest_profile="$profile_dir"
+            fi
         fi
+    done
+
+    if [ -n "$latest_profile" ]; then
+        echo "$latest_profile"
+        return 0
     fi
 
-    # If not found in standard path, try Snap path (if applicable)
-    if [ "$system" == "Linux" ] && [ -n "$profile_base_path_snap" ]; then
-        found_profile=$(check_base_path "$profile_base_path_snap")
-        if [ $? -eq 0 ] && [ -n "$found_profile" ]; then
-            echo "$found_profile"
-            return 0
-        fi
-    fi
-
-    echo "Could not find a default Firefox profile. Please ensure Firefox has been run at least once." >&2
+    # If no matching profile was found after checking all directories
+    echo "DEBUG: No matching default-release or .default profile found in '$current_base_path'." >&2 # Add debug
     return 1
 }
 
 # Function to set up userChrome.css by copying from a source
 setup_userchrome_css() {
-    local profile_path="$1"
     local source_css_path="$DOTFILE_REPO_DIR/setup/firefox/userChrome.css"
 
-    if [ -z "$profile_path" ]; then
+    if [ -z "$FF_PROFILE" ]; then
         echo "Cannot set up userChrome.css: Firefox profile path not provided." >2
         return 1
     fi
@@ -115,7 +114,7 @@ setup_userchrome_css() {
         return 1
     fi
 
-    local chrome_dir="$profile_path/chrome"
+    local chrome_dir="$FF_PROFILE/chrome"
     local dest_css_path="$chrome_dir/userChrome.css"
 
     # Ensure the 'chrome' directory exists
@@ -146,11 +145,13 @@ setup_userchrome_css() {
 
 # Main execution
 echo "Attempting to set up userChrome.css for Firefox.."
-find_firefox_profile
 
-if [ $? -eq 0 ] && [ -n "$PROFILE_PATH" ]; then
-    echo "Found Firefox profile: $PROFILE_PATH"
-    setup_userchrome_css "$PROFILE_PATH"
+FF_PATH=$(find_firefox_path)
+FF_PROFILE=$(check_base_path)
+
+if [ $? -eq 0 ] && [ -n "$FF_PROFILE" ]; then
+    echo "Found Firefox profile: $FF_PROFILE"
+    setup_userchrome_css "$FF_PROFILE"
 else
     echo "Setup failed. Please check the console output for details." >&2
 fi

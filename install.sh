@@ -1,79 +1,90 @@
 #!/bin/bash
 set -e
 
-if [ -f .env ]; then
-    echo "Sourcing .env file for configuration.."
-    source .env
-else
-    echo "Warning: .env file not found. Script will rely on environment variables or defaults."
-    # Define default values if .env is not present and variables are not set externally
-    # IMPORTANT: If you don't use a .env file, you MUST set DOTFILES_REPO here.
-    : "${DOTFILES_REPO:="https://github.com/YOUR_USERNAME/YOUR_DOTFILES_REPO.git"}"
-    : "${DOTFILE_REPO_DIR:="/home/user/path/to/dotfiles/repo"}"
-    : "${GITSTATUS_DIR:="$HOME/.gitstatus"}"
-    : "${OS_TYPE:="wsl"}"
-fi
-
-DOTFILE_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
-GITSTATUS_DIR="$HOME/.gitstatus"
-
-# Check if DOTFILES_REPO is set after sourcing .env or from defaults
-if [ -z "$DOTFILES_REPO" ] || [ "$DOTFILES_REPO" == "https://github.com/YOUR_USERNAME/YOUR_DOTFILES_REPO.git" ]; then
-    echo "ERROR: Please set the 'DOTFILES_REPO' variable in your .env file or directly in the script."
-    exit 1
-fi
-
-# Check if DOTFILE_REPO_DIR is set after sourcing .env or from defaults
-if [ -z "$DOTFILE_REPO_DIR" ] || [ "$DOTFILE_REPO_DIR" == "/home/user/path/to/dotfiles/repo" ]; then
-    echo "ERROR: Please set the 'DOTFILE_REPO_DIR' variable in your .env file or directly in the script."
-    if [[ -f "$DOTFILE_CONFIG_FILE" ]]; then
-        echo "DOTFILE_REPO_DIR pulled from $DOTFILE_CONFIG_FILE"
-        DOTFILE_REPO_DIR=$(grep '^DOTFILE_REPO_DIR=' "$DOTFILE_CONFIG_FILE" | cut -d'=' -f2-)
-        if [ -z "$DOTFILE_REPO_DIR" ]; then
-            echo "ERROR: DOTFILE_REPO_DIR not set in .env or exist in $DOTFILE_CONFIG_FILE"
+get_os_type() {
+    if [ -z "$OS_TYPE" ]; then
+        echo "[INFO] Detecting OS.." >&2
+        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            if grep -qi microsoft /proc/version; then
+                OS_TYPE="wsl"
+            else
+                OS_TYPE="linux"
+            fi
+        elif [[ "$OSTYPE" == "darwin"* ]]; then
+            OS_TYPE="macos"
+        else
+            echo "[ERROR] Unsupported OS: $OSTYPE"
             exit 1
         fi
-    else
-        echo "WARNING: No saved file found at $DOTFILE_CONFIG_FILE"
-        exit 1
     fi
+
+    echo "$OS_TYPE"
+}
+
+
+ENV_LOADED=false
+if [ -f .env ]; then
+    echo "[INFO] Configuration loaded from .env"
+    source .env
+    ENV_LOADED=true
 else
-    echo "DOTFILE_REPO_DIR set to $DOTFILE_REPO_DIR"
-fi
-
-# Check if OS_TYPE is set after sourcing .env or from defaults
-if [ -z "$OS_TYPE" ]; then
-    echo "Detecting OS.."
-    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        if grep -qi microsoft /proc/version; then
-            OS_TYPE="wsl"
-        else
-            OS_TYPE="linux"
-        fi
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        OS_TYPE="macos"
-    else
-        echo "ERROR: Unsupported OS: $OSTYPE"
-        exit 1
+    DOTFILES_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
+    if [[ -f "$DOTFILES_CONFIG_FILE" ]]; then
+        echo "[INFO] Configuration loaded from $DOTFILE_CONFIG_FILE"
+        source "$DOTFILES_CONFIG_FILE"
+        ENV_LOADED=true
     fi
 fi
 
-echo "OS_TYPE set to $OS_TYPE"
+DEFAULT_DOTFILES_REPO="https://github.com/tu-nguyen/dotfiles.git"
+DEFAULT_DOTFILES_REPO_DIR="$(pwd)"
+DEFAULT_GITSTATUS_DIR="$HOME/.gitstatus"
+DEFAULT_DOTFILES_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
+DEFAULT_OS_TYPE=$(get_os_type)
+GITSTATUS_DIR="$HOME/.gitstatus"
 
-echo -e "DOTFILE_REPO_DIR=$DOTFILE_REPO_DIR\nDOTFILES_REPO=$DOTFILES_REPO\nOS_TYPE=$OS_TYPE" > "$DOTFILE_CONFIG_FILE"
-export DOTFILE_REPO_DIR="$DOTFILE_REPO_DIR"
-export BASHRC_EXTRAS_PATH="$DOTFILE_REPO_DIR/.bash_extras"
-export BASHRC_INIT="$BASHRC_EXTRAS_PATH/init"
+if [[ "$ENV_LOADED" == "false" ]]
+    echo "[WARNING] .env and .dotfile_config files not found. Script will rely on defaults."
+    : "${DOTFILES_REPO:="$DEFAULT_DOTFILES_REPO"}"
+    : "${DOTFILES_REPO_DIR:="$DEFAULT_DOTFILES_REPO_DIR"}"
+    : "${DOTFILES_CONFIG_FILE:="$DEFAULT_DOTFILES_CONFIG_FILE"}"
+    : "${OS_TYPE:=$DEFAULT_OS_TYPE}"
+fi
 
-source "$DOTFILE_REPO_DIR/setup/bash/bash_colours" || {
+if [ -z "$DOTFILES_REPO_DIR" ] || [ "$DOTFILES_REPO_DIR" == "/home/user/path/to/dotfiles" ]; then
+    echo "[WARNING] 'DOTFILES_REPO_DIR' was not set, falling to default $DEFAULT_DOTFILES_REPO_DIR."
+    : "${DOTFILES_REPO_DIR:="$DEFAULT_DOTFILES_REPO_DIR"}"
+fi
+
+if [ -z "$DOTFILES_REPO" ] || [ "$DOTFILES_REPO" == "https://github.com/YOUR_USERNAME/YOUR_DOTFILES_REPO.git" ]; then
+    echo "[WARNING] 'DOTFILES_REPO' was not set, falling to default $DEFAULT_DOTFILES_REPO."
+    : "${DOTFILES_REPO:="$DEFAULT_DOTFILES_REPO"}"
+fi
+
+if [ -z "$DOTFILES_CONFIG_FILE" ] || [ "$DOTFILES_CONFIG_FILE" == "/home/user/.bash_extras/path/to/.dotfile_config" ]; then
+    echo "[WARNING] 'DOTFILES_CONFIG_FILE' was not set, falling to default $DEFAULT_DOTFILES_CONFIG_FILE."
+    : "${DOTFILES_CONFIG_FILE:="$DEFAULT_DOTFILES_CONFIG_FILE"}"
+fi
+
+if [ -z "$OS_TYPE" ] || [ "$OS_TYPE" == "some_os" ]; then
+    echo "[WARNING] 'OS_TYPE' was not set, falling to default $DEFAULT_OS_TYPE."
+    : "${OS_TYPE:="$DEFAULT_OS_TYPE"}"
+fi
+
+echo "DOTFILES_REPO=$DOTFILES_REPO" > "$DOTFILE_CONFIG_FILE"
+echo "DOTFILES_REPO_DIR=$DOTFILES_REPO_DIR" >> "$DOTFILE_CONFIG_FILE"
+echo "DOTFILES_CONFIG_FILE=$DOTFILES_CONFIG_FILE"  >> "$DOTFILE_CONFIG_FILE"
+echo "OS_TYPE=$OS_TYPE" >> "$DOTFILE_CONFIG_FILE"
+
+source "$DOTFILES_REPO_DIR/setup/bash/bash_colours" || {
     echo "Error: Could not source bash_colours.sh"
     exit 1
 }
-source "$DOTFILE_REPO_DIR/setup/bash/init" || {
+source "$DOTFILES_REPO_DIR/setup/bash/init" || {
     echo "Error: Could not source init.sh"
     exit 1
 }
-source "$DOTFILE_REPO_DIR/utils.sh" || {
+source "$DOTFILES_REPO_DIR/utils.sh" || {
     echo "Error: Could not source utils.sh"
     exit 1
 }

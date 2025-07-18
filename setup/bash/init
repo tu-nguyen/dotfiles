@@ -1,8 +1,8 @@
 
 if [[ -f "$HOME/.bash_extras/.bash_colours" ]]; then
     . "$HOME/.bash_extras/.bash_colours"
-elif [[ -f "$DOTFILE_REPO_DIR/bash/bash_colours" ]]; then
-    . "$DOTFILE_REPO_DIR/bash/bash_colours"
+elif [[ -f "$DOTFILES_REPO_DIR/bash/bash_colours" ]]; then
+    . "$DOTFILES_REPO_DIR/bash/bash_colours"
 else
     echo "[WARNING] Failed to load colours"
 fi

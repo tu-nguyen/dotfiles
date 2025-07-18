@@ -8,34 +8,25 @@
 # Function to find the Firefox profile directory
 find_firefox_profile() {
     local profile_base_path=""
-    local system=$(uname -s)
 
-    case "$system" in
-        Linux*)
-            profile_base_path="$HOME/.mozilla/firefox"
-            profile_base_path_snap="$HOME/snap/firefox/common/.mozilla/firefox" # Snap path
-            ;;
-        Darwin*) # macOS
-            profile_base_path="$HOME/Library/Application Support/Firefox/Profiles"
-            ;;
-        CYGWIN*|MINGW32*|MSYS*|MINGW*) # Windows (Git Bash, WSL, Cygwin)
-            WIN_APPDATA=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:APPDATA" | tr -d '\r')
-            WIN_USERPROFILE=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:USERPROFILE" | tr -d '\r')
+    if  [[ "$OS" == "Linux" ]]; then
+        profile_base_path="$HOME/.mozilla/firefox"
+        profile_base_path_snap="$HOME/snap/firefox/common/.mozilla/firefox" # Snap path
+    elif [[ "$OS" == "WSL" ]]; then
+        WIN_APPDATA=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:APPDATA" | tr -d '\r')
+        WIN_USERPROFILE=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:USERPROFILE" | tr -d '\r')
 
-            if [ -n "$WIN_APPDATA" ]; then
-                profile_base_path=$(echo "$WIN_APPDATA" | sed 's/\\/\//g')/Mozilla/Firefox/Profiles
-            elif [ -n "$WIN_USERPROFILE" ]; then
-                profile_base_path=$(echo "$WIN_USERPROFILE" | sed 's/\\/\//g')/AppData/Roaming/Mozilla/Firefox/Profiles
-            else
-                echo "Error: Could not determine Windows APPDATA or USERPROFILE paths." >&2
-                exit 1
-            fi
-            ;;
-        *)
-            echo "Unsupported operating system: $system" >&2
-            return 1
-            ;;
-    esac
+        if [ -n "$WIN_APPDATA" ]; then
+            profile_base_path=$(echo "$WIN_APPDATA" | sed 's/\\/\//g')/Mozilla/Firefox/Profiles
+        elif [ -n "$WIN_USERPROFILE" ]; then
+            profile_base_path=$(echo "$WIN_USERPROFILE" | sed 's/\\/\//g')/AppData/Roaming/Mozilla/Firefox/Profiles
+        else
+            echo "Error: Could not determine Windows APPDATA or USERPROFILE paths." >&2
+            exit 1
+        fi
+    elif [[ "$OS" == "macOS" ]]; then
+        profile_base_path="$HOME/Library/Application Support/Firefox/Profiles"
+    fi
 
     # Function to check a given base path for a Firefox profile
     check_base_path() {

@@ -97,6 +97,9 @@ check_base_path() {
             if [ -d "$full_profile_path" ]; then
                 # Check file count
                 local file_count=$(find "$full_profile_path" -maxdepth 1 -type f | wc -l)
+                echo "testtesttest"
+                echo "$file_count"
+                echo "testtesttest"
                 if [ $file_count -gt 4 ]; then
                     echo "$full_profile_path"
                     return 0 # Found and returned
@@ -197,16 +200,16 @@ echo "Attempting to set up userChrome.css for Firefox.."
 FF_PATH=$(find_firefox_path)
 FF_PROFILE=$(check_base_path)
 
-if [ $? -eq 0 ] && [ -n "$FF_PROFILE" ]; then
-    echo "Found Firefox profile: $FF_PROFILE"
-    # Check for Tree Style Tab
-    TST_ADDON_ID="treestyletab@piro.sakura.ne.jp"
-    if check_addon_installed "$FF_PROFILE" "$TST_ADDON_ID"; then
-        setup_userchrome_css
-    else
-        t ERROR "Setup failed. Please install Tree Style Tab plugin"
-    fi
+# if [ $? -eq 0 ] && [ -n "$FF_PROFILE" ]; then
+#     echo "Found Firefox profile: $FF_PROFILE"
+#     # Check for Tree Style Tab
+#     TST_ADDON_ID="treestyletab@piro.sakura.ne.jp"
+#     if check_addon_installed "$FF_PROFILE" "$TST_ADDON_ID"; then
+#         setup_userchrome_css
+#     else
+#         t ERROR "Setup failed. Please install Tree Style Tab plugin"
+#     fi
     
-else
-    t ERROR "Setup failed. Please check the console output for details." >&2
-fi
+# else
+#     t ERROR "Setup failed. Please check the console output for details." >&2
+# fi

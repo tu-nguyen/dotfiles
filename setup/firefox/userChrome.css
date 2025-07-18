@@ -1,8 +1,9 @@
-/* Hide main tabs toolbar */
-#TabsToolbar {
+/* Hide main tabs */
+/* #TabsToolbar { / * This would remove the min, max, and close buttons
     visibility: collapse;
-}
+} */
 
+/* Hide only the tabs themselves */
 #tabbrowser-tabs {
     visibility: collapse;
 }

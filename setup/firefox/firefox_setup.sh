@@ -97,7 +97,7 @@ check_base_path() {
             if [ -d "$full_profile_path" ]; then
                 # Check file count
                 local file_count=$(find "$full_profile_path" -maxdepth 1 -type f | wc -l)
-                echo "DEBUG: Found $file_count files in '$full_profile_path'."
+                echo "DEBUG: Found $file_count files in '$full_profile_path'."  >&2
                 if (( file_count >= 4 )); then
                     echo "$full_profile_path"
                     return 0 # Found and returned

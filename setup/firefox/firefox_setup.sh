@@ -8,11 +8,13 @@
 # Function to find the Firefox profile directory
 find_firefox_profile() {
     local profile_base_path=""
-
+    t 0000000000000000000
     if  [[ "$OS" == "Linux" ]]; then
+        t 111111111111111
         profile_base_path="$HOME/.mozilla/firefox"
         profile_base_path_snap="$HOME/snap/firefox/common/.mozilla/firefox" # Snap path
     elif [[ "$OS" == "WSL" ]]; then
+        t 22222222222222222222222
         WIN_APPDATA=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:APPDATA" | tr -d '\r')
         WIN_USERPROFILE=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:USERPROFILE" | tr -d '\r')
 
@@ -25,6 +27,7 @@ find_firefox_profile() {
             exit 1
         fi
     elif [[ "$OS" == "macOS" ]]; then
+    t 33333333333333333
         profile_base_path="$HOME/Library/Application Support/Firefox/Profiles"
     fi
 

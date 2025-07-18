@@ -19,13 +19,16 @@ find_firefox_profile() {
             profile_base_path="$HOME/Library/Application Support/Firefox/Profiles"
             ;;
         CYGWIN*|MINGW32*|MSYS*|MINGW*) # Windows (Git Bash, WSL, Cygwin)
-            # On Windows, APPDATA is typically where Firefox stores profiles
-            # We need to convert Windows path to Bash path if running in WSL/Git Bash
-            if [ -n "$APPDATA" ]; then
-                profile_base_path=$(echo "$APPDATA" | sed 's/\\/\//g')/Mozilla/Firefox/Profiles
+            WIN_APPDATA=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:APPDATA" | tr -d '\r')
+            WIN_USERPROFILE=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:USERPROFILE" | tr -d '\r')
+
+            if [ -n "$WIN_APPDATA" ]; then
+                profile_base_path=$(echo "$WIN_APPDATA" | sed 's/\\/\//g')/Mozilla/Firefox/Profiles
+            elif [ -n "$WIN_USERPROFILE" ]; then
+                profile_base_path=$(echo "$WIN_USERPROFILE" | sed 's/\\/\//g')/AppData/Roaming/Mozilla/Firefox/Profiles
             else
-                echo "Error: APPDATA environment variable not found. Cannot determine Firefox profile path on Windows." >&2
-                return 1
+                echo "Error: Could not determine Windows APPDATA or USERPROFILE paths." >&2
+                exit 1
             fi
             ;;
         *)

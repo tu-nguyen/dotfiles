@@ -250,7 +250,7 @@ install_packages() {
     return
 }
 
-# clone_or_pull_dotfiles # TODO remove when done testing
+clone_or_pull_dotfiles
 
 reset_pre() {
     t IMPORTANT "This should be ran at least once!"

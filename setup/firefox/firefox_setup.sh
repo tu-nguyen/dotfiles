@@ -23,7 +23,7 @@ check_addon_installed() {
     local addon_id="$2"
     local extensions_json="$profile_dir/extensions.json"
 
-    t DEBUG "Checking for add-on '$addon_id' in '$extensions_json'"
+    t DEBUG "Checking for add-on '$addon_id' in '$extensions_json'"  >&2
 
     if [ ! -f "$extensions_json" ]; then
         t WARNING "extensions.json not found at '$extensions_json'. Cannot check add-on status." >&2
@@ -97,12 +97,9 @@ check_base_path() {
             if [ -d "$full_profile_path" ]; then
                 # Check file count
                 local file_count=$(find "$full_profile_path" -maxdepth 1 -type f | wc -l)
-                echo "DEBUG: Found $file_count files in '$full_profile_path'."  >&2
                 if (( file_count >= 4 )); then
                     echo "$full_profile_path"
                     return 0 # Found and returned
-                else
-                    echo "DEBUG: Profile '$full_profile_path' has only $file_count files, which is less than $MIN_FILES_REQUIRED. Skipping." >&2
                 fi
             fi
         fi

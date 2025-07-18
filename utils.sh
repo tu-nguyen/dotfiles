@@ -249,7 +249,7 @@ install_packages() {
     return
 }
 
-clone_or_pull_dotfiles
+# clone_or_pull_dotfiles # TODO remove when done testing
 
 reset_pre() {
     prompt "pre_setup"

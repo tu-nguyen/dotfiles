@@ -22,8 +22,11 @@ find_firefox_path() {
     local profile_base_path=""
 
     if  [[ "$OS_TYPE" == "linux" ]]; then
-        profile_base_path="$HOME/.mozilla/firefox"
-        profile_base_path_snap="$HOME/snap/firefox/common/.mozilla/firefox" # Snap path
+        if [ -d "$HOME/.mozilla/firefox" ];
+            profile_base_path="$HOME/.mozilla/firefox"
+        else
+            profile_base_path="$HOME/snap/firefox/common/.mozilla/firefox" # Snap path
+        fi
     elif [[ "$OS_TYPE" == "wsl" ]]; then
         local raw_win_appdata=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:APPDATA" | tr -d '\r\n')
         local raw_win_userprofile=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:USERPROFILE" | tr -d '\r\n')

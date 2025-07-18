@@ -27,7 +27,12 @@ fi
 if [ -z "$DOTFILE_REPO_DIR" ] || [ "$DOTFILE_REPO_DIR" == "/home/user/path/to/dotfiles/repo" ]; then
     echo "ERROR: Please set the 'DOTFILE_REPO_DIR' variable in your .env file or directly in the script."
     if [[ -f "$DOTFILE_CONFIG_FILE" ]]; then
-        echo "DOTFILE_CONFIG_FILE set to $DOTFILE_CONFIG_FILE"
+        echo "DOTFILE_REPO_DIR pulled from $DOTFILE_CONFIG_FILE"
+        DOTFILE_REPO_DIR=$(grep '^DOTFILE_REPO_DIR=' "$DOTFILE_CONFIG_FILE" | cut -d'=' -f2-)
+        if [ -z "$DOTFILE_REPO_DIR" ]; then
+            echo "ERROR: DOTFILE_REPO_DIR not set in .env or exist in $DOTFILE_CONFIG_FILE"
+            exit 1
+        fi
     else
         echo "WARNING: No saved file found at $DOTFILE_CONFIG_FILE"
         exit 1

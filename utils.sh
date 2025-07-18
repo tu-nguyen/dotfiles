@@ -25,6 +25,8 @@ detect_os() {
     t "Detected OS: $OS"
 }
 
+echo "OS_TYPE=$OS" >> "$DOTFILE_CONFIG_FILE"
+
 install_linux_package() {
     check_sudo
     if dpkg -s "$1" &>/dev/null; then
@@ -266,7 +268,7 @@ install_packages() {
     return
 }
 
-clone_or_pull_dotfiles
+# clone_or_pull_dotfiles #TODO remove after testing
 
 reset_pre() {
     prompt "pre_setup"

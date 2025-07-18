@@ -8,14 +8,16 @@
 # Function to find the Firefox profile directory
 find_firefox_profile() {
     local profile_base_path=""
-    echo "00000000000000000"
+    DOTFILE_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
+    OS=$(grep '^OS_TYPE=' "$DOTFILE_CONFIG_FILE" | cut -d'=' -f2-)
+    echo "000000"
+    echo "$OS_TYPE"
+    echo "$DOTFILE_CONFIG_FILE"
 
     if  [[ "$OS" == "linux" ]]; then
-        echo "1111111111111"
         profile_base_path="$HOME/.mozilla/firefox"
         profile_base_path_snap="$HOME/snap/firefox/common/.mozilla/firefox" # Snap path
     elif [[ "$OS" == "wsl" ]]; then
-        echo "2222222222222222222"
         WIN_APPDATA=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:APPDATA" | tr -d '\r')
         WIN_USERPROFILE=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:USERPROFILE" | tr -d '\r')
 

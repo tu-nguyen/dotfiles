@@ -30,6 +30,9 @@ t() {
     info|INFO)
       echo -e "${BOLD}${PINK}[INFO]${NC} $message ${NC}"
       ;;
+    important|IMPORTANT)
+      echo -e "${BOLD}${PINK}[INFO] $message ${NC}"
+      ;;
     warn|warning|WARNING)
       echo -e "${BOLD}${YELLOW}[WARNING]${NC} $message ${NC}"
       ;;

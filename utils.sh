@@ -134,7 +134,7 @@ prompt() {
     if [ -z "$FORCE_YES" ]; then
         read -p "Are you sure you want to ${GREEN}$config${NC}? This will ${RED}erase existing data${NC}, might want to create a backup! [y/N] " -n 1 -r
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            t "Exiting.."
+            # t "Skipping.."
             RETURN=1
             return 
         fi
@@ -253,7 +253,7 @@ install_packages() {
 # clone_or_pull_dotfiles # TODO remove when done testing
 
 reset_pre() {
-    t "This should be ran at least once!"
+    t IMPORTANT "This should be ran at least once!"
     prompt "pre_setup"
     if [[ $RETURN -ne 0 ]]; then
         return

@@ -99,18 +99,19 @@ reset_powerline_config
 reset_firefox
 
 if [[ "$OS_TYPE" == "linux" ]]; then
-    t "Setting up Linux specific configurations.."
+    # t "Setting up Linux specific configurations.."
     # Add any Linux-specific setup here
-
+    :
 elif [[ "$OS_TYPE" == "wsl" ]]; then
-    t "Setting up WSL specific configurations.."
+    # t "Setting up WSL specific configurations.."
     # Add any WSL-specific setup here
     reset_wsl_config
 elif [[ "$OS_TYPE" == "macos" ]]; then
-    t "Setting up macOS specific configurations.."
+    # t "Setting up macOS specific configurations.."
     # Add any macOS-specific setup here
+    :
 fi
 # reset_post
 
 
-t SUCCESS "All done! You may need to exit and reopen!"
+t IMPORTANT "All done! You may need to exit and reopen!"

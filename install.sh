@@ -11,6 +11,7 @@ else
     : "${DOTFILES_REPO:="https://github.com/YOUR_USERNAME/YOUR_DOTFILES_REPO.git"}"
     : "${DOTFILE_DIR:="/home/user/path/to/dotfiles"}"
     : "${GITSTATUS_DIR:="$HOME/.gitstatus"}"
+    : "${OS_TYPE:="wsl"}"
 fi
 
 DOTFILE_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
@@ -41,8 +42,25 @@ else
     echo "DOTFILE_DIR set to $DOTFILE_DIR"
 fi
 
+# Check if OS_TYPE is set after sourcing .env or from defaults
+if [ -z "$OS_TYPE" ]]; then
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        if grep -qi microsoft /proc/version; then
+            OS_TYPE="wsl"
+        else
+            OS_TYPE="linux"
+        fi
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        OS_TYPE="macos"
+    else
+        echo "ERROR: Unsupported OS: $OSTYPE"
+        exit 1
+    fi
+fi
+
 echo "DOTFILE_DIR=$DOTFILE_DIR" > "$DOTFILE_CONFIG_FILE"
 echo "DOTFILES_REPO=$DOTFILES_REPO" >> "$DOTFILE_CONFIG_FILE"
+echo "OS_TYPE=$OS_TYPE" >> "$DOTFILE_CONFIG_FILE"
 export DOTFILE_DIR="$DOTFILE_DIR"
 export BASHRC_EXTRAS_PATH="$DOTFILE_DIR/.bash_extras"
 export BASHRC_INIT="$BASHRC_EXTRAS_PATH/init"
@@ -60,9 +78,6 @@ source "$DOTFILE_DIR/utils.sh" || {
     exit 1
 }
 
-t "Detecting OS.."
-detect_os
-
 t "Setting up configuration files.."
 reset_pre
 reset_bashrc
@@ -72,15 +87,15 @@ reset_vscode_config
 reset_powerline_config
 reset_firefox
 
-if [[ "$OS" == "linux" ]]; then
+if [[ "$OS_TYPE" == "linux" ]]; then
     t "Setting up Linux specific configurations.."
     # Add any Linux-specific setup here
 
-elif [[ "$OS" == "wsl" ]]; then
+elif [[ "$OS_TYPE" == "wsl" ]]; then
     t "Setting up WSL specific configurations.."
     # Add any WSL-specific setup here
     reset_wsl_config
-elif [[ "$OS" == "macos" ]]; then
+elif [[ "$OS_TYPE" == "macos" ]]; then
     t "Setting up macOS specific configurations.."
     # Add any macOS-specific setup here
 fi

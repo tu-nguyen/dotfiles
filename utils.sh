@@ -8,25 +8,6 @@ check_sudo() {
     fi
 }
 
-# Function to detect the OS
-detect_os() {
-    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        if grep -qi microsoft /proc/version; then
-            OS="wsl"
-        else
-            OS="linux"
-        fi
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        OS="macos"
-    else
-        t ERROR "Unsupported OS: $OSTYPE"
-        exit 1
-    fi
-    t "Detected OS: $OS"
-}
-
-echo "OS_TYPE=$OS" >> "$DOTFILE_CONFIG_FILE"
-
 install_linux_package() {
     check_sudo
     if dpkg -s "$1" &>/dev/null; then
@@ -66,9 +47,9 @@ install_pip_package() {
 install_package() {
     local package_name="$1"
     t "Installing $package_name.."
-    if [[ "$OS" == "Linux" || "$OS" == "WSL" ]]; then
+    if [[ "$OS_TYPE" == "Linux" || "$OS" == "WSL" ]]; then
         install_linux_package "$package_name"
-    elif [[ "$OS" == "macOS" ]]; then
+    elif [[ "$OS_TYPE" == "macOS" ]]; then
         if ! command -v brew &> /dev/null; then
             t WARNING "Homebrew not found. Installing Homebrew.."
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -235,7 +216,7 @@ install_packages() {
     install_powerline_fonts
     install_gitstatus
 
-    if [[ "$OS" == "linux" || "$OS" == "wsl" ]]; then
+    if [[ "$OS_TYPE" == "linux" || "$OS" == "wsl" ]]; then
         if ! command -v apt &>/dev/null; then
             t ERROR "apt package manager not found. Please install it first."
             return 1
@@ -247,7 +228,7 @@ install_packages() {
         install_linux_package powerline
         install_linux_package wget
         install_linux_package tree
-    elif [[ "$OS" == "macos" ]]; then
+    elif [[ "$OS_TYPE" == "macos" ]]; then
         install_mac_package lesspipe
         install_mac_package htop
 
@@ -260,7 +241,7 @@ install_packages() {
         fi
 
     else
-        t ERROR "Unsupported OS: $OS. Please install the required packages manually."
+        t ERROR "Unsupported OS: $OS_TYPE. Please install the required packages manually."
         return 1
     fi
 
@@ -268,7 +249,7 @@ install_packages() {
     return
 }
 
-# clone_or_pull_dotfiles #TODO remove after testing
+clone_or_pull_dotfiles
 
 reset_pre() {
     prompt "pre_setup"
@@ -365,7 +346,7 @@ reset_wsl_config() {
         return
     fi
 
-    if [[ "$OS" != "wsl" ]]; then
+    if [[ "$OS_TYPE" != "wsl" ]]; then
         t ERROR "This function is only for WSL. Skipping WSL configuration reset."
         return
     fi
@@ -398,4 +379,3 @@ reset_firefox() {
     bash -i $DOTFILE_DIR/setup/firefox/firefox_setup.sh
     t SUCCESS "Firefox configuration reset completed!"
 }
-

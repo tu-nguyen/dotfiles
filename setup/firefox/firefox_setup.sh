@@ -5,14 +5,23 @@
 # directory if it doesn't exist, and then copies an existing userChrome.css
 # file from a specified source path.
 
+# --- Load Configuration ---
+DOTFILE_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
+if [ -f "$DOTFILE_CONFIG_FILE" ]; then
+    source "$DOTFILE_CONFIG_FILE"
+    echo "Configuration loaded from $DOTFILE_CONFIG_FILE"
+    echo "DOTFILE_DIR: $DOTFILE_DIR"
+    echo "OS_TYPE: $OS_TYPE"
+else
+    echo "Error: Configuration file not found at $DOTFILE_CONFIG_FILE" >&2
+    exit 1
+fi
+
 # Function to find the Firefox profile directory
 find_firefox_profile() {
     local profile_base_path=""
-    DOTFILE_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
-    OS=$(grep '^OS_TYPE=' "$DOTFILE_CONFIG_FILE" | cut -d'=' -f2-)
-    echo "000000"
+
     echo "$OS_TYPE"
-    echo "$DOTFILE_CONFIG_FILE"
 
     if  [[ "$OS" == "linux" ]]; then
         profile_base_path="$HOME/.mozilla/firefox"

@@ -145,5 +145,4 @@ if [ $? -eq 0 ] && [ -n "$PROFILE_PATH" ]; then
     setup_userchrome_css "$PROFILE_PATH"
 else
     echo "Setup failed. Please check the console output for details." >&2
-    exit 1
 fi

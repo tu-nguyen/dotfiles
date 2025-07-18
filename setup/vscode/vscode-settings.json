@@ -69,7 +69,7 @@
     // "workbench.view.releaseNotes": false, // Don't show release notes on update
 
     // --- Terminal Settings ---
-    "terminal.integrated.fontSize": 13, // Adjust to match editor font size
+    "terminal.integrated.fontSize": 14, // Terminal font size
     "terminal.integrated.cursorBlinking": true,
     "terminal.integrated.defaultProfile.linux": "bash", // Or "zsh", "fish", etc.
     "terminal.integrated.defaultProfile.windows": "Git Bash", // Or "Git Bash", "CMD", "WSL"

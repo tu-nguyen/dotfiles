@@ -43,7 +43,7 @@ else
 fi
 
 # Check if OS_TYPE is set after sourcing .env or from defaults
-if [ -z "$OS_TYPE" ]]; then
+if [ -z "$OS_TYPE" ]; then
     echo "Detecting OS.."
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         if grep -qi microsoft /proc/version; then
@@ -59,7 +59,7 @@ if [ -z "$OS_TYPE" ]]; then
     fi
 fi
 
-echo $OS_TYPE
+echo "$OS_TYPE"
 
 echo "DOTFILE_DIR=$DOTFILE_DIR" > "$DOTFILE_CONFIG_FILE"
 echo "DOTFILES_REPO=$DOTFILES_REPO" >> "$DOTFILE_CONFIG_FILE"

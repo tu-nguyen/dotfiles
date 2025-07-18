@@ -4,115 +4,126 @@
 }
 
 #tabbrowser-tabs {
-  visibility: collapse;
+    visibility: collapse;
 }
+
+#main-window[tabsintitlebar="true"]:not([extradragspace="true"]) #TabsToolbar > .titlebar-buttonbox-container {
+    display: flex !important; /* Use flexbox for proper alignment */
+    position: absolute; /* Position it absolutely within its parent */
+    top: 0;
+    right: 0;
+    margin-top: 0; 
+    margin-right: 0;
+}
+
+
 #navigator-toolbox {
-  display: block;
-  align-items: end;
+    display: block;
+    align-items: end;
 }
 
 #titlebar {
-  order: 1;
-  background-color: rgb(0, 0, 0);
-  margin-right: 0%;
-  /* padding-left: calc(100% - 146px); */
-  height: 1.8em;
-  align-items: end;
+    order: 1;
+    background-color: rgb(0, 0, 0);
+    margin-right: 0%;
+    /* padding-left: calc(100% - 146px); */
+    height: 1.8em;
+    align-items: end;
 }
 #nav-bar {
-  order: 0;
+    order: 0;
 }
 #PersonalToolbar {
-  order: 2;
+    order: 2;
 }
 
 /* Hide border on tab bar, force its state to 'scroll', adjust margin-left for width of scrollbar. */
 #tabbar {
-  border: 0;
-  scrollbar-width: none;
-  overflow: scroll !important;
-  margin-top:  0 !important;
+    border: 0;
+    scrollbar-width: none;
+    overflow: scroll !important;
+    margin-top: 0 !important;
 }
 
 /* general tabs */
 .tab {
-  background-color: transparent;
+    background-color: transparent;
 }
 .tab,
 .tab.pinned {
-  height: 2.8em;
+    height: 2.8em;
 }
 
 /* Push tab labels slightly to the right so they're completely hidden in collapsed state, but still look fine while expanded. */
 .tab .label {
-  margin-left: 1em;
+    margin-left: 1em;
 }
 
 .tab .counter {
-  margin-left:  auto;
-  display: inline-block !important;
+    margin-left: auto;
+    display: inline-block !important;
 }
 
 /* Hide sound playing/muted button. */
 .sound-button {
-  margin-left: 0;
-  display: inline-block;
-  visibility: collapse;
+    margin-left: 0;
+    display: inline-block;
+    visibility: collapse;
 }
 
 .tab.audible .sound-button {
-  visibility: visible;
-  margin-left: 0.25em;
+    visibility: visible;
+    margin-left: 0.25em;
 }
 
 /* active tab */
 .tab.active {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  box-shadow:  inset 3px 0 0 #ffffff99 !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: inset 3px 0 0 #ffffff99 !important;
 }
 .tab:hover,
 .tab.active:hover {
-  background-color: inherit;
+    background-color: inherit;
 }
 .tab.active .label {
-  font-weight: bold;
-  color: #f4f4f4 !important;
+    font-weight: bold;
+    color: #f4f4f4 !important;
 }
 .tab .label,
 .tab.active .label {
-  border-bottom:  1px solid transparent;
+    border-bottom: 1px solid transparent;
 }
 .tab:hover .label,
 .tab.active:hover .label {
-  border-bottom:  1px dotted;
-  min-width:  0 !important;
-  flex-shrink:  1 !important;
-  flex-grow:  unset !important;
+    border-bottom: 1px dotted;
+    min-width: 0 !important;
+    flex-shrink: 1 !important;
+    flex-grow: unset !important;
 }
 
 /* pending / unloaded tabs */
 .tab.discarded {
-  background-color: #1d1d1d;
+    background-color: #1d1d1d;
 }
 .tab.discarded .label {
-  color: #efefefCC !important;
+    color: #efefefCC !important;
 }
 .tab.discarded:hover .label {
-  color: #efefef !important;
+    color: #efefef !important;
 }
 
 /* Adjust style for tab that has sound playing. */
 .tab.sound-playing .favicon::after,
 .tab.muted .favicon::after {
-  content: '🔊';
-  z-index: var(--favicon-base-z-index);
-  position: absolute;
-  font-size: 0.5em;
-  bottom: -0.35em;
-  right: -0.7em;
+    content: '🔊';
+    z-index: var(--favicon-base-z-index);
+    position: absolute;
+    font-size: 0.5em;
+    bottom: -0.35em;
+    right: -0.7em;
 }
 
 /* Adjust style for tab that is muted. */
 .tab.muted .favicon::after {
-  content: '🔇';
+    content: '🔇';
 }

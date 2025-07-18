@@ -47,9 +47,9 @@ install_pip_package() {
 install_package() {
     local package_name="$1"
     t "Installing $package_name.."
-    if [[ "$OS_TYPE" == "Linux" || "$OS" == "WSL" ]]; then
+    if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         install_linux_package "$package_name"
-    elif [[ "$OS_TYPE" == "macOS" ]]; then
+    elif [[ "$OS_TYPE" == "macos" ]]; then
         if ! command -v brew &> /dev/null; then
             t WARNING "Homebrew not found. Installing Homebrew.."
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -211,6 +211,7 @@ install_packages() {
     install_package python3
     install_package python3-pip
     install_package make
+    install_package jq
     install_pip_package powerline-status
 
     install_powerline_fonts
@@ -252,6 +253,7 @@ install_packages() {
 # clone_or_pull_dotfiles # TODO remove when done testing
 
 reset_pre() {
+    t "This should be ran at least once!"
     prompt "pre_setup"
     if [[ $RETURN -ne 0 ]]; then
         return
@@ -259,7 +261,7 @@ reset_pre() {
 
     install_packages
 
-    t SUCCESS "Pre-setup completed!"
+    t DEBUG "reset_pre() end"
 }
 
 reset_bashrc() {
@@ -281,7 +283,7 @@ reset_bashrc() {
 
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bashrc" "$HOME/.bashrc"
 
-    t SUCCESS "Bash setup completed!"
+    t DEBUG "reset_bashrc() end"
 }
 
 reset_vimrc() {
@@ -313,7 +315,7 @@ reset_vimrc() {
 
     vim +PluginInstall +qall
 
-    t SUCCESS "Vim setup completed!"
+    t DEBUG "reset_vimrc() end"
 }
 
 reset_git_config() {
@@ -325,7 +327,7 @@ reset_git_config() {
     chmod +x $DOTFILES_REPO_DIR/setup/git/git_config_setup.sh
     $DOTFILES_REPO_DIR/setup/git/git_config_setup.sh
 
-    t SUCCESS "Git configuration reset completed!"
+    t DEBUG "reset_git_config() end"
 }
 
 reset_vscode_config() {
@@ -335,9 +337,9 @@ reset_vscode_config() {
     fi
 
     chmod +x $DOTFILES_REPO_DIR/setup/vscode/vscode_config_setup.sh
-    bash -i $DOTFILES_REPO_DIR/setup/vscode/vscode_config_setup.sh
+    bash -i $DOTFILES_REPO_DIR/setup/vscode/vscode_config_setup.sh || t WARNING "Some error occured during reset_vscode_config()"
 
-    t SUCCESS "VSCode configuration reset completed!"
+    t DEBUG "reset_vscode_config() end"
 }
 
 reset_wsl_config() {
@@ -352,8 +354,8 @@ reset_wsl_config() {
     fi
 
     chmod +x $DOTFILES_REPO_DIR/setup/wsl/wsl_config_setup.sh
-    bash -i $DOTFILES_REPO_DIR/setup/wsl/wsl_config_setup.sh
-    t SUCCESS "WSL configuration reset completed!"
+    bash -i $DOTFILES_REPO_DIR/setup/wsl/wsl_config_setup.sh  || t WARNING "Some error occured during reset_wsl_config()"
+    t DEBUG "reset_wsl_config() end"
 }
 
 reset_powerline_config() {
@@ -376,6 +378,6 @@ reset_firefox() {
     fi
 
     chmod +x $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh
-    bash -i $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh
-    t SUCCESS "Firefox configuration reset completed!"
+    bash -i $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh || t WARNING "Some error occured during reset_firefox()"
+    t DEBUG "reset_firefox() end"
 }

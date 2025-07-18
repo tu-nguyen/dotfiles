@@ -30,7 +30,7 @@ if [ -f .env ]; then
 else
     DOTFILES_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
     if [[ -f "$DOTFILES_CONFIG_FILE" ]]; then
-        echo "[INFO] Configuration loaded from $DOTFILE_CONFIG_FILE"
+        echo "[INFO] Configuration loaded from $DOTFILES_CONFIG_FILE"
         source "$DOTFILES_CONFIG_FILE"
         ENV_LOADED=true
     fi

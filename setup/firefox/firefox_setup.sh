@@ -6,16 +6,57 @@
 # file from a specified source path.
 
 # --- Load Configuration ---
-DOTFILE_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
-if [ -f "$DOTFILE_CONFIG_FILE" ]; then
-    source "$DOTFILE_CONFIG_FILE"
-    echo "Configuration loaded from $DOTFILE_CONFIG_FILE"
-    echo "DOTFILES_REPO_DIR: $DOTFILES_REPO_DIR"
-    echo "OS_TYPE: $OS_TYPE"
+DOTFILES_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
+if [ -f "$DOTFILES_CONFIG_FILE" ]; then
+    source "$DOTFILES_CONFIG_FILE"
 else
-    echo "Error: Configuration file not found at $DOTFILE_CONFIG_FILE" >&2
+    t Error "Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
     exit 1
 fi
+
+# Function to check if a specific Firefox add-on is installed and enabled
+# Arguments:
+#   $1: Full path to the Firefox profile directory
+#   $2: The ID of the add-on to check (e.g., "treestyletab@piro.mo")
+check_addon_installed() {
+    local profile_dir="$1"
+    local addon_id="$2"
+    local extensions_json="$profile_dir/extensions.json"
+
+    t DEBUG "Checking for add-on '$addon_id' in '$extensions_json'"
+
+    if [ ! -f "$extensions_json" ]; then
+        t WARNING "extensions.json not found at '$extensions_json'. Cannot check add-on status." >&2
+        return 1
+    fi
+
+    # Check if jq is installed
+    if ! command -v jq &> /dev/null; then
+        t Error "'jq' command not found. Please install jq to check add-on status (e.g., sudo apt install jq)." >&2
+        return 1
+    fi
+
+    # Use jq to check for the add-on.
+    # .addons[] iterates through each add-on object.
+    # select(.id == "$addon_id") filters for the specific add-on.
+    # .userDisabled == false checks if it's NOT user-disabled (i.e., enabled).
+    # .active == true checks if it's currently active (loaded in memory).
+    # .appDisabled == false checks if it's NOT disabled by the application (e.g., compatibility issues).
+    # The output is then piped to head -n 1 to get just one match if found.
+    
+    local is_installed=$(jq -r --arg ADDON_ID "$addon_id" \
+        '.addons[] | select(.id == $ADDON_ID and .userDisabled == false and .active == true and .appDisabled == false) | .id' \
+        "$extensions_json" | head -n 1)
+
+    if [ -n "$is_installed" ]; then
+        t "Add-on '$addon_id' (Tree Style Tab) is installed and enabled."
+        return 0 # Add-on is installed and enabled
+    else
+        t "Add-on '$addon_id' (Tree Style Tab) is NOT found or not enabled."
+        # You might want to provide instructions to the user here.
+        return 1 # Add-on not found or not enabled
+    fi
+}
 
 # Function to find the Firefox profile directory
 find_firefox_path() {
@@ -36,7 +77,7 @@ find_firefox_path() {
         elif [ -n "$raw_win_userprofile" ]; then
             profile_base_path=$(wslpath -u "$raw_win_userprofile")/AppData/Roaming/Mozilla/Firefox
         else
-            echo "Error: Could not determine Windows APPDATA or USERPROFILE paths." >&2
+            t ERROR "Could not determine Windows APPDATA or USERPROFILE paths." >&2
             exit 1
         fi
     elif [[ "$OS_TYPE" == "macos" ]]; then
@@ -80,7 +121,7 @@ check_base_path() {
                 # Fallback if stat isn't robust or portable enough, or just skip mtime check
                 # You might need to adjust this if stat fails frequently.
                 # For this specific scenario, given we expect stat, it's fine.
-                echo "Warning: 'stat' command not behaving as expected for modification time check. Skipping time comparison for '$profile_dir'." >&2
+                t WARNING "'stat' command not behaving as expected for modification time check. Skipping time comparison for '$profile_dir'." >&2
                 continue # Skip to the next directory
             fi
 
@@ -98,7 +139,7 @@ check_base_path() {
     fi
 
     # If no matching profile was found after checking all directories
-    echo "DEBUG: No matching default-release or .default profile found in '$current_base_path'." >&2 # Add debug
+    t DEBUG "No matching default-release or .default profile found in '$current_base_path'." >&2 # Add debug
     return 1
 }
 
@@ -107,13 +148,13 @@ setup_userchrome_css() {
     local source_css_path="$DOTFILES_REPO_DIR/setup/firefox/userChrome.css"
 
     if [ -z "$FF_PROFILE" ]; then
-        echo "Cannot set up userChrome.css: Firefox profile path not provided." >2
+        t ERROR "Cannot set up userChrome.css: Firefox profile path not provided." >2
         return 1
     fi
 
     if [ ! -f "$source_css_path" ]; then
-        echo "Error: Source userChrome.css file not found at: $source_css_path" >&2
-        echo "Please ensure the file exists before running the script." >&2
+        t Error "Source userChrome.css file not found at: $source_css_path" >&2
+        t "Please ensure the file exists before running the script." >&2
         return 1
     fi
 
@@ -123,15 +164,15 @@ setup_userchrome_css() {
     # Ensure the 'chrome' directory exists
     mkdir -p "$chrome_dir"
     if [ $? -ne 0 ]; then
-        echo "Error: Could not create 'chrome' directory at: $chrome_dir" >&2
+        t Error "Could not create 'chrome' directory at: $chrome_dir" >&2
         return 1
     fi
-    echo "Ensured 'chrome' directory exists at: $chrome_dir"
+    t "Ensured 'chrome' directory exists at: $chrome_dir"
 
     # Copy the userChrome.css file
     cp "$source_css_path" "$dest_css_path"
     if [ $? -eq 0 ]; then
-        echo "Successfully copied userChrome.css from '$source_css_path' to '$dest_css_path'"
+        t "Successfully copied userChrome.css from '$source_css_path' to '$dest_css_path'"
         echo ""
         echo "IMPORTANT: For userChrome.css to work, you need to enable it in Firefox:"
         echo "1. Open Firefox."
@@ -154,7 +195,14 @@ FF_PROFILE=$(check_base_path)
 
 if [ $? -eq 0 ] && [ -n "$FF_PROFILE" ]; then
     echo "Found Firefox profile: $FF_PROFILE"
-    setup_userchrome_css "$FF_PROFILE"
+    # Check for Tree Style Tab
+    TST_ADDON_ID="treestyletab@piro.sakura.ne.jp"
+    if check_addon_installed "$FF_PROFILE" "$TST_ADDON_ID"; then
+        setup_userchrome_css
+    else
+        t ERROR "Setup failed. Please install Tree Style Tab plugin"
+    fi
+    
 else
-    echo "Setup failed. Please check the console output for details." >&2
+    t ERROR "Setup failed. Please check the console output for details." >&2
 fi

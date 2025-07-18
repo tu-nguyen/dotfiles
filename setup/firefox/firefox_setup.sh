@@ -90,17 +90,15 @@ find_firefox_path() {
 # Function to check a given base path for a Firefox profile
 check_base_path() {
     local profiles_ini="$FF_PATH/profiles.ini"
+    local MIN_FILES_REQUIRED=4
     if [ -f "$profiles_ini" ]; then
         local default_profile_dir=$(grep -A 5 "\[Profile" "$profiles_ini" | grep "Default=1" -B 3 | grep "Path=" | cut -d '=' -f 2)
         if [ -n "$default_profile_dir" ]; then
             local full_profile_path="$FF_PATH/$default_profile_dir"
             if [ -d "$full_profile_path" ]; then
                 # Check file count
-                local file_count=$(find "$full_profile_path" -maxdepth 1 -type f | wc -l)
-                echo "testtesttest"
-                echo "$file_count"
-                echo "testtesttest"
-                if [ $file_count -gt 4 ]; then
+                local local file_count=$(find "$full_profile_path" -maxdepth 1 -type f | grep -c .)
+                if (( file_count >= MIN_FILES_REQUIRED )); then
                     echo "$full_profile_path"
                     return 0 # Found and returned
                 fi

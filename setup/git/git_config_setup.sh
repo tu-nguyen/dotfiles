@@ -12,7 +12,7 @@
 # git config --global user.name "Tu Nguyen"
 # git config --global user.email "tu.t.nguyen93@gmail.com"
 
-git config pull.rebase true 
+git config --global pull.rebase true 
 git config --global core.editor "vim"
 
 # git config --global merge.tool kdiff3

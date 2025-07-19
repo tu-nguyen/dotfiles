@@ -136,7 +136,7 @@ prompt() {
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             # t "Skipping.."
             RETURN=1
-            return 
+            return
         fi
     fi
   echo ""
@@ -191,7 +191,7 @@ clone_or_pull_dotfiles() {
                 t Warning "Failed to pop stash. You may have conflicts to resolve manually in '$DOTFILES_REPO_DIR'."
             fi
         fi
-        
+
     else # Repository does not exist, clone it
         t "  Cloning dotfiles repository '$DOTFILES_REPO' to '$DOTFILES_REPO_DIR'.."
         mkdir -p "$DOTFILES_REPO_DIR" # Ensure parent directory exists
@@ -254,7 +254,7 @@ clone_or_pull_dotfiles
 
 reset_pre() {
     t IMPORTANT "This should be ran at least once!"
-    prompt "pre_setup"
+    prompt "run pre_setup"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi
@@ -265,7 +265,7 @@ reset_pre() {
 }
 
 reset_bashrc() {
-    prompt "reset the .bashrc"
+    prompt "reset .bashrc"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi
@@ -287,7 +287,7 @@ reset_bashrc() {
 }
 
 reset_vimrc() {
-    prompt "reset the .vimrc"
+    prompt "reset .vimrc"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi
@@ -319,7 +319,7 @@ reset_vimrc() {
 }
 
 reset_git_config() {
-    prompt "reset the .gitconfig"
+    prompt "reset .gitconfig"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi
@@ -343,7 +343,7 @@ reset_vscode_config() {
 }
 
 reset_wsl_config() {
-    prompt "reset the WSL configuration"
+    prompt "reset the wsl configs"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi
@@ -359,7 +359,7 @@ reset_wsl_config() {
 }
 
 reset_powerline_config() {
-    prompt "reset the Powerline configuration"
+    prompt "reset the powerline configs"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi
@@ -372,7 +372,7 @@ reset_powerline_config() {
 }
 
 reset_firefox() {
-    prompt "reset the Firefox configuration"
+    prompt "reset the firefox configs"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi

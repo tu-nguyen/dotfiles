@@ -100,6 +100,16 @@
     "terminal.integrated.enableMultiLinePasteWarning": false, // Disable warning for multi-line paste
     "python.terminal.activateEnvironment": true, // **Automatically activate Python environment in new terminals**
 
+    // Python
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        "--line-length",
+        "88" // **Ensure Black's line length matches the ruler if you want perfect alignment**
+    ],
+    "pylint.args": [
+        "\"load-plugins=pylint_django\""
+    ],
+
     // TODO
     "security.allowedUNCHosts": [
         "dumpster"
@@ -114,9 +124,7 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "jupyter.askForKernelRestart": false,
-    "pylint.args": [
-        "\"load-plugins=pylint_django\""
-    ],
+
 
     "emmet.includeLanguages": {
         "django-html": "html"

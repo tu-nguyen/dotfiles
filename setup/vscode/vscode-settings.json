@@ -100,7 +100,17 @@
     "terminal.integrated.enableMultiLinePasteWarning": false, // Disable warning for multi-line paste
     "python.terminal.activateEnvironment": true, // **Automatically activate Python environment in new terminals**
 
-    // Python
+    // --- Source Control ---
+    "git.autofetch": true, // Automatically fetch from remotes
+    "git.confirmSync": false, // Don't ask to confirm sync
+    "git.enableCommitSigning": false, // Enable GPG commit signing (requires setup)
+    "git.decorations.enabled": true, // Show Git decorations in file explorer
+    "git.openRepositoryInParentFolders": "never", // Prevents VS Code from opening Git repos in parent folders automatically
+
+    // Python (Microsoft Python extension)
+    "python.languageServer": "Pylance", // Recommended and default for Python
+    // "python.defaultInterpreterPath": "~/.venv/todo/uv?/python", // **UPDATE THIS! Example path for a global .venv**
+
     "python.formatting.provider": "black",
     "python.formatting.blackArgs": [
         "--line-length",
@@ -109,6 +119,53 @@
     "pylint.args": [
         "\"load-plugins=pylint_django\""
     ],
+
+    "python.analysis.typeCheckingMode": "basic", // Or "strict" for more rigorous type checking with Pylance
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.diagnosticMode": "workspace", // Analyze entire workspace for issues
+    "python.analysis.inlayHints.functionReturnTypes": true, // Show inferred return types
+    "python.analysis.inlayHints.variableTypes": true, // Show inferred variable types
+    "python.analysis.indexing": true, // Enable full workspace indexing for faster symbol search
+
+    // Docker
+    "docker.commands.enableDebugging": true,
+
+    // Markdown Preview Enhanced
+    "markdown-preview-enhanced.autoPreview": false,
+
+    // Remote-Containers / WSL / SSH (Crucial for consistent envs)
+    "remote.containers.defaultExtensions": [
+        "ms-python.python",
+        "ms-python.black-formatter", // Black
+        "ms-python.ruff",            // Ruff
+        "batisteo.vscode-django",    // Django extension
+        "esbenp.prettier-vscode",    // Prettier for JS/CSS
+        "dbaeumer.vscode-eslint"     // ESLint for JS
+    ],
+    "remote.SSH.defaultExtensions": [
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "ms-python.ruff",
+        "batisteo.vscode-django"
+    ],
+    "remote.WSL.defaultExtensions": [
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "ms-python.ruff",
+        "batisteo.vscode-django"
+    ],
+
+    // Breadcrumbs (navigation aid)
+    "breadcrumbs.enabled": true,
+    "breadcrumbs.filePath": "on",
+    "breadcrumbs.symbolPath": "on",
+
+    // --- VS Code Specific Behavior ---
+    "window.zoomLevel": 0, // Adjust zoom level if needed
+    "security.workspace.trust.enabled": true, // Enable Workspace Trust for security
+    "extensions.ignoreRecommendations": false, // Show extension recommendations
+    "telemetry.telemetryLevel": "off" // Opt-out of sending telemetry data
+
 
     // TODO
     "security.allowedUNCHosts": [

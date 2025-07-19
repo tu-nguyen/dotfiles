@@ -9,7 +9,8 @@
     "editor.insertSpaces": true, // Use spaces instead of tabs
     "editor.detectIndentation": true, // Automatically detect indentation from file
     "editor.renderWhitespace": "all", // Show all whitespace characters (spaces, tabs, newlines)
-    "editor.rulers": [79, 120], // **PEP 8 (79 chars) and common soft wrap (120 chars)**
+    // "editor.rulers": [79, 120], // **PEP 8 (79 chars) and common soft wrap (120 chars)**
+    "editor.rulers": [88, 120], // **Black's default (88 chars) and common soft wrap (120 chars)**
     "editor.wordWrap": "off", // Usually off for code, prefer horizontal scrolling or formatters
     "editor.formatOnSave": true, // Auto-format code on save (requires formatters like Black)
     "editor.defaultFormatter": "ms-python.black-formatter", // **Set Black as the default formatter for Python**

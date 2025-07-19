@@ -331,7 +331,7 @@ reset_git_config() {
 }
 
 reset_vscode_config() {
-    prompt "reset the VSCode configuration"
+    prompt "reset the vscode configs"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi

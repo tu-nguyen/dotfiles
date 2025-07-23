@@ -16,8 +16,8 @@ if [[ "$OS_TYPE" == "linux" ]]; then
     t "TBD"
 
 elif [[ "$OS_TYPE" == "wsl" ]]; then
-    local raw_win_appdata=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:APPDATA" | tr -d '\r\n')
-    local raw_win_userprofile=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:USERPROFILE" | tr -d '\r\n')
+    raw_win_appdata=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:APPDATA" | tr -d '\r\n')
+    raw_win_userprofile=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:USERPROFILE" | tr -d '\r\n')
 
     if [ -n "$raw_win_appdata" ]; then
         profile_base_path=$(wslpath -u "$raw_win_appdata")/Roaming/Code/User

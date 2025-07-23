@@ -20,7 +20,7 @@ elif [[ "$OS_TYPE" == "wsl" ]]; then
     raw_win_userprofile=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:USERPROFILE" | tr -d '\r\n')
 
     if [ -n "$raw_win_appdata" ]; then
-        profile_base_path=$(wslpath -u "$raw_win_appdata")/Roaming/Code/User
+        profile_base_path=$(wslpath -u "$raw_win_appdata")/Code/User
     elif [ -n "$raw_win_userprofile" ]; then
         profile_base_path=$(wslpath -u "$raw_win_userprofile")/AppData/Roaming/Code/User
     else

@@ -22,7 +22,7 @@
     },
     "editor.minimap.enabled": true, // Show minimap (code overview)
     "editor.stickyScroll.enabled": true, // Keeps relevant scope (function/class headers) visible at the top
-    "editor.scrollBeyondLastLine": false, // Don't scroll past the last line
+    // "editor.scrollBeyondLastLine": false, // Don't scroll past the last line
     "editor.linkedEditing": true, // Enable linked editing (rename HTML tags, etc.)
     "editor.bracketPairColorization.enabled": true, // Colorize matching brackets for better readability
     "editor.guides.bracketPairs": "active", // Show guides for active bracket pairs

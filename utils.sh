@@ -39,7 +39,8 @@ install_pip_package() {
         t SUCCESS "$1 is already installed via pip."
     else
         t "Installing $1.."
-        pip3 install "$@" --user --break-system-packages
+        # tmp remove --user --break-system-packages
+        pip3 install "$@" 
     fi
 }
 

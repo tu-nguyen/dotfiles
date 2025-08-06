@@ -39,7 +39,8 @@ fi
 DEFAULT_DOTFILES_REPO="https://github.com/tu-nguyen/dotfiles.git"
 DEFAULT_DOTFILES_REPO_DIR="$(pwd)"
 DEFAULT_GITSTATUS_DIR="$HOME/.gitstatus"
-DEFAULT_DOTFILES_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
+DEFAULT_EXTRAS=$HOME/.bash_extras
+DEFAULT_DOTFILES_CONFIG_FILE="$DEFAULT_EXTRAS/.dotfile_config"
 DEFAULT_OS_TYPE=$(get_os_type)
 GITSTATUS_DIR="$HOME/.gitstatus"
 
@@ -71,6 +72,7 @@ if [ -z "$OS_TYPE" ] || [ "$OS_TYPE" == "some_os" ]; then
     : "${OS_TYPE:="$DEFAULT_OS_TYPE"}"
 fi
 
+mkdir -p "$DEFAULT_EXTRAS"
 echo "DOTFILES_REPO=$DOTFILES_REPO" > "$DOTFILES_CONFIG_FILE"
 echo "DOTFILES_REPO_DIR=$DOTFILES_REPO_DIR" >> "$DOTFILES_CONFIG_FILE"
 echo "DOTFILES_CONFIG_FILE=$DOTFILES_CONFIG_FILE"  >> "$DOTFILES_CONFIG_FILE"

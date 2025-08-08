@@ -1,14 +1,5 @@
 #!/bin/bash
 
-# --- Load Configuration ---
-DOTFILES_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
-if [ -f "$DOTFILES_CONFIG_FILE" ]; then
-    source "$DOTFILES_CONFIG_FILE"
-else
-    echo Error "Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
-    exit 1
-fi
-
 POWERLINE_PATH=$(pip show powerline-status 2>/dev/null | grep '^Location:' | cut -d' ' -f2-)
 file_path="$POWERLINE_PATH/powerline/bindings/config.py"
 

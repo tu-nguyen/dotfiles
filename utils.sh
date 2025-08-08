@@ -370,7 +370,7 @@ reset_powerline_config() {
     # t SUCCESS "Powerline configuration reset completed!"
 
     chmod +x $DOTFILES_REPO_DIR/setup/powerline/fix_powerline.sh
-    bash -i $DOTFILES_REPO_DIR/setup/powerline/fix_powerline.sh
+    sudo $DOTFILES_REPO_DIR/setup/powerline/fix_powerline.sh
     t SUCCESS "Powerline configuration reset completed!"
 }
 

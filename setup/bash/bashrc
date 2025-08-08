@@ -84,7 +84,8 @@ if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
     # PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
     enable_powerline
     if is_powerline_enabled; then
-        t SUCCESS "Powerline is enabled"
+        # t SUCCESS "Powerline is enabled"
+        :
     else
         t WARNING "Powerline is not enabled"
     fi

@@ -213,10 +213,6 @@ install_packages() {
     install_package python3-pip
     install_package make
     install_package jq
-    install_pip_package powerline-status
-
-    install_powerline_fonts
-    install_gitstatus
 
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         if ! command -v apt &>/dev/null; then
@@ -224,15 +220,17 @@ install_packages() {
             return 1
         fi
 
-        install_linux_package coreutils
-        install_linux_package less
-        install_linux_package htop
-        install_linux_package powerline
-        install_linux_package wget
-        install_linux_package tree
+        sudo add-apt-repository universe
+        install_package powerline
+        install_package coreutils
+        install_package less
+        install_package htop
+        install_package wget
+        install_package tree
+
     elif [[ "$OS_TYPE" == "macos" ]]; then
-        install_mac_package lesspipe
-        install_mac_package htop
+        install_package lesspipe
+        install_package htop
 
         # Check for python3, but do NOT install it
         if ! command -v python3 &>/dev/null; then
@@ -246,6 +244,9 @@ install_packages() {
         t ERROR "Unsupported OS: $OS_TYPE. Please install the required packages manually."
         return 1
     fi
+
+    install_powerline_fonts
+    install_gitstatus
 
     t SUCCESS "All required packages installed successfully."
     return

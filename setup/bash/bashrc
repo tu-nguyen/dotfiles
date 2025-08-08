@@ -1,5 +1,5 @@
 # ========================================== #
-# 
+#
 # #
 
 # TODO add comments later
@@ -11,7 +11,7 @@
 set -o vi
 set -o ignoreeof
 
-shopt -s dotglob 
+shopt -s dotglob
 shopt -s nullglob
 shopt -s checkwinsize
 shopt -s cdspell
@@ -68,7 +68,7 @@ enable_powerline() {
         powerline-daemon -q
         POWERLINE_BASH_CONTINUATION=1
         POWERLINE_BASH_SELECT=1
-        if [[ -f "$POWERLINE_PATH/powerline/bindings/bash/powerline.sh" ]]; then
+        if [[ -f /usr/share/powerline/bindings/bash/powerline.sh ]]; then
             source "$POWERLINE_PATH/powerline/bindings/bash/powerline.sh"
         elif [[ -f "$POWERLINE_PATH/powerline/bindings/config.py" ]]; then
             python3 "$POWERLINE_PATH/powerline/bindings/config.py"

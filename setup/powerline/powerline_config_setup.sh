@@ -16,4 +16,7 @@ else
 fi
 
 mkdir -p $HOME/.config/powerline
+cp -R /usr/share/powerline/config_files/* \
+      $HOME/.config/powerline/
+
 cp $DOTFILES_REPO_DIR/setup/powerline/powerline-shell-config.json  $HOME/.config/powerline/themes/shell/default.json

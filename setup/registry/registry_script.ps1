@@ -77,6 +77,3 @@ reg.exe add "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Direct3D" /v "Max
 Write-Host "Maximizing network performance.."
 reg.exe add "HKEY_LOCAL_MACHINE\Software\Microsoft\MSMQ\Parameters\Tcp" /v "IRR" /t REG_DWORD /d 0 /f
 reg.exe add "HKEY_LOCAL_MACHINE\Software\Microsoft\MSMQ\Parameters\Tcp" /v "SendTimeout" /t REG_DWORD /d 0 /f
-
-# Add this line to keep the window open after execution is complete.
-Read-Host -Prompt "Press Enter to exit"

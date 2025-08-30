@@ -23,11 +23,11 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "WaitToKil
 # --- 3. Disable automatic reboot after Windows Updates
 # Prevents the PC from automatically restarting after an update.
 Write-Host "Disabling automatic reboot for updates..."
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "NoAutoRebootWithLoggedOnUsers" -Value 1 -Type DWORD -Force
-
-Write-Host "All registry tweaks have been applied."
-Write-Host "Press any key to close this window..."
-$Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | Out-Null
+$auPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU"
+if (-not (Test-Path -Path $auPath)) {
+    New-Item -Path $auPath -Force | Out-Null
+}
+Set-ItemProperty -Path $auPath -Name "NoAutoRebootWithLoggedOnUsers" -Value 1 -Type DWORD -Force
 
 # --- Gaming Tweaks ---
 
@@ -117,3 +117,7 @@ reg.exe add "HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Direct3D" /v "Max
 Write-Host "Maximizing network performance.."
 reg.exe add "HKEY_LOCAL_MACHINE\Software\Microsoft\MSMQ\Parameters\Tcp" /v "IRR" /t REG_DWORD /d 0 /f
 reg.exe add "HKEY_LOCAL_MACHINE\Software\Microsoft\MSMQ\Parameters\Tcp" /v "SendTimeout" /t REG_DWORD /d 0 /f
+
+Write-Host "All registry tweaks have been applied."
+# Write-Host "Press any key to close this window.."
+# $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | Out-Null

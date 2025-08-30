@@ -133,14 +133,13 @@ prompt() {
     local config="$1"
 
     if [ -z "$FORCE_YES" ]; then
-        read -p "Are you sure you want to ${GREEN}$config${NC}? This will ${RED}erase existing data${NC}, might want to create a backup! [y/N] " -n 1 -r
+        read -p "Are you sure you want to ${GREEN}$config${NC}? This will ${RED}erase existing data${NC}, might want to create a backup! [y/N] " -r
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            # t "Skipping.."
             RETURN=1
             return
         fi
     fi
-  echo ""
+    echo ""
 }
 
 # Function to clone or pull dotfiles repository

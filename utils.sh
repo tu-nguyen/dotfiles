@@ -135,6 +135,7 @@ prompt() {
     if [ -z "$FORCE_YES" ]; then
         read -p "Are you sure you want to ${GREEN}$config${NC}? This will ${RED}erase existing data${NC}, might want to create a backup! [y/N] " -r
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            t "Skipping.."
             RETURN=1
             return
         fi

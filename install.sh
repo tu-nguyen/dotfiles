@@ -142,7 +142,7 @@ while true; do
         x | X) break ;;
         *) echo "Invalid option, please try again." ;;
     esac
-    read -p "Press Enter to continue..."
+    read -p "Press Enter to continue.."
 done
 
 echo "Setup script finished."

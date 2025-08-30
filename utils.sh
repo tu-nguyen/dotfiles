@@ -371,9 +371,9 @@ reset_registry() {
         return
     fi
 
-    chmod +x $DOTFILES_REPO_DIR/setup/registry/registry_setup.sh
+    chmod +x $DOTFILES_REPO_DIR/setup/registry/registry_script.sh
 
-    powershell.exe -Command "Start-Process powershell.exe -Verb RunAs -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"$(wslpath -w $DOTFILES_REPO_DIR/setup/registry/registry_setup.sh)\"'"  || t WARNING "Some error occured during reset_registry()"
+    powershell.exe -Command "Start-Process powershell.exe -Verb RunAs -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"$(wslpath -w $DOTFILES_REPO_DIR/setup/registry/registry_script.sh)\"'"  || t WARNING "Some error occured during reset_registry()"
     t DEBUG "reset_registry() end"
 }
 

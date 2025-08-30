@@ -367,13 +367,13 @@ reset_registry() {
     fi
 
     if [[ "$OS_TYPE" != "wsl" ]]; then
-        t ERROR "This function is only for WSL. Skipping WSL configuration reset."
+        t ERROR "This function is only for WSL. Skipping registry reset."
         return
     fi
 
-    chmod +x $DOTFILES_REPO_DIR/setup/registry/registry_script.sh
+    chmod +x $DOTFILES_REPO_DIR/setup/registry/registry_script.ps1
 
-    powershell.exe -Command "Start-Process powershell.exe -Verb RunAs -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"$(wslpath -w $DOTFILES_REPO_DIR/setup/registry/registry_script.sh)\"'"  || t WARNING "Some error occured during reset_registry()"
+    powershell.exe -Command "Start-Process powershell.exe -Verb RunAs -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"$(wslpath -w $DOTFILES_REPO_DIR/setup/registry/registry_script.ps1)\"'"  || t WARNING "Some error occured during reset_registry()"
     t DEBUG "reset_registry() end"
 }
 

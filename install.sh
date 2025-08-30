@@ -108,6 +108,7 @@ elif [[ "$OS_TYPE" == "wsl" ]]; then
     # t "Setting up WSL specific configurations.."
     # Add any WSL-specific setup here
     reset_wsl_config
+    reset_registry
 elif [[ "$OS_TYPE" == "macos" ]]; then
     # t "Setting up macOS specific configurations.."
     # Add any macOS-specific setup here

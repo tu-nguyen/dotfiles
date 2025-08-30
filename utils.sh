@@ -360,6 +360,23 @@ reset_wsl_config() {
     t DEBUG "reset_wsl_config() end"
 }
 
+reset_registry() {
+    prompt "reset the registry entries"
+    if [[ $RETURN -ne 0 ]]; then
+        return
+    fi
+
+    if [[ "$OS_TYPE" != "wsl" ]]; then
+        t ERROR "This function is only for WSL. Skipping WSL configuration reset."
+        return
+    fi
+
+    chmod +x $DOTFILES_REPO_DIR/setup/registry/registry_setup.sh
+
+    powershell.exe -Command "Start-Process powershell.exe -Verb RunAs -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"$(wslpath -w $DOTFILES_REPO_DIR/setup/registry/registry_setup.sh)\"'"  || t WARNING "Some error occured during reset_registry()"
+    t DEBUG "reset_registry() end"
+}
+
 reset_powerline_config() {
     prompt "reset the powerline configs"
     if [[ $RETURN -ne 0 ]]; then

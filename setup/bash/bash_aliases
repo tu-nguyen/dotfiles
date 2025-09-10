@@ -86,6 +86,7 @@ alias .5='cd ../../../../..'
 alias ga='git a'
 alias gb='git b'
 alias gbr='git br'
+alias gbd='git branch -D'
 alias gc='git cam'
 alias gcl='git cl'
 alias gl="git l"

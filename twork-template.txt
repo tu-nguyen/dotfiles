@@ -1,0 +1,71 @@
+# .bash_extras/.bash_twork
+
+# twork ref
+function tworktt() {
+    printf "${BOLD}${H}twork cheatsheet${NC}\n"
+    printf "%s\n" "$br"
+    printf "${H2}cd${NC}\n"
+    printf "  cd0 or cd-example1\n"
+    printf "  cd1 or cd-example2\n"
+    printf "  cd2 or cd-example3\n"
+    printf "  cd3 or cd-example4\n"
+    printf "%s\n" "$br"
+    printf "${H2}ssh${NC}\n"
+    printf "  ssh-example1 (example server 1)\n"
+    printf "  ssh-example2 (example server 2)\n"
+    printf "  ssh-example3 (example server 3)\n"
+    printf "  ssh-example4 (example server 4)\n"
+    printf "%s\n" "$br"
+    printf "${H2}twork functions${NC}\n"
+
+    # printf "  azr                  → Clear the Azure CLI cache\n"
+    # printf "  print_curr_iter      → Print current Azure DevOps iter..\n"
+    printf "%s\n" "$br"
+ }
+
+twork_motd() {
+    printf "${BOLD}${H}Welcome to twork!${NC}\n"
+    # printf "Run '${BOLD}${H}td${NC}' to display tasks.\n"
+}
+
+function td() {
+    if [ -z "$FORCE_YES" ]; then
+        read -p "${PINK}Display Tasks?${NC} [y/N] " -n 1 -r
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            RETURN=1
+            return
+        else
+            print_curr_iter "RESOURCE_GROUP" "NAME" "TEAM" "SECRET"
+        fi
+    fi
+}
+
+# twork aliases
+alias cd0="cd /location/of/example1"
+alias cd-example1='cd0'
+alias cd1="cd /location/of/example2"
+alias cd-example2='cd1'
+alias cd2="cd /location/of/example3"
+alias cd-example1='cd2'
+alias cd3="cd /location/of/example4"
+alias cd-example4='cd4'
+alias qs="ssh something@something.com"
+alias ssh-example1='ssh example1@123.45.6789'
+alias ssh-example2='az ssh vm --ip example2.canadacentral.cloudapp.azure.com'
+alias ssh-example3='ssh example3@example3.com'
+alias ssh-example4='ssh example4@example4.com'
+
+# twork exports
+# Setting PATH for Python 3.13
+# The original version is saved in .bash_profile.pysave
+# PATH="/Library/Frameworks/Python.framework/Versions/3.13/bin:${PATH}"
+# Setting PATH for Python 3.12
+# The original version is saved in .bash_profile.pysave
+# export PATH=/Library/Frameworks/Python.framework/Versions/3.12/bin:$PATH
+# Setting PATH for Python 3.11
+# The original version is saved in .bash_profile.pysave
+# PATH="/Library/Frameworks/Python.framework/Versions/3.11/bin:${PATH}"
+# Setting PATH for Python 3.10
+# The original version is saved in .bash_profile.pysave
+# PATH="/Library/Frameworks/Python.framework/Versions/3.10/bin:${PATH}"
+# export PATH=/opt/homebrew/bin:$PATH

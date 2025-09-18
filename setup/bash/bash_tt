@@ -161,6 +161,7 @@ function gtt() {
   printf "                       → gc (cam)                     → gbd (delete branch)\n"
   printf "                       → cl (log)                     → gcl (cl show last commit)\n"
   printf "                       → crr (hard reset)             → gll (bigger log)\n"
+  printf "                       → gf (git fetch)               → gfetch (also git fetch)\n"
   printf "${H2}git alt${NC}                → s (status -s)                → b (fancy branch)\n"
   printf "                       → st (status)                  → br (branch)\n"
   printf "                       → co (checkout)                → a (add)\n"

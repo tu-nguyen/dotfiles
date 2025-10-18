@@ -140,7 +140,7 @@ alias ethtool='ethtool eth1'
 alias iwconfig='iwconfig wlan0'
 
 # python and uv
-alias venv="rm -rf venv && uv venv my-name"
+alias venv="rm -rf venv && uv venv venv"
 alias activate="source venv/bin/activate"
 
 if [[ "$(uname)" == "Darwin" ]]; then

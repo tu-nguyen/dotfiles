@@ -140,7 +140,7 @@ alias ethtool='ethtool eth1'
 alias iwconfig='iwconfig wlan0'
 
 # python and uv
-# alias venv="rm -rf venv && uv venv venv && source venv/bin/activate && uv pip sync requirements.txt"
+# alias venv='rm -rf venv && echo "Old environment removed." && uv venv venv && echo "Virtual environment created and activated." && ( [ -f requirements.txt ] && ( uv pip sync requirements.txt && echo "Synced main requirements.txt" ) || echo "requirements.txt not found, skipping main sync." ) && ( [ -f requirements-test.txt ] && ( uv pip sync requirements-test.txt && echo "Synced test requirements-test.txt" ) || echo "requirements-test.txt not found, skipping test sync." )'
 
 if [[ "$(uname)" == "Darwin" ]]; then
     alias diskspace="du | sort -n -r | more"

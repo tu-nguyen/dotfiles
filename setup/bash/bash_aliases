@@ -140,8 +140,7 @@ alias ethtool='ethtool eth1'
 alias iwconfig='iwconfig wlan0'
 
 # python and uv
-alias venv="rm -rf venv && uv venv venv"
-alias activate="source venv/bin/activate"
+# alias venv="rm -rf venv && uv venv venv && source venv/bin/activate && uv pip sync requirements.txt"
 
 if [[ "$(uname)" == "Darwin" ]]; then
     alias diskspace="du | sort -n -r | more"

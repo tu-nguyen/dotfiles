@@ -139,6 +139,10 @@ alias ethtool='ethtool eth1'
 # Only useful for laptop as all servers are without wireless interface
 alias iwconfig='iwconfig wlan0'
 
+# python and uv
+alias venv="rm -rf venv && uv venv my-name"
+alias activate="source venv/bin/activate"
+
 if [[ "$(uname)" == "Darwin" ]]; then
     alias diskspace="du | sort -n -r | more"
     alias ports='netstat -tulanp'

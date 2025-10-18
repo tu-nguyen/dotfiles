@@ -1,3 +1,6 @@
+let g:python_host_prog = '/usr/bin/python3'
+let g:python3_host_prog = '/usr/bin/python3'
+
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
@@ -22,12 +25,12 @@ Plugin 'scrooloose/syntastic'
 " ADDED SuperTab
 Plugin 'ervandew/supertab'
 " ADDED Ultisnips
-Plugin 'SirVer/ultisnips'   
+Plugin 'SirVer/ultisnips'
 " Snippets are separated from the engine. Add this if you want them:
 Plugin 'honza/vim-snippets'
 " ADDED Dracula colour scheme.
 Plugin 'dracula/vim', { 'name': 'dracula' }
-" ADDED YouCompleteMe 
+" ADDED YouCompleteMe
 " Plugin 'Valloric/YouCompleteMe'
 " ADDED indent python
 Plugin 'vim-scripts/indentpython.vim'
@@ -70,11 +73,11 @@ filetype plugin indent on    " required
 " Non Vundle stuff ************************************************
 
 set nocompatible                " Makes vim incompatibile with vi
-set t_Co=256    
-set modelines=0  
+set t_Co=256
+set modelines=0
 set autoread                    " Auto reads when file is changed from outside
 set encoding=utf-8              " Set UTF 8 standard
-command! -nargs=0 Sw w !sudo tee % > /dev/null 
+command! -nargs=0 Sw w !sudo tee % > /dev/null
 
 
 syntax on                       " Syntax highlighting
@@ -83,7 +86,7 @@ set smarttab                    " Insert tab on start of line base on context
 set hlsearch                    " Search highlighting
 set incsearch                   " Show search matches as you type
 set ignorecase                  " Ignores case when searching
-set smartcase                   " Ignore case if search pattern is all 
+set smartcase                   " Ignore case if search pattern is all
                                 "   lower case, case sensitive otherwise
 filetype plugin indent on       " Auto detects filetypes
 
@@ -114,11 +117,11 @@ set wildmenu                    " Tab completion for files act like in bash
 set wildmode=list:full          " Show list when pressing tab
 set spell                       " Spell check enabled
 
-set mouse=a                     " Enable mousesset  
+set mouse=a                     " Enable mousesset
 
 set backspace=indent,eol,start  " Backspace for dummies
 set linespace=0                 " No extra spaces between rows
-set numberwidth=1               
+set numberwidth=1
 set whichwrap=b,s,h,l,<,>,[,]   " Backspace and cursor keys wrap too
 
 set scrolloff=0
@@ -147,17 +150,17 @@ if has("autocmd")
     au filetype racket set lisp
     au filetype racket set autoindent
 endif
-               
+
 " Save mouse position
 augroup resCur
     autocmd!
     autocmd BufReadPost * call setpos(".", getpos("'\""))
-augroup END   
+augroup END
 
 
 " NerdTree settings
 " Automatically opens up nerdtree
-"autocmd vimenter * NERDTree     
+"autocmd vimenter * NERDTree
 " Opens nerdtree with Control-n
 map <C-n> :NERDTreeToggle<CR>
 " Closes nerdtree if vim closes
@@ -176,7 +179,7 @@ let g:syntastic_check_on_wq = 0
 
 set rtp+="$POWERLINE_PATH/powerline/bindings/vim"
 
-let g:powerline_pycmd="py3"  
+let g:powerline_pycmd="py3"
 let g:Powerline_symbols = 'fancy'
 
 let s:uname = system("uname")
@@ -184,9 +187,11 @@ if s:uname == "Darwin\n"
     set guifont=Inconsolata\ for\ Powerline:h15
     set fillchars+=stl:\ ,stlnc:\
 else
-    python3 from powerline.vim import setup as powerline_setup
-    python3 powerline_setup()
-    python3 del powerline_setup
+    if !exists('$VIRTUAL_ENV')
+        python3 from powerline.vim import setup as powerline_setup
+        python3 powerline_setup()
+        python3 del powerline_setup
+    endif
 endif
 
 " TODO figure out how to make this work on macos"

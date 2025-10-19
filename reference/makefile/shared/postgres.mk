@@ -1,0 +1,7 @@
+# DB defaults
+POSTGRES_HOST ?= $(PROJECT_NAME)-db
+POSTGRES_DB ?= something_$(PROJECT_NAME)
+POSTGRES_USER ?= some_user
+POSTGRES_PASSWORD ?= some_password
+POSTGRES_PORT ?= 5432
+HOST_POSTGRES_PORT := $(shell echo $$(($(POSTGRES_PORT) + $(PORT_OFFSET))))

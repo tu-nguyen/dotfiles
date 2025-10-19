@@ -239,6 +239,7 @@ function venv () {
         else
             echo "requirements-test.txt not found, skipping test install."
         fi
+    fi
 
     echo "Python executable AFTER VENV activation:"
     which python

@@ -177,6 +177,74 @@ function status_colour() {
     esac
 }
 
+# Python venv
+# TODO: add args for other txt?
+function venv () {
+    echo "Checking for uv installation.."
+    # Check if 'uv' command exists
+    if command -v uv &> /dev/null
+    then
+        # --- UV MODE ---
+        echo "uv found. Using uv for fast environment setup."
+
+        # 1. Remove environment
+        rm -rf venv
+        echo "Old environment removed."
+
+        # 2. Create and activate base environment
+        uv venv venv
+        source venv/bin/activate
+        echo "Virtual environment created and activated."
+
+        # 3. Conditional install for main requirements.txt
+        if [ -f requirements.txt ]; then
+            uv pip install -r requirements.txt
+            echo "Installed main requirements.txt"
+        else
+            echo "requirements.txt not found.."
+        fi
+
+        # 4. Conditional install for test requirements-test.txt
+        if [ -f requirements-test.txt ]; then
+            uv pip install -r requirements-test.txt
+            echo "Installed test requirements-test.txt"
+        else
+            echo "requirements-test.txt not found.."
+        fi
+    else
+        # --- FALLBACK MODE (Standard VENV + PIP) ---
+        echo "uv not found. Falling back to python -m venv and pip."
+
+        # 1. Remove environment
+        rm -rf venv
+        echo "Old environment removed."
+
+        # 2. Create and activate base environment using standard venv
+        python -m venv venv
+        source venv/bin/activate
+        echo "Virtual environment created and activated."
+
+        # 3. Conditional sync for main requirements.txt
+        if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+            echo "Installed main requirements.txt"
+        else
+            echo "requirements.txt not found, skipping main install."
+        fi
+
+        # 4. Conditional sync for test requirements-test.txt
+        if [ -f requirements-test.txt ]; then
+            pip install -r requirements-test.txt
+            echo "Installed test requirements-test.txt"
+        else
+            echo "requirements-test.txt not found, skipping test install."
+        fi
+
+    echo "Python executable AFTER VENV activation:"
+    which python
+    echo "Setup complete. Environment is active."
+}
+
 # github related functions
 function gpull() {
     git pull origin $(git rev-parse --abbrev-ref HEAD)

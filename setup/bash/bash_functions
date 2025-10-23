@@ -259,7 +259,7 @@ function gpush() {
 function gco() {
     local branch=$1
     if [ -z "$branch" ]; then
-        t "Usage: gsw <branch_name>"
+        t "Usage: gco <branch_name>"
         return 1
     fi
     git checkout $branch
@@ -274,7 +274,7 @@ function gco() {
 function gcob() {
     local branch=$1
     if [ -z "$branch" ]; then
-        t "Usage: gsw <branch_name>"
+        t "Usage: gcob <branch_name>"
         return 1
     fi
     git checkout $branch
@@ -287,6 +287,27 @@ function gcob() {
         else
             t ERROR "Failed to create and switch branch"
         fi
+    fi
+}
+
+# Rename git branch
+function grn() {
+    local old_branch=$1
+    local new_branch=$2
+    if [ -z "$old_branch" ] || [ -z "$new_branch" ]; then
+        t "Usage: grn <old_branch_name> <new_branch_name>"
+        return 1
+    fi
+    git checkout $old_branch
+    git branch -m $new_branch
+    git push origin $new_branch
+    git push origin --delete $old_branch
+
+    if [ $? -eq 0 ]; then
+        t SUCCESS "Branch ${GREEN}$old_branch${NC} renamed to ${GREEN}$new_branch${NC}"
+    else
+        t SUCCESS "Branch ${GREEN}$old_branch${NC} renamed to ${GREEN}$new_branch${NC}"
+        t INFO "A 'failed to push some refs' error may have occured, this can be ignored."
     fi
 }
 

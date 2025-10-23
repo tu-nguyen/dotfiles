@@ -180,6 +180,7 @@ function gtt() {
   printf "  gcob                 → Same as above but with fallback to create a branch\n"
   printf "  greset               → Hard reset on current branch\n"
   printf "  gclean               → Hard reset and removes untracked files\n"
+  printf "  grn                  → Rename git branch\n"
   printf "%s\n" "$br"
 }
 

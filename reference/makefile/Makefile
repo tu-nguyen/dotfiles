@@ -1,11 +1,13 @@
 include .env
 
+include ./shared/style.mk
 include ./shared/default.mk
-include ./shared/helper.mk
+include ./shared/base.mk
 # include ./shared/docker.mk
 # include ./shared/python.mk
-# include ./shared/django.mk
 # include ./shared/postgres.mk
+
+SHELL := /bin/bash
 
 ## Help and variable check
 hello: # Default help command
@@ -13,8 +15,8 @@ hello: # Default help command
 
 ### Shared commands
 help ::
-	@printf "$(H2)Shared Commands$(NC)\n"
-	@printf "    $(GREEN)help$(NC): Default help command\n"
+# 	@printf "$(H2)Shared Commands$(NC)\n"
+# 	@printf "    $(GREEN)help$(NC): Default help command\n"
 	# docker
 	@printf "$(H2)Docker Commands$(NC)\n"
 	@printf "    $(GREEN)docker-status$(NC): List containers for environment\n"

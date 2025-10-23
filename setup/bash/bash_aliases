@@ -95,6 +95,7 @@ alias grr="git rr"
 alias gs='git st'
 alias greset='git reset --hard HEAD'
 alias gclean='git clean -f'
+alias gclone='git clone'
 alias gf='git fetch'
 alias gfetch='git fetch'
 

@@ -1,27 +1,15 @@
 SHELL := /bin/bash
 
-# Colors for output
-NC = $(shell tput sgr0)
-RED = $(shell tput setaf 1)
-GREEN = $(shell tput setaf 2)
-YELLOW = $(shell tput setaf 3)
-MAGENTA = $(shell tput setaf 5)
-CYAN = $(shell tput setaf 6)
-PINK = $(shell echo -e '\033[38;5;205m')
-
-BOLD = $(shell tput bold)
-
-H1 = $(BOLD)$(CYAN)
-H2 = $(BOLD)$(PINK)
-
 # Arguments helper
 args = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 
-HELPER_COMMANDS = all
-EXCLUDE_PATTERN = $(shell echo $(HELPER_COMMANDS) | sed 's/ /|/g')
+HELPER_COMMANDS = all hello
+EXCLUDE_PATTERN = $(shell echo $(HELPER_COMMANDS) | sed 's/ /|/g')  # Might not need
 
 test ::
 	@echo "test from mk"
+	@echo $(HELPER_COMMANDS)
+# 	@echo $(EXCLUDE_PATTERN)  # Need to fix
 
 .PHONY: help
 ## Help and variable check

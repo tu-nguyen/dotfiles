@@ -6,10 +6,16 @@ args = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 HELPER_COMMANDS = all hello
 EXCLUDE_PATTERN = $(shell echo $(HELPER_COMMANDS) | sed 's/ /|/g')  # Might not need
 
-test ::
-	@echo "test from mk"
-	@echo $(HELPER_COMMANDS)
-# 	@echo $(EXCLUDE_PATTERN)  # Need to fix
+USER_NAME ?= $(USER)
+GROUP_NAME ?= $(shell id -g -n $(USER))
+DEFAULT_UID := $(shell id -u)
+DEFAULT_GID := $(shell id -g)
+LOCAL_UID := $(shell id -u $(USER_NAME) 2>/dev/null || echo $(DEFAULT_UID))
+LOCAL_GID := $(shell id -g $(GROUP_NAME) 2>/dev/null || echo $(DEFAULT_GID))
+
+# Environment target (local, staging, production), default to local
+ENVIRONMENT ?= local
+ENV = $(strip $(ENVIRONMENT))
 
 .PHONY: help
 ## Help and variable check

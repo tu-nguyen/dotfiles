@@ -1,29 +1,30 @@
-
-# *** Be sure to override in Makefile
+DOCKER_DIR = docker
+ifeq ($(ENV),local)
+	COMPOSE_PROFILES := dev
+	DOCKER_BUILD_FILE = $(DOCKER_DIR)/Dockerfile.local
+	DOCKER_COMPOSE_FILE ?= $(DOCKER_DIR)/docker-compose.local.yaml
+else ifeq ($(ENV),staging)
+	COMPOSE_PROFILES := deploy
+	DOCKER_BUILD_FILE = $(DOCKER_DIR)/Dockerfile.deploy
+	DOCKER_COMPOSE_FILE ?= $(DOCKER_DIR)/docker-compose.staging.yaml
+else
+	COMPOSE_PROFILES := deploy
+	DOCKER_BUILD_FILE = $(DOCKER_DIR)/Dockerfile.deploy
+	DOCKER_COMPOSE_FILE ?= $(DOCKER_DIR)/docker-compose.production.yaml
+endif
 
 # ARCH target (amd64, arm64), default to amd64
 ARCH_TEMP ?= amd64
 ARCH ?= $(strip $(ARCH_TEMP))
+TAG ?= latest.$(ENV)-$(ARCH)
+PORT_OFFSET ?= 0
 
 # Service target (web, db, etc), default to web
 SERVICE ?= web
-PROJECT_NAME ?= central
 SUBDOMAIN ?= $(PROJECT_NAME)
-TAG ?= latest.$(ENV)-$(ARCH)
 TARGET ?= $(PROJECT_NAME)-$(SERVICE)
-PORT_OFFSET ?= 0
 
-# Docker Compose file directory
-DOCKER_DIR = docker
 
-# Dockerfile and Docker Compose file
-COMPOSE_FILE = $(DOCKER_DIR)/docker-compose.$(ENV).yml
-
-ifeq ($(ENV),local)
-	BUILD_FILE = $(DOCKER_DIR)/Dockerfile.local
-else
-	BUILD_FILE = $(DOCKER_DIR)/Dockerfile.deploy
-endif
 
 # Docker Exec command helper (generic)
 ifeq ($(GITHUB_ACTIONS),true)

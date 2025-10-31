@@ -30,3 +30,6 @@ endif
 
 H1 = $(BOLD)$(CYAN)
 H2 = $(BOLD)$(PINK)
+SUCCESS = $(BOLD)$(GREEN)
+INFO = $(BOLD)$(CYAN)
+ERR = $(BOLD)$(RED)

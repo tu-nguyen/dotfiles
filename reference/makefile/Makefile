@@ -3,39 +3,57 @@ include .env
 include ./shared/style.mk
 include ./shared/default.mk
 include ./shared/base.mk
-# include ./shared/docker.mk
-# include ./shared/python.mk
-# include ./shared/postgres.mk
 
 SHELL := /bin/bash
 
+PROJECT_NAME ?= $(shell basename $$(pwd))
+PROJECT_DIR := $(CURDIR)
+export PROJECT_NAME
+export PROJECT_DIR
+
+# How to use:
+# look at base.mk and helper.mk
+# if any commands uses variable set here
+# be sure to export so it's available to the mks
+# LOCAL_UID ?= 1000
+# LOCAL_GID ?= 1000
+# export LOCAL_UID
+# export LOCAL_GID
+
+# If the project is python base
+# your install command can call python-install
+.PHONY: install
+install:          ## Initialize Python venv and install requirements.txt and requirements-test.txt.
+	@make python-install
+
 ## Help and variable check
-hello: # Default help command
-	@echo "hello"
+.PHONY: help
+help: # Default help command
+	@echo "$(H1)Usage$(NC):"
+	@echo "  make [command] <arg>"
+	@echo "           make install"
+	@echo "           make logs db"
+	@echo "           make test tests/api/test_set_locale.py"
+	@echo "  $(H2)**Note you can also override variables**$(NC):"
+	@echo "           make install PYTHON=python3.12"
+	@echo "$(H1)Environment Variables:$(NC) (run '$(GREEN)make make-check$(NC)' to see more)"
+	@echo "  ENV: $(ENV)"
+	@echo "  TARGET: $(TARGET)"
+	@echo "  TAG: $(TAG)"
+	@echo "$(H1)Common Commands:$(NC) $(GREEN)install, logs, test, lint, clean, help$(NC)"
+	@echo "$(H1)Available Commands:$(NC)"
+	@grep -E '^(## |[a-zA-Z0-9 _-]+:.*#)' Makefile | grep -v '^###' | grep -Ev "^($(EXCLUDE_PATTERN)):" | while read -r line; do \
+		if echo "$$line" | grep -q '^##'; then \
+			printf "$(H2)$$(echo $$line | sed 's/^## //')$(NC)\n"; \
+		else \
+			cmd=$$(echo $$line | cut -f 1 -d':'); \
+			desc=$$(echo $$line | cut -f 2- -d'#'); \
+			printf "    $(GREEN)$$cmd$(NC):$$desc\n"; \
+		fi; \
+	done
 
-### Shared commands
-help ::
-# 	@printf "$(H2)Shared Commands$(NC)\n"
-# 	@printf "    $(GREEN)help$(NC): Default help command\n"
-	# docker
-	@printf "$(H2)Docker Commands$(NC)\n"
-	@printf "    $(GREEN)docker-status$(NC): List containers for environment\n"
-	@printf "    $(GREEN)docker-image docker-images$(NC): List images for environment\n"
-	@printf "    $(GREEN)docker-pull$(NC): Pull the services\n"
-	@printf "    $(GREEN)docker-push$(NC): Push the services (only for deploy)\n"
-	@printf "    $(GREEN)docker-build$(NC): Build the services for environment\n"
-	@printf "    $(GREEN)docker-rebuild$(NC): Rebuild the services (no cache)\n"
-	@printf "    $(GREEN)docker-up$(NC): Start the services in detached mode for environment\n"
-	@printf "    $(GREEN)docker-down$(NC): Stop the services in environment\n"
-	@printf "    $(GREEN)docker-restart$(NC): Restart a specific service in environment\n"
-	@printf "    $(GREEN)docker-build-up$(NC): Build and start the services in detached mode for environment\n"
-	@printf "    $(GREEN)docker-log docker-logs$(NC): View logs for specific service in environment\n"
-	@printf "    $(GREEN)docker-clean-container docker-clean-containers:$(NC): Clean up unused Docker containers\n"
-	@printf "    $(GREEN)docker-clean-image docker-clean-images:$(NC): Clean up unused Docker images\n"
-	@printf "    $(GREEN)docker-clean-volume docker-clean-volumes$(NC): Clean up unused Docker volumes\n"
-	@printf "    $(GREEN)docker-clean-network$(NC): Clean up unused Docker networks\n"
-	@printf "    $(GREEN)docker-clean$(NC):  Clean up unused Docker resources (containers, images, volumes)\n"
-	@printf "    $(GREEN)docker-purge$(NC):  Purge all Docker resources (containers, images, volumes, networks)\n"
-	@printf "    $(GREEN)docker-bash docker-shell:$(NC):  Shell into running container\n"
-
-
+make-check: # Check current environment variable
+	@make _make-check-default
+	@make _make-check-python
+	@make _make-check-django
+	@make _make-check-docker

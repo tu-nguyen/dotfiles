@@ -10,7 +10,7 @@ function print_tt() {
         return 1
     fi
 
-    awk -v h="${H}" nc="${NC}" '
+    awk -v h="$H" -v nc="$NC" '
     BEGIN { comment="" }
     /^#/ { comment = $0; next }
     /^[a-zA-Z_][a-zA-Z0-9_]* *\(\) *\{/ {

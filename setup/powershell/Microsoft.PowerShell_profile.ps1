@@ -49,8 +49,29 @@ function touchOnPowershell {
     echo $null > $file
   }
 }
+function cdHome {
+  cd ~
+}
+function cdUp {
+  cd ..
+}
+function cdUpUp {
+  cd ..
+  cd ..
+}
+function cdUpUpUp {
+  cd ..
+  cd ..
+  cd ..
+}
 New-Alias -Name "touch" -Value "touchOnPowershell"
 Set-Alias -Name 'tt' -Value 'Get-TT' -Force
+Set-Alias -Name 'c' -Value 'clear' -Force
+Set-Alias -Name 'x' -Value 'exit' -Force
+Set-Alias -Name '~' -Value 'cdHome' -Force
+Set-Alias -Name '..' -Value 'cdUp' -Force
+Set-Alias -Name '...' -Value 'cdUpUp' -Force
+Set-Alias -Name '....' -Value 'cdUpUpUp' -Force
 
 # Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Confirm:$false -ErrorAction Stop
 
@@ -94,7 +115,7 @@ Set-PowerLinePrompt -SetCurrentDirectory -PowerLineFont -Title {
 } -Colors "HotPink", "DeepPink", "MediumVioletRed", "DeepPink4", "Pink", "LightPink"
 # } -Colors "SteelBlue4", "DodgerBlue3", "DeepSkyBlue2", "SkyBlue2", "SteelBlue2", "LightSkyBlue1"
 
-Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
+# Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 Set-PSReadlineOption -ContinuationPrompt '> '
 
 echo "Microsoft.Powershell_profile.ps1 done"

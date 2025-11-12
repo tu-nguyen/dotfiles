@@ -401,3 +401,19 @@ reset_firefox() {
     bash -i $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh || t WARNING "Some error occured during reset_firefox()"
     t DEBUG "reset_firefox() end"
 }
+
+reset_ps() {
+    prompt "reset the PowerShell profile"
+    if [[ $RETURN -ne 0 ]]; then
+        return
+    fi
+
+    if [[ "$OS_TYPE" != "wsl" ]]; then
+        t ERROR "This function is only for WSL. Skipping WSL configuration reset."
+        return
+    fi
+
+    chmod +x $DOTFILES_REPO_DIR/setup/powershell/ps1_setup.sh
+    bash -i $DOTFILES_REPO_DIR/setup/powershell/ps1_setup.sh  || t WARNING "Some error occured during reset_ps()"
+    t DEBUG "reset_ps() end"
+}

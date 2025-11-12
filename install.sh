@@ -106,6 +106,7 @@ show_menu() {
     echo "7. Reset Firefox"
     echo "8. Reset WSL Config (WSL only)"
     echo "9. Run Gaming Registry Tweaks (WSL only)"
+    echo "10. Reset PowerShell profile (WSL only)"
     echo "0. Run All of the Above (Default)"
     echo "x. Exit"
     echo "======================================="
@@ -126,6 +127,7 @@ while true; do
         7) reset_firefox ;;
         8) reset_wsl_config ;;
         9) reset_registry ;;
+        10) reset_ps ;;
         "" | 0)
             echo "Running all configuration resets..."
             reset_pre
@@ -137,6 +139,7 @@ while true; do
             reset_firefox
             reset_wsl_config
             reset_registry
+            reset_ps
             break
             ;;
         x | X) break ;;

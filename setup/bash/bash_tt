@@ -74,6 +74,8 @@ function tt() {
   fi
 
   printf "%s\n" "$br"
+  printf "${H2}reminder${NC}      \n"
+  printf "  ${H}cd-dotfiles${NC}          → to acd to original dotfiles dir\n"
 }
 
 function btt() {

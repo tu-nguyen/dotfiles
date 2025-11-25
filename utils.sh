@@ -277,8 +277,9 @@ reset_bashrc() {
 
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_aliases" "$HOME/.bash_extras/.bash_aliases"
     echo "" >> "$HOME/.bash_extras/.bash_aliases"
-    echo "alias cd-dotfile='cd $DOTFILES_REPO_DIR'" >> "$HOME/.bash_extras/.bash_aliases"
-    echo "alias cd-dotfiles='cd-dotfile'"
+    echo "alias cd-dot='cd $DOTFILES_REPO_DIR'" >> "$HOME/.bash_extras/.bash_aliases"
+    echo "alias cd-dotfile='cd-dot'"
+    echo "alias cd-dotfiles='cd-dot'"
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_docker_functions" "$HOME/.bash_extras/.bash_docker_functions"
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_functions" "$HOME/.bash_extras/.bash_functions"
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_exports" "$HOME/.bash_extras/.bash_exports"

@@ -97,7 +97,9 @@ fi
 # TODO
 # echo -e "${BOLD}${CYAN}Hello, World! This is BASH ${BOLD}${RED}${BASH_VERSION%.*}${BOLD}${CYAN}\
 # - TODO ${BOLD}${RED}..{NC}"
-eval "$(starship init bash)"
+if command -v starship &> /dev/null; then
+    eval "$(starship init bash)"
+fi
 
 if [[ -f "$HOME/.bash_extras/.bash_motd" ]]; then
     motd

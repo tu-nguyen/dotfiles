@@ -234,8 +234,20 @@ install_packages() {
 
         sudo add-apt-repository universe
         # install_package powerline
-        curl -sS https://starship.rs/install.sh | sh
-        curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        if ! command -v starship &> /dev/null; then
+            echo "Starship not found. Installing now..."
+            curl -sS https://starship.rs/install.sh | sh
+        else
+            echo "Starship is already installed at $(command -v starship)"
+            starship --version
+        fi
+        if [ ! -f ~/.vim/autoload/plug.vim ]; then
+            echo "Vim-Plug not found. Installing..."
+            curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+                https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        else
+            echo "Vim-Plug is already installed."
+        fi
         install_package coreutils
         install_package less
         install_package htop

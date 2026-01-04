@@ -109,6 +109,9 @@ install_fira_font() {
     fi
 
     if [[ "$OS_TYPE" == "wsl" ]]; then
+        # If this didn't work, manually move Fira Font
+        # explorer.exe .
+        # explorer.exe shell:fonts
         WIN_FONT_DIR_RAW=$(cmd.exe /c "echo %SystemRoot%\Fonts" 2>/dev/null | tr -d '\r')
         WIN_FONT_DIR=$(wslpath "$WIN_FONT_DIR_RAW")
 

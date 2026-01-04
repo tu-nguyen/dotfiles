@@ -1,219 +1,111 @@
-let g:python_host_prog = '/usr/bin/python3'
-let g:python3_host_prog = '/usr/bin/python3'
+" ---------------------------------------------------------------------
+" 1. PLUGINS (using vim-plug)
+" ---------------------------------------------------------------------
+call plug#begin('~/.vim/plugged')
 
-set nocompatible              " be iMproved, required
-filetype off                  " required
+" Aesthetics & Interface
+Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'preservim/nerdtree'
+Plug 'jistr/vim-nerdtree-tabs'
 
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
+" Code Intelligence & Linting
+Plug 'dense-analysis/ale'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
+Plug 'tmhedberg/SimpylFold'
 
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
+" Editor Features
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-surround'
+Plug 'ervandew/supertab'
+Plug 'vim-scripts/indentpython.vim'
 
-"ADDED Powerline
-" Plugin 'powerline/powerline'
-Bundle 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}
-" ADDED Nerdtree
-Plugin 'scrooloose/nerdtree'
-" ADDED Nerdtree-Tab
-Bundle 'jistr/vim-nerdtree-tabs'
-" ADDED Syntastic : Syntax checking hacks for vim
-Plugin 'scrooloose/syntastic'
-" ADDED SuperTab
-Plugin 'ervandew/supertab'
-" ADDED Ultisnips
-Plugin 'SirVer/ultisnips'
-" Snippets are separated from the engine. Add this if you want them:
-Plugin 'honza/vim-snippets'
-" ADDED Dracula colour scheme.
-Plugin 'dracula/vim', { 'name': 'dracula' }
-" ADDED YouCompleteMe
-" Plugin 'Valloric/YouCompleteMe'
-" ADDED indent python
-Plugin 'vim-scripts/indentpython.vim'
-" ADDED SimplyFold
-Plugin 'tmhedberg/SimplyFold'
+call plug#end()
 
-" The following are examples of different formats supported.
-" Keep Plugin commands between vundle#begin/end.
-" plugin on GitHub repo
-Plugin 'tpope/vim-fugitive'
-" plugin from http://vim-scripts.org/vim/scripts.html
-" Plugin 'L9'
-" Git plugin not hosted on GitHub
-Plugin 'git://git.wincent.com/command-t.git'
-" git repos on your local machine (i.e. when working on your own plugin)
-" Plugin 'file:///home/gmarik/path/to/plugin'
-" The sparkup vim script is in a subdirectory of this repo called vim.
-" Pass the path to set the runtimepath properly.
-Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
-" Install L9 and avoid a Naming conflict if you've already installed a
-" different version somewhere else.
-" Plugin 'ascenator/L9', {'name': 'newL9'}
+" ---------------------------------------------------------------------
+" 2. GENERAL SETTINGS
+" ---------------------------------------------------------------------
+let mapleader = " "                 " Use Space as the leader key
+set nocompatible
+filetype plugin indent on
+syntax on
 
-" All of your Plugins must be added before the following line
-call vundle#end()            " required
-filetype plugin indent on    " required
-
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
-"
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
-
-" Non Vundle stuff ************************************************
-
-set nocompatible                " Makes vim incompatibile with vi
+" Colors & UI
 set t_Co=256
-set modelines=0
-set autoread                    " Auto reads when file is changed from outside
-set encoding=utf-8              " Set UTF 8 standard
-command! -nargs=0 Sw w !sudo tee % > /dev/null
+colorscheme dracula
+set number relativenumber           " Hybrid line numbers
+set cursorline                      " Highlight current line
+set showmatch
+set laststatus=2
+set noshowmode                      " Airline shows the mode already
 
+" Search
+set hlsearch
+set incsearch
+set ignorecase
+set smartcase
 
-syntax on                       " Syntax highlighting
-colors dracula                  " enable dracula color scheme duh
-set smarttab                    " Insert tab on start of line base on context
-set hlsearch                    " Search highlighting
-set incsearch                   " Show search matches as you type
-set ignorecase                  " Ignores case when searching
-set smartcase                   " Ignore case if search pattern is all
-                                "   lower case, case sensitive otherwise
-filetype plugin indent on       " Auto detects filetypes
+" System Behavior
+set autoread
+set encoding=utf-8
+set nobackup
+set noswapfile
+set mouse=a
+set clipboard=unnamedplus           " Link Vim clipboard to System clipboard
+set hidden                          " Switch buffers without saving
 
-set nobackup                    " Do not keep backup files
-set noswapfile                  " Do not write swap files
-set noerrorbells                " Disable beeping
-set visualbell
-set t_vb=
-set tm=500
+" Tabbing & Indent
+set tabstop=4
+set shiftwidth=4
+set expandtab
+set autoindent
+set smarttab
+
+" Cursor Behavior
 set guicursor=n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20
-" n-v-c-sm:block → Normal, Visual, Command modes: block cursor
-" i-ci-ve:ver25 → Insert, Command-line Insert, Visual Exclusive: thin vertical bar
-" r-cr-o:hor20 → Replace, Command-line Replace, Operator-pending: horizontal cursor
 au VimLeave * set guicursor=a:ver25
 
+" ---------------------------------------------------------------------
+" 3. PLUGIN SPECIFIC CONFIG
+" ---------------------------------------------------------------------
 
-set nowrap                      " Do not wrap long lines
-set autoindent                  " Auto indenting on
-set copyindent                  " Copy previous indentation on auto
-set foldenable                  " Auto fold code
-set showmode                    " Show current mode currently in
-set showmatch                   " Cursor shows matching parentthesis
-set number                      " Shows line numbers
-set relativenumber              " Show line number relative to cursor
+" NERDTree: Use Leader + n to toggle
+nnoremap <leader>n :NERDTreeToggle<CR>
+let g:nerdtree_tabs_autoclose=1
 
+" ALE (Linting) Settings
+let g:ale_sign_column_always = 1
+let g:ale_lint_on_text_changed = 'always'
+let g:ale_python_flake8_options = '--max-line-length=88'
 
-set wildmenu                    " Tab completion for files act like in bash
-set wildmode=list:full          " Show list when pressing tab
-set spell                       " Spell check enabled
-
-set mouse=a                     " Enable mousesset
-
-set backspace=indent,eol,start  " Backspace for dummies
-set linespace=0                 " No extra spaces between rows
-set numberwidth=1
-set whichwrap=b,s,h,l,<,>,[,]   " Backspace and cursor keys wrap too
-
-set scrolloff=0
-set virtualedit=all
-set fileformats="unix,dos,mac"
-set formatoptions+=1
-set ruler
-
-set textwidth=80
-set linebreak
-set fo+=t
-set wrapmargin=0
-"set columns=80
-set wrap!                       " Prevent wrapping that goes off screen
-
-" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
+" Snippets
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<c-b>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
-" If you want :UltiSnipsEdit to split your window.
-let g:UltiSnipsEditSplit="vertical"
+" Airline (Status Bar)
+let g:airline_powerline_fonts = 1    " Set to 0? Patch font
 
-if has("autocmd")
-    au BufReadPost *.rkt,*.rktl set filetype=racket
-    au filetype racket set lisp
-    au filetype racket set autoindent
-endif
+" ---------------------------------------------------------------------
+" 4. MAPPINGS & CUSTOM COMMANDS
+" ---------------------------------------------------------------------
 
-" Save mouse position
-augroup resCur
-    autocmd!
-    autocmd BufReadPost * call setpos(".", getpos("'\""))
-augroup END
+" Save with sudo via :Sw
+command! -nargs=0 Sw w !sudo tee % > /dev/null
 
-
-" NerdTree settings
-" Automatically opens up nerdtree
-"autocmd vimenter * NERDTree
-" Opens nerdtree with Control-n
-map <C-n> :NERDTreeToggle<CR>
-" Closes nerdtree if vim closes
-let g:nerdtree_tabs_autoclose=1
-
-" Syntastic Settins
-" recommended?
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-
-set rtp+="$POWERLINE_PATH/powerline/bindings/vim"
-
-let g:powerline_pycmd="py3"
-let g:Powerline_symbols = 'fancy'
-
-let s:uname = system("uname")
-if s:uname == "Darwin\n"
-    set guifont=Inconsolata\ for\ Powerline:h15
-    set fillchars+=stl:\ ,stlnc:\
-else
-    if !exists('$VIRTUAL_ENV')
-        python3 from powerline.vim import setup as powerline_setup
-        python3 powerline_setup()
-        python3 del powerline_setup
-    endif
-endif
-
-" TODO figure out how to make this work on macos"
-" python3 from powerline.vim import setup as powerline_setup
-" python3 powerline_setup()
-" python3 del powerline_setup
-
-set laststatus=2                   " show powerline all the time
-"set showtabline=2      " Always display the tabline
-"set noshowmode  " Hide the default mode text
-
-" split navigations
+" Split navigations (Ctrl + hjkl)
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 
-" Enable folding
-set foldmethod=indent
-set foldlevel=99
+" Clear highlights with Leader + Space
+nnoremap <leader><space> :noh<cr>
 
-set tabstop=4
-set shiftwidth=4
-
-set expandtab
+" Remember cursor position
+augroup resCur
+    autocmd!
+    autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+augroup END

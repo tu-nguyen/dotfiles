@@ -63,26 +63,26 @@ install_package() {
     fi
 }
 
-# Function to install Powerline fonts
-install_powerline_fonts() {
-    t "Installing Powerline fonts.."
-    local fonts_temp_dir=$(mktemp -d -t powerline-fonts-XXXXXX)
-    if ! git clone https://github.com/powerline/fonts.git "$fonts_temp_dir"; then
-        t "Error" "Failed to clone Powerline fonts repository."
-        rm -rf "$fonts_temp_dir"
-        exit 1
-    fi
+# # Function to install Powerline fonts
+# install_powerline_fonts() {
+#     t "Installing Powerline fonts.."
+#     local fonts_temp_dir=$(mktemp -d -t powerline-fonts-XXXXXX)
+#     if ! git clone https://github.com/powerline/fonts.git "$fonts_temp_dir"; then
+#         t "Error" "Failed to clone Powerline fonts repository."
+#         rm -rf "$fonts_temp_dir"
+#         exit 1
+#     fi
 
-    t "  Running font installation script.."
-    if ! "$fonts_temp_dir/install.sh"; then
-        t "Warning: Powerline font installation script failed. You might need to install fonts manually or update font cache."
-    fi
+#     t "  Running font installation script.."
+#     if ! "$fonts_temp_dir/install.sh"; then
+#         t "Warning: Powerline font installation script failed. You might need to install fonts manually or update font cache."
+#     fi
 
-    t "Cleaning up temporary font directory.."
-    rm -rf "$fonts_temp_dir"
-    t "Powerline fonts installation attempted."
-    t "NOTE: You may need to configure your terminal emulator to use a Powerline-compatible font (e.g., 'Meslo LG S DZ Regular for Powerline')."
-}
+#     t "Cleaning up temporary font directory.."
+#     rm -rf "$fonts_temp_dir"
+#     t "Powerline fonts installation attempted."
+#     t "NOTE: You may need to configure your terminal emulator to use a Powerline-compatible font (e.g., 'Meslo LG S DZ Regular for Powerline')."
+# }
 
 # Function to install Gitstatus
 install_gitstatus() {
@@ -209,8 +209,8 @@ install_packages() {
     install_package git
     install_package curl
     install_package vim
-    install_package python3
-    install_package python3-pip
+    # install_package python3
+    # install_package python3-pip
     install_package make
     install_package jq
 
@@ -221,7 +221,9 @@ install_packages() {
         fi
 
         sudo add-apt-repository universe
-        install_package powerline
+        # install_package powerline
+        curl -sS https://starship.rs/install.sh | sh
+        curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
         install_package coreutils
         install_package less
         install_package htop
@@ -245,7 +247,7 @@ install_packages() {
         return 1
     fi
 
-    install_powerline_fonts
+    # install_powerline_fonts
     install_gitstatus
 
     t SUCCESS "All required packages installed successfully."
@@ -383,19 +385,19 @@ reset_registry() {
     t DEBUG "reset_registry() end"
 }
 
-reset_powerline_config() {
-    prompt "reset the powerline configs"
-    if [[ $RETURN -ne 0 ]]; then
-        return
-    fi
+# reset_powerline_config() {
+#     prompt "reset the powerline configs"
+#     if [[ $RETURN -ne 0 ]]; then
+#         return
+#     fi
 
-    chmod +x $DOTFILES_REPO_DIR/setup/powerline/fix_powerline.sh
-    sudo $DOTFILES_REPO_DIR/setup/powerline/fix_powerline.sh
+#     chmod +x $DOTFILES_REPO_DIR/setup/powerline/fix_powerline.sh
+#     sudo $DOTFILES_REPO_DIR/setup/powerline/fix_powerline.sh
 
-    chmod +x $DOTFILES_REPO_DIR/setup/powerline/powerline_config_setup.sh
-    bash -i $DOTFILES_REPO_DIR/setup/powerline/powerline_config_setup.sh
-    t SUCCESS "Powerline configuration reset completed!"
-}
+#     chmod +x $DOTFILES_REPO_DIR/setup/powerline/powerline_config_setup.sh
+#     bash -i $DOTFILES_REPO_DIR/setup/powerline/powerline_config_setup.sh
+#     t SUCCESS "Powerline configuration reset completed!"
+# }
 
 reset_firefox() {
     prompt "reset the firefox configs"

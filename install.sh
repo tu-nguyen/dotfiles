@@ -102,7 +102,7 @@ show_menu() {
     echo "3. Reset .vimrc"
     echo "4. Reset Git Config"
     echo "5. Reset VS Code Config"
-    echo "6. Reset Powerline Config"
+    echo "-- 6. Reset Powerline Config -- PHASING OUT"
     echo "7. Reset Firefox"
     echo "8. Reset WSL Config (WSL only)"
     echo "9. Run Gaming Registry Tweaks (WSL only)"
@@ -123,7 +123,7 @@ while true; do
         3) reset_vimrc ;;
         4) reset_git_config ;;
         5) reset_vscode_config ;;
-        6) reset_powerline_config ;;
+        # 6) reset_powerline_config ;;
         7) reset_firefox ;;
         8) reset_wsl_config ;;
         9) reset_registry ;;
@@ -135,7 +135,7 @@ while true; do
             reset_vimrc
             reset_git_config
             reset_vscode_config
-            reset_powerline_config
+            # reset_powerline_config
             reset_firefox
             reset_wsl_config
             reset_registry

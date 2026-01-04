@@ -86,14 +86,27 @@ install_package() {
 
 # Function to install (patch) Fira font (Nerd font icons)
 install_fira_font() {
-    mkdir -p ~/.local/share/fonts
+    # Check if FiraCode is already installed in the font cache
+    if ! fc-list | grep -qi "FiraCode"; then
+        echo "FiraCode Nerd Font not found. Installing..."
 
-    cd ~/.local/share/fonts
-    curl -fLO https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip
-    unzip -o FiraCode.zip
-    rm FiraCode.zip
+        # Create directory and move into it
+        mkdir -p ~/.local/share/fonts
+        cd ~/.local/share/fonts || exit
 
-    fc-cache -fv
+        # Download and unzip
+        curl -fLO https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip
+        unzip -o FiraCode.zip
+
+        # Clean up zip and extra files
+        rm FiraCode.zip
+
+        # Update the system font cache
+        fc-cache -fv
+        echo "Installation complete!"
+    else
+        echo "FiraCode Nerd Font is already installed."
+    fi
 }
 
 # Function to install Gitstatus

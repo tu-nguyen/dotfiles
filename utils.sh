@@ -84,6 +84,18 @@ install_package() {
 #     t "NOTE: You may need to configure your terminal emulator to use a Powerline-compatible font (e.g., 'Meslo LG S DZ Regular for Powerline')."
 # }
 
+# Function to install (patch) Fira font (Nerd font icons)
+install_fira_font() {
+    mkdir -p ~/.local/share/fonts
+
+    cd ~/.local/share/fonts
+    curl -fLO https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip
+    unzip -o FiraCode.zip
+    rm FiraCode.zip
+
+    fc-cache -fv
+}
+
 # Function to install Gitstatus
 install_gitstatus() {
     t "Installing Gitstatus.."
@@ -233,6 +245,7 @@ install_packages() {
     elif [[ "$OS_TYPE" == "macos" ]]; then
         install_package lesspipe
         install_package htop
+        brew install --cask font-fira-code-nerd-font
 
         # Check for python3, but do NOT install it
         if ! command -v python3 &>/dev/null; then
@@ -248,6 +261,7 @@ install_packages() {
     fi
 
     # install_powerline_fonts
+    install_fira_font
     install_gitstatus
 
     t SUCCESS "All required packages installed successfully."

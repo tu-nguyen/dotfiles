@@ -246,6 +246,7 @@ install_packages() {
         fi
 
         sudo add-apt-repository universe
+        install_linux_package unzip
         # install_package powerline
         if ! command -v starship &> /dev/null; then
             echo "Starship not found. Installing now..."

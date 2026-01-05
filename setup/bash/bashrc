@@ -67,8 +67,8 @@ if command -v fnm &> /dev/null; then
     eval "$(fnm env --use-on-cd --shell bash)"
 fi
 
-fnm install --lts
-fnm default $(fnm list | grep 'lts-latest' | awk '{print $2}')
+fnm install --lts >/dev/null
+fnm default $(fnm list | grep 'lts-latest' | awk '{print $2}') >/dev/null
 
 # function _update_ps1() {
 #     PS1=$(powerline-shell $?)

@@ -134,10 +134,49 @@ install_fira_font() {
             "
             t SUCCESS "Windows registration complete."
         fi
-
     fi
+}
 
+# Function to install Starship
+install_starship() {
+    t "Installing Starship.."
+    if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
+        if ! command -v starship &> /dev/null; then
+            echo "Starship not found. Installing now.."
+            curl -sS https://starship.rs/install.sh | sh
+        else
+            echo "Starship is already installed at $(command -v starship)"
+            starship --version
+        fi
+    elif [[ "$OS_TYPE" == "macos" ]]; then
+        brew install starship
+    fi
+}
 
+# Function to install uv
+install_uv() {
+    t "Installing uv.."
+
+    if ! command -v uv &> /dev/null; then
+        echo "uv not found. Installing now.."
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+    else
+        echo "uv is already installed at $(command -v starship)"
+        uv --version
+    fi
+}
+
+# Function to install Fast Node Manager
+install_fnm() {
+    t "Installing fnm.."
+
+    if ! command -v fnm &> /dev/null; then
+        echo "fnm not found. Installing now.."
+        curl -fsSL https://fnm.vercel.app/install | bash
+    else
+        echo "fnm is already installed at $(command -v starship)"
+        fnm --version
+    fi
 }
 
 # Function to install Gitstatus
@@ -264,11 +303,18 @@ clone_or_pull_dotfiles() {
 install_packages() {
     install_package git
     install_package curl
+    install_package unzip
     install_package vim
     # install_package python3
     # install_package python3-pip
     install_package make
     install_package jq
+
+    install_fira_font
+    install_starship
+
+    install_uv
+    install_fnm
 
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         if ! command -v apt &>/dev/null; then
@@ -276,27 +322,8 @@ install_packages() {
             return 1
         fi
 
-        sudo add-apt-repository universe
-        install_linux_package unzip
-        # install_package powerline
-        if ! command -v starship &> /dev/null; then
-            echo "Starship not found. Installing now..."
-            curl -sS https://starship.rs/install.sh | sh
-        else
-            echo "Starship is already installed at $(command -v starship)"
-            starship --version
-        fi
-        if [ ! -f ~/.vim/autoload/plug.vim ]; then
-            echo "Vim-Plug not found. Installing..."
-            curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-                https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-        else
-            echo "Vim-Plug is already installed."
-        fi
         install_package coreutils
         install_package less
-        install_package htop
-        install_package wget
         install_package tree
 
     elif [[ "$OS_TYPE" == "macos" ]]; then
@@ -317,9 +344,9 @@ install_packages() {
         return 1
     fi
 
-    # install_powerline_fonts
-    install_fira_font
     install_gitstatus
+    install_package htop
+    install_package wget
 
     t SUCCESS "All required packages installed successfully."
     return
@@ -386,15 +413,14 @@ reset_vimrc() {
     cp  "$DOTFILES_REPO_DIR/setup/vim/vimrc" "$HOME/.vimrc"
     t SUCCESS "Linked $DOTFILES_REPO_DIR/setup/vim/vimrc to $HOME/.vimrc successfully."
 
-    t "Installing Vundle and plugins.."
-    VUNDLE_PATH="$HOME/.vim/bundle/Vundle.vim"
-    sudo rm -rf "$VUNDLE_PATH"
-
-    t "Installed Vundle.."
-    git clone https://github.com/VundleVim/Vundle.vim.git "$VUNDLE_PATH"
-    t SUCCESS "Vundle installed at $VUNDLE_PATH"
-
-    vim +PluginInstall +qall
+    t "Installing Vim-Plug.."
+    if [ ! -f ~/.vim/autoload/plug.vim ]; then
+        echo "Vim-Plug not found. Installing..."
+        curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
+            https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    else
+        echo "Vim-Plug is already installed."
+    fi
 
     t DEBUG "reset_vimrc() end"
 }

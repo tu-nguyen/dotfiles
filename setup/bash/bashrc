@@ -50,31 +50,19 @@ if [[ -d "$HOME/.bash_extras" ]]; then
     done
 fi
 
-# #------------------------------------------
-# # Powerline settings
-# #------------------------------------------
-# POWERLINE_PATH=$(pip show powerline-status 2>/dev/null | grep '^Location:' | cut -d' ' -f2-)
-# export PATH="$POWERLINE_PATH:$PATH"
+#------------------------------------------
+# setup settings
+#------------------------------------------
+if command -v starship &> /dev/null; then
+    eval "$(starship init bash)"
+fi
 
-# is_powerline_enabled() {
-#     pgrep -f powerline-daemon >/dev/null && return 0
-#     type _powerline_prompt 2>/dev/null | grep -q "function" && return 0
-#     echo "$PS1" | grep -q "powerline" && return 0
-#     return 1
-# }
+if command -v fnm &> /dev/null; then
+    eval "$(fnm env --use-on-cd --shell bash)"
+fi
 
-# enable_powerline() {
-#     if [[ -n "$POWERLINE_PATH" ]]; then
-#         powerline-daemon -q
-#         POWERLINE_BASH_CONTINUATION=1
-#         POWERLINE_BASH_SELECT=1
-#         if [[ -f /usr/share/powerline/bindings/bash/powerline.sh ]]; then
-#             source /usr/share/powerline/bindings/bash/powerline.sh
-#         elif [[ -f "$POWERLINE_PATH/powerline/bindings/config.py" ]]; then
-#             python3 "$POWERLINE_PATH/powerline/bindings/config.py"
-#         fi
-#     fi
-# }
+fnm install --lts
+fnm default $(fnm list | grep 'lts-latest' | awk '{print $2}')
 
 # function _update_ps1() {
 #     PS1=$(powerline-shell $?)
@@ -97,9 +85,7 @@ fi
 # TODO
 # echo -e "${BOLD}${CYAN}Hello, World! This is BASH ${BOLD}${RED}${BASH_VERSION%.*}${BOLD}${CYAN}\
 # - TODO ${BOLD}${RED}..{NC}"
-if command -v starship &> /dev/null; then
-    eval "$(starship init bash)"
-fi
+
 
 if [[ -f "$HOME/.bash_extras/.bash_motd" ]]; then
     motd

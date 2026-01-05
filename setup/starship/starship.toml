@@ -7,7 +7,7 @@ $time\
 $directory\
 $git_branch\
 $git_status\
-[> ](fg:color_white)\
+[>](fg:color_white)\
 $c\
 $elixir\
 $elm\
@@ -135,7 +135,7 @@ format = '[$symbol($version)]($style)'
 [git_branch]
 symbol = ""
 style = "fg:#FCA17D"
-format = '[$symbol $branch]($style)'
+format = '[$symbol$branch]($style)'
 
 [git_status]
 style = "fg:#FCA17D"
@@ -184,5 +184,3 @@ format = '[$symbol($version)]($style)'
 symbol = " "
 style = "fg:#86BBD8"
 format = '[$symbol($version)]($style)'
-
-

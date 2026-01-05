@@ -108,33 +108,34 @@ install_fira_font() {
         echo "FiraCode Nerd Font is already installed."
     fi
 
-    if [[ "$OS_TYPE" == "wsl" ]]; then
-        # If this didn't work, manually move Fira Font
-        # explorer.exe .
-        # explorer.exe shell:fonts
-        WIN_FONT_DIR_RAW=$(cmd.exe /c "echo %SystemRoot%\Fonts" 2>/dev/null | tr -d '\r')
-        WIN_FONT_DIR=$(wslpath "$WIN_FONT_DIR_RAW")
+    # TODO: fix windows font installation
+    # if [[ "$OS_TYPE" == "wsl" ]]; then
+    #     # If this didn't work, manually move Fira Font
+    #     # explorer.exe .
+    #     # explorer.exe shell:fonts
+    #     WIN_FONT_DIR_RAW=$(cmd.exe /c "echo %SystemRoot%\Fonts" 2>/dev/null | tr -d '\r')
+    #     WIN_FONT_DIR=$(wslpath "$WIN_FONT_DIR_RAW")
 
-        cp -n ~/.local/share/fonts/*FiraCode*Nerd*.ttf "$WIN_FONT_DIR" 2>/dev/null
+    #     cp -n ~/.local/share/fonts/*FiraCode*Nerd*.ttf "$WIN_FONT_DIR" 2>/dev/null
 
-        if [ $? -ne 0 ]; then
-            t WARNING  "Warning: Could not copy fonts to C:\Windows\Fonts."
-            t WARNING  "Try running your Terminal as Administrator."
-        else
-            t "Registering fonts in Windows Registry via PowerShell..."
-            powershell.exe -ExecutionPolicy Bypass -Command "
-                \$FontsFolder = 'C:\\Windows\\Fonts'
-                Get-ChildItem -Path \$FontsFolder -Filter '*FiraCode*Nerd*.ttf' | ForEach-Object {
-                    \$RegistryPath = 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts'
-                    \$Name = \$_.Name.Replace('.ttf', ' (TrueType)')
-                    if (-not (Get-ItemProperty -Path \$RegistryPath -Name \$Name -ErrorAction SilentlyContinue)) {
-                        New-ItemProperty -Path \$RegistryPath -Name \$Name -Value \$_.Name -PropertyType String
-                    }
-                }
-            "
-            t SUCCESS "Windows registration complete."
-        fi
-    fi
+    #     if [ $? -ne 0 ]; then
+    #         t WARNING  "Warning: Could not copy fonts to C:\Windows\Fonts."
+    #         t WARNING  "Try running your Terminal as Administrator."
+    #     else
+    #         t "Registering fonts in Windows Registry via PowerShell..."
+    #         powershell.exe -ExecutionPolicy Bypass -Command "
+    #             \$FontsFolder = 'C:\\Windows\\Fonts'
+    #             Get-ChildItem -Path \$FontsFolder -Filter '*FiraCode*Nerd*.ttf' | ForEach-Object {
+    #                 \$RegistryPath = 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts'
+    #                 \$Name = \$_.Name.Replace('.ttf', ' (TrueType)')
+    #                 if (-not (Get-ItemProperty -Path \$RegistryPath -Name \$Name -ErrorAction SilentlyContinue)) {
+    #                     New-ItemProperty -Path \$RegistryPath -Name \$Name -Value \$_.Name -PropertyType String
+    #                 }
+    #             }
+    #         "
+    #         t SUCCESS "Windows registration complete."
+    #     fi
+    # fi
 }
 
 # Function to install Starship
@@ -174,7 +175,7 @@ install_fnm() {
         echo "fnm not found. Installing now.."
         curl -fsSL https://fnm.vercel.app/install | bash
     else
-        echo "fnm is already installed at $(command -v starship)"
+        echo "fnm is already installed at $(command -v fnm)"
         fnm --version
     fi
 }

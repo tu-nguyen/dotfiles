@@ -7,7 +7,7 @@ $time\
 $directory\
 $git_branch\
 $git_status\
-[>](fg:color_white)\
+[> ](fg:color_white)\
 $c\
 $elixir\
 $elm\
@@ -21,6 +21,7 @@ $nim\
 $rust\
 $scala\
 $docker_context\
+[> ](fg:color_white)\
 """
 
 # Disable the blank line at the start of the prompt
@@ -109,79 +110,79 @@ truncation_symbol = "…/"
 [c]
 symbol = " "
 style = "fg:#86BBD8"
-format = '[ $symbol($version)]($style)'
+format = '[$symbol($version)]($style)'
 
 [cpp]
 symbol = " "
 style = "fg:#86BBD8"
-format = '[ $symbol($version)]($style)'
+format = '[$symbol($version)]($style)'
 
 [docker_context]
 symbol = " "
 style = "fg:#06969A"
-format = '[ $symbol $context ]($style)'
+format = '[$symbol $context]($style)'
 
 [elixir]
 symbol = " "
 style = "fg:#86BBD8"
-format = '[ $symbol($version)]($style)'
+format = '[$symbol($version)]($style)'
 
 [elm]
 symbol = " "
 style = "fg:#86BBD8"
-format = '[ $symbol($version)]($style)'
+format = '[$symbol($version)]($style)'
 
 [git_branch]
 symbol = ""
 style = "fg:#FCA17D"
-format = '[ $symbol $branch ]($style)'
+format = '[$symbol $branch]($style)'
 
 [git_status]
 style = "fg:#FCA17D"
-format = '[$all_status$ahead_behind ]($style)'
+format = '[$all_status$ahead_behind]($style)'
 
 [golang]
 symbol = " "
 style = "fg:#86BBD8"
-format = '[ $symbol($version)]($style)'
+format = '[$symbol($version)]($style)'
 
 [gradle]
 style = "fg:#86BBD8"
-format = '[ $symbol($version)]($style)'
+format = '[$symbol($version)]($style)'
 
 [haskell]
 symbol = " "
 style = "fg:#86BBD8"
-format = '[ $symbol($version)]($style)'
+format = '[$symbol($version)]($style)'
 
 [java]
 symbol = " "
 style = "fg:#86BBD8"
-format = '[ $symbol($version)]($style)'
+format = '[$symbol($version)]($style)'
 
 [julia]
 symbol = " "
 style = "fg:#86BBD8"
-format = '[ $symbol($version)]($style)'
+format = '[$symbol($version)]($style)'
 
 [nodejs]
 symbol = ""
 style = "fg:#86BBD8"
-format = '[ $symbol($version)]($style)'
+format = '[$symbol($version)]($style)'
 
 [nim]
 symbol = "󰆥 "
 style = "fg:#86BBD8"
-format = '[ $symbol($version)]($style)'
+format = '[$symbol($version)]($style)'
 
 [rust]
 symbol = ""
 style = "fg:#86BBD8"
-format = '[ $symbol($version)]($style)'
+format = '[$symbol($version)]($style)'
 
 [scala]
 symbol = " "
 style = "fg:#86BBD8"
-format = '[ $symbol($version)]($style)'
+format = '[$symbol($version)]($style)'
 
 

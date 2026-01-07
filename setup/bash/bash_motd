@@ -104,13 +104,19 @@ motd() {
             ELAPSED=$((CURRENT_TIME - LAST_RUN))
 
             if [ "$ELAPSED" -lt "$COOLDOWN_TIME" ]; then
-                motd_short
+                short_motd
+                if [[ $- == *i* ]] && [ -t 0 ] && command -v twork_motd >/dev/null; then
+                    twork_motd
+                fi
                 return 0
             fi
         fi
         # Update timestamp only on auto-runs that actually display
         echo "$CURRENT_TIME" > "$COOLDOWN_FILE"
     fi
-    motd_short
-    motd_long
+    short_motd
+    long_motd_long
+    if [[ $- == *i* ]] && [ -t 0 ] && command -v twork_motd >/dev/null; then
+        twork_motd
+    fi
 }

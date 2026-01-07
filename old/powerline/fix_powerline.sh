@@ -7,7 +7,7 @@ incorrect_line="TMUX_VAR_RE = re.compile('\$(_POWERLINE_\w+)')"
 correct_line="TMUX_VAR_RE = re.compile(r'\$(_POWERLINE_\w+)')"
 
 if grep -q "$incorrect_line" "$file_path"; then
-    echo "Found incorrect line in $file_path. Correcting it..."
+    echo "Found incorrect line in $file_path. Correcting it.."
     sudo sed -i "s#${incorrect_line}#${correct_line}#g" "$file_path"
     echo "Correction complete."
 else

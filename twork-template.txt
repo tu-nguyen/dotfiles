@@ -19,7 +19,7 @@ function tworktt() {
     printf "${H2}twork functions${NC}\n"
 
     # printf "  azr                  → Clear the Azure CLI cache\n"
-    # printf "  print_curr_iter      → Print current Azure DevOps iter..\n"
+    # printf "  print_azure_status      → Print current Azure DevOps iter..\n"
     printf "%s\n" "$br"
  }
 
@@ -35,7 +35,7 @@ function td() {
             RETURN=1
             return
         else
-            print_curr_iter "RESOURCE_GROUP" "NAME" "TEAM" "SECRET"
+            print_azure_status "RESOURCE_GROUP" "NAME" "TEAM" "SECRET"
         fi
     fi
 }

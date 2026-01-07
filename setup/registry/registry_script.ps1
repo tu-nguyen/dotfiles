@@ -6,7 +6,7 @@
 
 # --- 1. Disable "Shortcut" Arrow on Icons
 # Removes the small arrow overlay from shortcut icons on the desktop and in explorer.
-Write-Host "Disabling the 'shortcut' arrow on icons..."
+Write-Host "Disabling the 'shortcut' arrow on icons.."
 $path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons"
 if (-not (Test-Path $path)) {
     New-Item -Path $path -Force | Out-Null
@@ -15,14 +15,14 @@ New-ItemProperty -Path $path -Name "29" -Value "%windir%\System32\shell32.dll,50
 
 # --- 2. Speed up PC shutdown time
 # Reduces the wait time for hung processes to close on shutdown.
-Write-Host "Speeding up shutdown..."
+Write-Host "Speeding up shutdown.."
 Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "WaitToKillAppTimeout" -Value 5000 -Type String -Force
 Set-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name "HungAppTimeout" -Value 1000 -Type String -Force
 Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "WaitToKillServiceTimeout" -Value 5000 -Type String -Force
 
 # --- 3. Disable automatic reboot after Windows Updates
 # Prevents the PC from automatically restarting after an update.
-Write-Host "Disabling automatic reboot for updates..."
+Write-Host "Disabling automatic reboot for updates.."
 $auPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU"
 if (-not (Test-Path -Path $auPath)) {
     New-Item -Path $auPath -Force | Out-Null
@@ -57,7 +57,7 @@ reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Paramete
 
 # --- 4. Optimize TCP for Gaming
 # A common tweak to reduce latency for a smoother online experience.
-Write-Host "Optimizing TCP for gaming..."
+Write-Host "Optimizing TCP for gaming.."
 # Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "Tcp1323Opts" -Value 1 -Type DWORD -Force
 Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "DefaultTTL" -Value 64 -Type DWORD -Force
 Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "GlobalMaxTcpWindowSize" -Value 65535 -Type DWORD -Force

@@ -84,7 +84,7 @@ _install_package() {
 install_fira_font() {
     # Check if FiraCode is already installed in the font cache
     if ! fc-list | grep -qi "FiraCode"; then
-        echo "FiraCode Nerd Font not found. Installing..."
+        echo "FiraCode Nerd Font not found. Installing.."
 
         # Create directory and move into it
         mkdir -p ~/.local/share/fonts
@@ -118,7 +118,7 @@ install_fira_font() {
     #         t WARNING  "Warning: Could not copy fonts to C:\Windows\Fonts."
     #         t WARNING  "Try running your Terminal as Administrator."
     #     else
-    #         t "Registering fonts in Windows Registry via PowerShell..."
+    #         t "Registering fonts in Windows Registry via PowerShell.."
     #         powershell.exe -ExecutionPolicy Bypass -Command "
     #             \$FontsFolder = 'C:\\Windows\\Fonts'
     #             Get-ChildItem -Path \$FontsFolder -Filter '*FiraCode*Nerd*.ttf' | ForEach-Object {
@@ -246,7 +246,7 @@ clone_or_pull_dotfiles() {
         local stashed_changes=false
         # Check if there are any uncommitted changes (staged or unstaged)
         if [[ $(git status --porcelain) ]]; then
-            t "  Uncommitted changes detected. Stashing them temporarily..."
+            t "  Uncommitted changes detected. Stashing them temporarily.."
             # Use 'git stash push' for modern git, 'save' is deprecated but works
             if git stash push -m "Temporary stash by dotfiles script before pull"; then
                 stashed_changes=true
@@ -266,7 +266,7 @@ clone_or_pull_dotfiles() {
             t Error "Failed to pull dotfiles from '$DOTFILES_REPO'. Please check your network or repository access."
             # Attempt to reapply stash even if pull failed, so user can resolve
             if $stashed_changes; then
-                t "  Attempting to reapply stashed changes after pull failure..."
+                t "  Attempting to reapply stashed changes after pull failure.."
                 git stash pop || t Warning "Failed to pop stash. You may have conflicts to resolve manually."
             fi
             # Return to home directory before exiting on error
@@ -275,7 +275,7 @@ clone_or_pull_dotfiles() {
         fi
 
         if $stashed_changes; then
-            t "  Applying stashed changes..."
+            t "  Applying stashed changes.."
             # git stash pop will fail if there are conflicts, but the user requested it.
             # We'll report if it fails.
             if git stash pop; then
@@ -414,7 +414,7 @@ reset_vimrc() {
 
     t "Installing Vim-Plug.."
     if [ ! -f ~/.vim/autoload/plug.vim ]; then
-        echo "Vim-Plug not found. Installing..."
+        echo "Vim-Plug not found. Installing.."
         curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
             https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     else

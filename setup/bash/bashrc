@@ -102,7 +102,3 @@ if [[ -f "$DOTFILES_CONFIG_DIR/.bash_motd" ]]; then
 else
     t WARNING "MOTD file not found at $DOTFILES_CONFIG_DIR/.bash_motd\n"
 fi
-
-if [[ $- == *i* ]] && [ -t 0 ] && command -v twork_motd >/dev/null; then
-    twork_motd
-fi

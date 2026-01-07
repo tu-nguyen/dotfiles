@@ -1,27 +1,32 @@
-# ~/.bash_extras/.bash_tt
+# ~/.config/dotfiles/.bash_tt
 
 br="${BOLD}${H1}----------------------------------------------------------------------------------${NC}"
 
 # Generalized function printer
 function print_tt() {
-    local file="$1"
-    if [[ ! -f "$file" ]]; then
-        echo "File not found: $file"
-        return 1
-    fi
+  local file="$1"
+  if [[ ! -f "$file" ]]; then
+    echo "File not found: $file"
+    return 1
+  fi
 
-    awk -v h="$H" -v nc="$NC" '
-    BEGIN { comment="" }
-    /^#/ { comment = $0; next }
-    /^[a-zA-Z_][a-zA-Z0-9_]* *\(\) *\{/ {
-        gsub(/^# *|^## */, "", comment)
-        sub(/ *\(\) *\{/, "", $0)
-        printf "  %s%-20s%s → %s\n", h, $0, nc, comment
-        comment=""
-    }' "$file"
+  awk -v h="$H" -v nc="$NC" '
+  BEGIN { comment="" }
+  /^#/ { comment = $0; next }
+  /^[a-zA-Z_][a-zA-Z0-9_]* *\(\) *\{/ {
+      gsub(/^# *|^## */, "", comment)
+      sub(/ *\(\) *\{/, "", $0)
+      printf "  %s%-20s%s → %s\n", h, $0, nc, comment
+      comment=""
+  }' "$file"
 }
 
 function tt() {
+  if [ -z "$DOTFILES_CONFIG_DIR" ]; then
+    DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
+    printf "${BOLD}${RED}[WARNING]${NC} DOTFILES_CONFIG_DIR is not set, defaulting to $DOTFILES_CONFIG_DIR"
+  fi
+
   printf "${BOLD}${H1}tt cheatsheet${NC}\n"
   printf "%s\n" "$br"
   # TODO: add chmod aliases
@@ -48,7 +53,7 @@ function tt() {
   # other
   printf "%s\n" "$br"
   printf "${H2}other functions${NC}      \n"
-  print_tt "$HOME/.bash_extras/.bash_functions"
+  print_tt "$DOTFILES_CONFIG_DIR/.bash_functions"
   # other other
   printf "%s\n" "$br"
   printf "${H2}other tt${NC}      \n"
@@ -61,14 +66,14 @@ function tt() {
   printf "  ${H}dktt${NC}                 → to view docker stuff\n"
   printf "  ${H}vtt${NC}                  → to view vim cheatsheet\n"
 
-  if [[ ! -f "$HOME/.bash_extras/.bash_personal" ]]; then
-    printf "  ${H}ptt${NC}                  → .bash_personal ${RED}does not exist${NC} inside $HOME/.bash_extras\n"
+  if [[ ! -f "$DOTFILES_CONFIG_DIR/.bash_personal" ]]; then
+    printf "  ${H}ptt${NC}                  → .bash_personal ${RED}does not exist${NC} inside $DOTFILES_CONFIG_DIR\n"
   else
     printf "  ${H}ptt${NC}                  → to view personal stuff\n"
   fi
 
-  if [[ ! -f "$HOME/.bash_extras/.bash_twork" ]]; then
-    printf "  ${H}tworktt${NC}              → .bash_twork ${RED}does not exist${NC} inside $HOME/.bash_extras\n"
+  if [[ ! -f "$DOTFILES_CONFIG_DIR/.bash_twork" ]]; then
+    printf "  ${H}tworktt${NC}              → .bash_twork ${RED}does not exist${NC} inside $DOTFILES_CONFIG_DIR\n"
     printf "                             run ${H}set-tworktt${NC} to copy .bash_twork template\n"
   else
     printf "  ${H}tworktt${NC}              → to view twork stuff\n"
@@ -300,7 +305,7 @@ function dktt() {
   printf "                       → ${H}dkrm${NC} (docker rm <requires at least 1 argument CONTAINER>)\n"
   printf "%s\n" "$br"
   printf "${H2}docker functions${NC}      \n"
-  print_tt "$HOME/.bash_extras/.bash_docker_functions"
+  print_tt "$DOTFILES_CONFIG_DIR/.bash_docker_functions"
   printf "%s\n" "$br"
 }
 

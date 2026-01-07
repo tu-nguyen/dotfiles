@@ -1,4 +1,4 @@
-# ~/.bash_extras/.bash_exports
+# ~/.config/dotfiles/.bash_exports
 
 shopt -s histappend
 
@@ -32,5 +32,5 @@ if [[ "$(uname)" == "Darwin" ]]; then
   export PATH="/opt/homebrew/bin:$PATH"
   # export PATH=/Users/$(whoami)/.local/bin:$PATH
   export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH"
-  export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH" 
+  export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
 fi

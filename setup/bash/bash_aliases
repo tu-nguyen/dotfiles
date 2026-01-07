@@ -1,4 +1,4 @@
-# ~/.bash_extras/.bash_aliases
+# ~/.config/dotfiles/.bash_aliases
 
 ## aliases cause you're a lazy piece of shit smfh
 # if user is not root, pass all commands via sudo #

@@ -1,11 +1,116 @@
-# ~/.bash_extras/.bash_motd
+# ~/.config/dotfiles/.bash_motd
 
 #------------------------------------------
 # Display a message of the day (MOTD) when starting a new terminal session
 #-------------------------------------------
-motd() {
+motd_short() {
+
+    USER=$(whoami)
+    HOSTNAME=$(hostname)
+    LEFT_TEXT="${USER}@${HOSTNAME}"
+
     # Print date in "Friday, 2025-06-05" format
     # Print time in "Time: 17:32:08" format
-    printf "${PINK}Date:${NC} $(date '+%A, %Y-%m-%d')${NC} \n"
-    printf "${PINK}Time:${NC} $(date '+%H:%M:%S')${NC} \n"
+    DATE=$(date '+%a %Y/%m/%d' | tr '[:upper:]' '[:lower:]')
+    TIME=$(date '+%H:%M:%S')
+    RIGHT_TEXT=${DATE}
+
+    TERMWIDTH=$(tput cols)
+    PADDING_SIZE=$(( (TERMWIDTH / 3) - ${#LEFT_TEXT} - ${#RIGHT_TEXT} ))
+    SPACES=$(printf '%*s' "$PADDING_SIZE" "")
+
+
+    echo -e "${PINK}${BOLD}${USER}${WHITE}@${PINK}${BOLD}${HOSTNAME}${SPACES}${DATE}${NC}"
+    # echo -e "${PINK}date:   ${NC}${DATE}"
+    # echo -e "${PINK}Time:    ${NC}${TIME}"  Comment out since we always display time
+}
+
+motd_long() {
+    # User Information
+    USER=$(whoami | tr '[:upper:]' '[:lower:]')
+    FULLNAME=$(getent passwd "$USER" | cut -d: -f5 | cut -d, -f1 | tr '[:upper:]' '[:lower:]')
+    LAST_LOGIN=$(last -n 1 $USER | head -n 1 | awk '{ print $5, $6, $7 }')
+    SHELL_VER=$($SHELL --version | head -n1 | grep -oP '\d+\.\d+\.\d+')
+    SHELL_NAME=$(basename "$SHELL")
+    SHELL_DISPLAY=$(echo "${SHELL_NAME} ${SHELL_VER}")
+
+    # System Information
+    OS_BASE=$(source /etc/os-release && echo "$PRETTY_NAME" | tr '[:upper:]' '[:lower:]')
+    ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
+    if grep -qi Microsoft /proc/version; then
+        # If WSL, try to get Windows version from systeminfo.exe
+        # Note: systeminfo can be slow; using cmd.exe for a faster ver check
+        WIN_MAJOR=$(cmd.exe /c "ver" 2>/dev/null | grep -oP 'Version \K\d+' | tr '[:upper:]' '[:lower:]')
+        OS="${OS_BASE} on windows ${WIN_MAJOR} ${ARCH}"
+    else
+        OS="$OS_BASE"
+    fi
+    OS=$(echo "$OS" | tr '[:upper:]' '[:lower:]')
+    HOSTNAME=$(hostname | tr '[:upper:]' '[:lower:]')
+    UPTIME=$(uptime -p | sed 's/up //' | tr '[:upper:]' '[:lower:]')
+    LOAD=$(uptime | awk '{print $8,$9,$10}' | sed 's/,//g')
+    IP_ADDRESS=$(ip addr show | grep -oP 'inet \K[\d.]+' | head -n 1)
+    KERNEL=$(uname -r | tr '[:upper:]' '[:lower:]')
+
+    # Disk Usage
+    DISK_ROOT=$(df -h / | tail -1 | awk '{print $5}')
+
+    # Get memory info (Convert to MiB)
+    MEM_INFO=$(free -m | awk '/Mem:/ { print $3 "MIB / " $2 "MIB" }')
+
+    # Get CPU model (Model, Cores, and Speed)
+    # Pulls model name, core count from nproc, and current MHz from lscpu
+    CPU_MODEL=$(grep 'model name' /proc/cpuinfo | head -1 | cut -d ':' -f 2 | xargs | tr '[:upper:]' '[:lower:]')
+    CPU_CORES=$(nproc)
+    CPU_SPEED_MHZ=$(wmic.exe cpu get MaxClockSpeed | tail -n +2 | tr -d '\r' | xargs)
+    CPU_GHZ=$(echo "$CPU_SPEED_MHZ" | awk '{printf "%.3f", $1/1000}')
+    CPU=$(echo "${CPU_MODEL} (${CPU_CORES}) @ ${CPU_GHZ}GHZ" )
+
+    # Recent Logins
+    RECENT_LOGINS=$(last -n 5 | awk '{print $1, $3, $5, $6, $7}')
+
+    # Recent Commands
+    LAST_COMMANDS=$(history | tail -n 5 | awk '{print $2, $3, $4, $5, $6, $7}')
+
+    # Last Shutdown/Reboot
+    LAST_SHUTDOWN=$(last -x shutdown | head -n 1 | awk '{ print $5, $6, $7, $8 }')
+
+    # ==========================================
+    # MOTD Display (with Formatting)
+    # ==========================================
+    # echo -e "${PINK}${BOLD}${USER}${WHITE}@${PINK}${BOLD}${HOSTNAME}${NC}"
+    echo -e "${WHITE}------------------------------------------${NC}"
+    echo -e "${PINK}os:     ${NC}${OS}"
+    echo -e "${PINK}kernel: ${NC}${KERNEL}"
+    echo -e "${PINK}uptime: ${NC}${UPTIME}"
+    echo -e "${PINK}shell:  ${NC}${SHELL_DISPLAY}"
+    echo -e "${PINK}cpu:    ${NC}${CPU}"
+    echo -e "${PINK}memory: ${NC}${MEM_INFO}"
+}
+
+motd() {
+    if [ -z "$DOTFILES_CONFIG_DIR" ]; then
+        DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
+        printf "${BOLD}${RED}[WARNING]${NC} DOTFILES_CONFIG_DIR is not set, defaulting to $DOTFILES_CONFIG_DIR"
+    fi
+
+    if [ "$1" == "auto" ]; then
+        COOLDOWN_FILE="$DOTFILES_CONFIG_DIR/okfetch_last_run_${USER}"
+        CURRENT_TIME=$(date +%s)
+        COOLDOWN_TIME=2520
+
+        if [ -f "$COOLDOWN_FILE" ]; then
+            LAST_RUN=$(cat "$COOLDOWN_FILE")
+            ELAPSED=$((CURRENT_TIME - LAST_RUN))
+
+            if [ "$ELAPSED" -lt "$COOLDOWN_TIME" ]; then
+                motd_short
+                return 0
+            fi
+        fi
+        # Update timestamp only on auto-runs that actually display
+        echo "$CURRENT_TIME" > "$COOLDOWN_FILE"
+    fi
+    motd_short
+    motd_long
 }

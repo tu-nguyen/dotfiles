@@ -1,4 +1,4 @@
-# ~/.bash_extras/.bash_docker_functions
+# ~/.confid/dotfiles/.bash_docker_functions
 
 alias dk="docker"
 alias dkps="docker ps --format '{{.ID}} - {{.Names}} - {{.Image}} - {{.Status}}'"
@@ -43,7 +43,7 @@ function dkrmif() {
         else
                 t "No images to remove."
         fi
-	
+
 	t "These images were preserved:"
 	for image in "${KEEP_IMAGES[@]}"; do
 		echo "	$image"
@@ -52,7 +52,7 @@ function dkrmif() {
 
 # Load a docker image from tar
 dkimport () {
-	if [ -z "$1" ]; then 
+	if [ -z "$1" ]; then
 		t WARNING "no arg given, defaulting to 'docker_image_backup.tar'"
 		$1="docker_image_backup.tar"
 	else
@@ -113,7 +113,7 @@ dkclean() {
 # Stop a docker container
 dkstop() {
 	if [ -n "$1" ]; then
-		docker stop "$1" && echo "Container $1 stopped successfully." || echo "Failed to stop container $1" 
+		docker stop "$1" && echo "Container $1 stopped successfully." || echo "Failed to stop container $1"
 	else
  		docker ps -q | while read -r container_id; do
 		docker stop "$container_id" && echo "Container $container_id stopped successfully."

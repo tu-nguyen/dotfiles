@@ -1,18 +1,22 @@
 #!/bin/bash
 
-# --- Load Configuration ---
-# DOTFILES_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
+# # --- Start Load Configuration ---
+# if [ -z "$DOTFILES_CONFIG_FILE" ]; then
+#     DOTFILES_CONFIG_FILE="$HOME/.config/dotfiles/.dotfile_config.env"
+# fi
+
 # if [ -f "$DOTFILES_CONFIG_FILE" ]; then
 #     source "$DOTFILES_CONFIG_FILE"
 # else
 #     t Error "Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
 #     exit 1
 # fi
+# # --- End Load Configuration ---
 
 # git config --global user.name "Tu Nguyen"
 # git config --global user.email "tu.t.nguyen93@gmail.com"
 
-git config --global pull.rebase true 
+git config --global pull.rebase true
 git config --global core.editor "vim"
 
 # git config --global merge.tool kdiff3

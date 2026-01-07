@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-get_os_type() {
+_get_os_type() {
     if [ -z "$OS_TYPE" ]; then
         echo "[INFO] Detecting OS.." >&2
         if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -27,7 +27,7 @@ if [ -f .env ]; then
     source .env
     ENV_LOADED=true
 else
-    DOTFILES_CONFIG_FILE="$HOME/.bash_extras/.dotfile_config"
+    DOTFILES_CONFIG_FILE="$HOME/.config/dotfiles/.dotfile_config.env"
     if [[ -f "$DOTFILES_CONFIG_FILE" ]]; then
         echo "[INFO] Configuration loaded from $DOTFILES_CONFIG_FILE"
         source "$DOTFILES_CONFIG_FILE"
@@ -38,20 +38,20 @@ fi
 DEFAULT_DOTFILES_REPO="https://github.com/tu-nguyen/dotfiles.git"
 DEFAULT_DOTFILES_REPO_DIR="$(pwd)"
 DEFAULT_GITSTATUS_DIR="$HOME/.gitstatus"
-DEFAULT_EXTRAS=$HOME/.bash_extras
-DEFAULT_DOTFILES_CONFIG_FILE="$DEFAULT_EXTRAS/.dotfile_config"
-DEFAULT_OS_TYPE=$(get_os_type)
+DEFAULT_CONFIG=$HOME/.config/dotfiles
+DEFAULT_DOTFILES_CONFIG_FILE="$DEFAULT_CONFIG/.dotfile_config.env"
+DEFAULT_OS_TYPE=$(_get_os_type)
 GITSTATUS_DIR="$HOME/.gitstatus"
 
 if [[ "$ENV_LOADED" == "false" ]]; then
-    echo "[WARNING] .env and .dotfile_config files not found. Script will rely on defaults."
+    echo "[WARNING] .env and .dotfile_config.env files not found. Script will rely on defaults."
     : "${DOTFILES_REPO:="$DEFAULT_DOTFILES_REPO"}"
     : "${DOTFILES_REPO_DIR:="$DEFAULT_DOTFILES_REPO_DIR"}"
     : "${DOTFILES_CONFIG_FILE:="$DEFAULT_DOTFILES_CONFIG_FILE"}"
     : "${OS_TYPE:=$DEFAULT_OS_TYPE}"
 fi
 
-if [ -z "$DOTFILES_REPO_DIR" ] || [ "$DOTFILES_REPO_DIR" == "/home/user/path/to/dotfiles" ]; then
+if [ -z "$DOTFILES_REPO_DIR" ] || [ "$DOTFILES_REPO_DIR" == "/path/to/dotfiles" ]; then
     echo "[WARNING] 'DOTFILES_REPO_DIR' was not set, falling to default $DEFAULT_DOTFILES_REPO_DIR."
     : "${DOTFILES_REPO_DIR:="$DEFAULT_DOTFILES_REPO_DIR"}"
 fi
@@ -61,7 +61,12 @@ if [ -z "$DOTFILES_REPO" ] || [ "$DOTFILES_REPO" == "https://github.com/YOUR_USE
     : "${DOTFILES_REPO:="$DEFAULT_DOTFILES_REPO"}"
 fi
 
-if [ -z "$DOTFILES_CONFIG_FILE" ] || [ "$DOTFILES_CONFIG_FILE" == "/home/user/.bash_extras/path/to/.dotfile_config" ]; then
+if [ -z "$DEFAULT_CONFIG" ] || [ "$DEFAULT_CONFIG" == "/path/to/.config/dotfiles" ]; then
+    echo "[WARNING] 'DEFAULT_CONFIG' was not set, falling to default $DEFAULT_DOTFILES_CONFIG."
+    : "${DOTFILES_CONFIG:="$DEFAULT_DOTFILES_CONFIG"}"
+fi
+
+if [ -z "$DOTFILES_CONFIG_FILE" ] || [ "$DOTFILES_CONFIG_FILE" == "/path/to/.dotfile_config.env" ]; then
     echo "[WARNING] 'DOTFILES_CONFIG_FILE' was not set, falling to default $DEFAULT_DOTFILES_CONFIG_FILE."
     : "${DOTFILES_CONFIG_FILE:="$DEFAULT_DOTFILES_CONFIG_FILE"}"
 fi
@@ -71,18 +76,19 @@ if [ -z "$OS_TYPE" ] || [ "$OS_TYPE" == "some_os" ]; then
     : "${OS_TYPE:="$DEFAULT_OS_TYPE"}"
 fi
 
-mkdir -p "$DEFAULT_EXTRAS"
+mkdir -p "$DEFAULT_CONFIG"
 echo "DOTFILES_REPO=$DOTFILES_REPO" > "$DOTFILES_CONFIG_FILE"
 echo "DOTFILES_REPO_DIR=$DOTFILES_REPO_DIR" >> "$DOTFILES_CONFIG_FILE"
+echo "DOTFILES_CONFIG=$DOTFILES_CONFIG"  >> "$DOTFILES_CONFIG_FILE"
 echo "DOTFILES_CONFIG_FILE=$DOTFILES_CONFIG_FILE"  >> "$DOTFILES_CONFIG_FILE"
 echo "OS_TYPE=$OS_TYPE" >> "$DOTFILES_CONFIG_FILE"
 
 source "$DOTFILES_REPO_DIR/setup/bash/bash_colours" || {
-    echo "Error: Could not source bash_colours.sh"
+    echo "Error: Could not source bash_colours"
     exit 1
 }
 source "$DOTFILES_REPO_DIR/setup/bash/init" || {
-    echo "Error: Could not source init.sh"
+    echo "Error: Could not source init"
     exit 1
 }
 source "$DOTFILES_REPO_DIR/utils.sh" || {
@@ -93,9 +99,9 @@ source "$DOTFILES_REPO_DIR/utils.sh" || {
 # A menu function to display options
 show_menu() {
     clear
-    echo "======================================="
-    echo "    Dotfiles Setup - Choose an Option  "
-    echo "======================================="
+    echo "=========================================="
+    echo "     Dotfiles Setup -- Choose an Option   "
+    echo "=========================================="
     echo "1. Reset Pre-configuration"
     echo "2. Reset .bashrc"
     echo "3. Reset .vimrc"
@@ -107,7 +113,7 @@ show_menu() {
     echo "9. Reset PowerShell profile (WSL only)"
     echo "0. Run All of the Above (Default)"
     echo "x. Exit"
-    echo "======================================="
+    echo "=========================================="
 }
 
 t "Setting up configuration files.."
@@ -126,7 +132,7 @@ while true; do
         8) reset_registry ;;
         9) reset_ps ;;
         "" | 0)
-            echo "Running all configuration resets..."
+            echo "Running all dotfiles resets.."
             reset_pre
             reset_bashrc
             reset_vimrc
@@ -146,6 +152,5 @@ done
 
 echo "Setup script finished."
 # reset_post
-
 
 t IMPORTANT "All done! You may need to exit and reopen!"

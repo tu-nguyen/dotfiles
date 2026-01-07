@@ -1,6 +1,7 @@
 DOTFILES_REPO=https://github.com/YOUR_USERNAME/YOUR_DOTFILES_REPO.git
-DOTFILES_REPO_DIR=/home/user/path/to/dotfiles
-DOTFILES_CONFIG_FILE=/home/user/.bash_extras/path/to/.dotfile_config
+DOTFILES_REPO_DIR=/path/to/dotfiles
+DOTFILES_CONFIG=/path/to/.config/dotfiles
+DOTFILES_CONFIG_FILE=/path/to/.dotfile_config.env
 
 # wsl, linux, macos
 OS_TYPE=some_os

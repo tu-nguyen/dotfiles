@@ -1,4 +1,4 @@
-# .bash_extras/.bash_twork
+# .config/dotfiles/.bash_twork
 
 # twork ref
 function tworktt() {

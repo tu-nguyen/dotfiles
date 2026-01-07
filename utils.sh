@@ -373,20 +373,20 @@ reset_bashrc() {
         return
     fi
 
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_colours" "$HOME/.bash_extras/.bash_colours"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/init" "$HOME/.bash_extras/.init"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_colours" "$DOTFILES_CONFIG/.bash_colours"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/init" "$DOTFILES_CONFIG/.init"
 
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_aliases" "$HOME/.bash_extras/.bash_aliases"
-    echo "" >> "$HOME/.bash_extras/.bash_aliases"
-    echo "alias cd-dot='cd $DOTFILES_REPO_DIR'" >> "$HOME/.bash_extras/.bash_aliases"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_aliases" "$DOTFILES_CONFIG/.bash_aliases"
+    echo "" >> "$DOTFILES_CONFIG/.bash_aliases"
+    echo "alias cd-dot='cd $DOTFILES_REPO_DIR'" >> "$DOTFILES_CONFIG/.bash_aliases"
     echo "alias cd-dotfile='cd-dot'"
     echo "alias cd-dotfiles='cd-dot'"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_docker_functions" "$HOME/.bash_extras/.bash_docker_functions"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_functions" "$HOME/.bash_extras/.bash_functions"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_exports" "$HOME/.bash_extras/.bash_exports"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_motd" "$HOME/.bash_extras/.bash_motd"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_other" "$HOME/.bash_extras/.bash_other"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_tt" "$HOME/.bash_extras/.bash_tt"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_docker_functions" "$DOTFILES_CONFIG/.bash_docker_functions"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_functions" "$DOTFILES_CONFIG/.bash_functions"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_exports" "$DOTFILES_CONFIG/.bash_exports"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_motd" "$DOTFILES_CONFIG/.bash_motd"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_other" "$DOTFILES_CONFIG/.bash_other"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_tt" "$DOTFILES_CONFIG/.bash_tt"
 
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bashrc" "$HOME/.bashrc"
 
@@ -484,20 +484,6 @@ reset_registry() {
     powershell.exe -Command "Start-Process powershell.exe -Verb RunAs -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"$(wslpath -w $DOTFILES_REPO_DIR/setup/registry/registry_script.ps1)\"'"  || t WARNING "Some error occured during reset_registry()"
     t DEBUG "reset_registry() end"
 }
-
-# reset_powerline_config() {
-#     prompt "reset the powerline configs"
-#     if [[ $RETURN -ne 0 ]]; then
-#         return
-#     fi
-
-#     chmod +x $DOTFILES_REPO_DIR/setup/powerline/fix_powerline.sh
-#     sudo $DOTFILES_REPO_DIR/setup/powerline/fix_powerline.sh
-
-#     chmod +x $DOTFILES_REPO_DIR/setup/powerline/powerline_config_setup.sh
-#     bash -i $DOTFILES_REPO_DIR/setup/powerline/powerline_config_setup.sh
-#     t SUCCESS "Powerline configuration reset completed!"
-# }
 
 reset_firefox() {
     prompt "reset the firefox configs"

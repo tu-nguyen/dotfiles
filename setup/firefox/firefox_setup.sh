@@ -6,14 +6,18 @@
 # file from a specified source path.
 
 # --- Start Load Configuration ---
+if [ -z "$DOTFILES_CONFIG_DIR" ]; then
+    DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
+fi
+
 if [ -z "$DOTFILES_CONFIG_FILE" ]; then
-    DOTFILES_CONFIG_FILE="$HOME/.config/dotfiles/.dotfile_config.env"
+    DOTFILES_CONFIG_FILE="$DOTFILES_CONFIG_DIR/.dotfile_config.env"
 fi
 
 if [ -f "$DOTFILES_CONFIG_FILE" ]; then
     source "$DOTFILES_CONFIG_FILE"
 else
-    t Error "Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
+    echo "[Error] Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
     exit 1
 fi
 # --- End Load Configuration ---

@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+# --- Start Load Configuration ---
+if [ -z "$DOTFILES_CONFIG_FILE" ]; then
+    DOTFILES_CONFIG_FILE="$HOME/.config/dotfiles/.dotfile_config.env"
+fi
+
+if [ -f "$DOTFILES_CONFIG_FILE" ]; then
+    source "$DOTFILES_CONFIG_FILE"
+else
+    t Error "Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
+    exit 1
+fi
+# --- End Load Configuration ---
+
 # Function to check for sudo availability
 check_sudo() {
     if ! command -v sudo &> /dev/null; then
@@ -62,27 +75,6 @@ install_package() {
         fi
     fi
 }
-
-# # Function to install Powerline fonts
-# install_powerline_fonts() {
-#     t "Installing Powerline fonts.."
-#     local fonts_temp_dir=$(mktemp -d -t powerline-fonts-XXXXXX)
-#     if ! git clone https://github.com/powerline/fonts.git "$fonts_temp_dir"; then
-#         t "Error" "Failed to clone Powerline fonts repository."
-#         rm -rf "$fonts_temp_dir"
-#         exit 1
-#     fi
-
-#     t "  Running font installation script.."
-#     if ! "$fonts_temp_dir/install.sh"; then
-#         t "Warning: Powerline font installation script failed. You might need to install fonts manually or update font cache."
-#     fi
-
-#     t "Cleaning up temporary font directory.."
-#     rm -rf "$fonts_temp_dir"
-#     t "Powerline fonts installation attempted."
-#     t "NOTE: You may need to configure your terminal emulator to use a Powerline-compatible font (e.g., 'Meslo LG S DZ Regular for Powerline')."
-# }
 
 # Function to install (patch) Fira font (Nerd font icons)
 install_fira_font() {

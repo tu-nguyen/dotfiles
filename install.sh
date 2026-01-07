@@ -100,28 +100,28 @@ source "$DOTFILES_REPO_DIR/utils.sh" || {
 # A menu function to display options
 show_menu() {
     clear
-    echo "=========================================="
-    echo "     Dotfiles Setup -- Choose an Option   "
-    echo "=========================================="
-    echo "1. Reset Pre-configuration"
-    echo "2. Reset .bashrc"
-    echo "3. Reset .vimrc"
-    echo "4. Reset Git Config"
-    echo "5. Reset VS Code Config"
-    echo "6. Reset Firefox"
-    echo "7. Reset WSL Config (WSL only)"
-    echo "8. Run Gaming Registry Tweaks (WSL only)"
-    echo "9. Reset PowerShell profile (WSL only)"
-    echo "0. Run All of the Above (Default)"
-    echo "x. Exit"
-    echo "=========================================="
+    printf "${H1}==========================================${NC}\n"
+    printf "     ${H1}Dotfiles Setup -- Choose an Option${NC}   \n"
+    printf "${H1}==========================================${NC}\n"
+    printf "1. Reset Pre-configuration\n"
+    printf "2. Reset .bashrc\n"
+    printf "3. Reset .vimrc\n"
+    printf "4. Reset Git Config\n"
+    printf "5. Reset VS Code Config\n"
+    printf "6. Reset Firefox\n"
+    printf "7. Reset WSL Config ${H2}(WSL only)${NC}\n"
+    printf "8. Run Gaming Registry Tweaks ${H2}(WSL only)${NC}\n"
+    printf "9. Reset PowerShell profile ${H2}(WSL only)${NC}\n"
+    printf "0. Run All of the Above ${H2}(Default)${NC}\n"
+    printf "${RED}x. Exit${NC}\n"
+    printf "==========================================\n"
 }
 
 t "Setting up configuration files.."
 # User input loop
 while true; do
     show_menu
-    read -p "Enter your choice (press Enter for default): " choice
+    read -p "Enter your choice (press ${H}Enter${NC} for default): " choice
     case $choice in
         1) reset_pre ;;
         2) reset_bashrc ;;
@@ -133,7 +133,7 @@ while true; do
         8) reset_registry ;;
         9) reset_ps ;;
         "" | 0)
-            echo "Running all dotfiles resets.."
+            echo "Running ${RED}all${NC} dotfiles resets.."
             reset_pre
             reset_bashrc
             reset_vimrc
@@ -146,12 +146,12 @@ while true; do
             break
             ;;
         x | X) break ;;
-        *) echo "Invalid option, please try again." ;;
+        *) echo "${RED}Invalid${NC} option, please try again." ;;
     esac
-    read -p "Press Enter to continue.."
+    read -p "Press ${H}Enter${NC} to continue.."
 done
 
-echo "Setup script finished."
+echo "${GREEN}Setup script finished.${NC}"
 # reset_post
 
 t IMPORTANT "All done! You may need to exit and reopen!"

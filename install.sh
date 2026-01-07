@@ -21,7 +21,6 @@ get_os_type() {
     echo "$OS_TYPE"
 }
 
-
 ENV_LOADED=false
 if [ -f .env ]; then
     echo "[INFO] Configuration loaded from .env"

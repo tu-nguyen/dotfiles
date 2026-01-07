@@ -38,16 +38,25 @@ fi
 #------------------------------------------
 # Load custom bash files from ~/.bash_extras
 if [[ -d "$HOME/.bash_extras" ]]; then
+
     # Load the prep file if it exists
     if [[ -f "$HOME/.bash_extras/.init" ]]; then
         . "$HOME/.bash_extras/.init"
     fi
+
+    # Load the dotfile config if it exists
+    if [[ -f "$HOME/.bash_extras/.dotfile_config" ]]; then
+        . "$HOME/.bash_extras/.dotfile_config"
+    fi
+
     # Load all bash files in ~/.bash_extras
     for file in "$HOME/.bash_extras/.bash_"*; do
         if [[ -f "$file" ]]; then
         [ -f "$file" ] && . "$file"
         fi
     done
+
+
 fi
 
 #------------------------------------------

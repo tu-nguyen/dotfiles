@@ -36,6 +36,23 @@ r() {
     t SUCCESS "Reset successful!"
 }
 
+set-tworktt() {
+    if [ -z "$DOTFILES_REPO_DIR" ]; then
+		t ERROR "DOTFILES_REPO_DIR not set, check $HOME/.bash_extras/.dotfile_config"
+        exit 1
+	else
+		t "Generating basic tworktt file"
+        TWORKTT_FILE="$DOTFILES_REPO_DIR/twork-template.txt"
+        if [ -f "$TWORKTT_FILE" ]; then
+            cp "$TWORKTT_FILE" "$HOME/.bash_extras/.bash_twork"
+            t SUCCESS "All set! Remember to edit .bash_twork"
+        else
+            t Error "twork-template.txt file not found at $DOTFILES_REPO_DIR" >&2
+            exit 1
+        fi
+	fi
+}
+
 # Extract a file
 extract () {
    if [ -f $1 ] ; then

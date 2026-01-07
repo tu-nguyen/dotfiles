@@ -69,6 +69,7 @@ function tt() {
 
   if [[ ! -f "$HOME/.bash_extras/.bash_twork" ]]; then
     printf "  ${H}tworktt${NC}              → .bash_twork ${RED}does not exist${NC} inside $HOME/.bash_extras\n"
+    printf "                             run ${H}set-tworktt${NC} to copy .bash_twork template\n"
   else
     printf "  ${H}tworktt${NC}              → to view twork stuff\n"
   fi

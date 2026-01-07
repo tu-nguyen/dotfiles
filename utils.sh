@@ -3,12 +3,9 @@
 # --- Start Load Configuration ---
 if [ -z "$DOTFILES_CONFIG_FILE" ]; then
     DOTFILES_CONFIG_FILE="$HOME/.config/dotfiles/.dotfile_config.env"
-    echo "0000000"
 fi
-echo "q"
 
 if [ -f "$DOTFILES_CONFIG_FILE" ]; then
-    echo "1111111"
     source "$DOTFILES_CONFIG_FILE"
 else
     t Error "Configuration file not found at $DOTFILES_CONFIG_FILE" >&2

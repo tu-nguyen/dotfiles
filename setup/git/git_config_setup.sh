@@ -8,7 +8,7 @@
 # if [ -f "$DOTFILES_CONFIG_FILE" ]; then
 #     source "$DOTFILES_CONFIG_FILE"
 # else
-#     t Error "Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
+#     echo "[Error] Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
 #     exit 1
 # fi
 # # --- End Load Configuration ---

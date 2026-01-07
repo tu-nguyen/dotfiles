@@ -36,27 +36,24 @@ fi
 #------------------------------------------
 # Load custom bash files
 #------------------------------------------
-# Load custom bash files from ~/.bash_extras
-if [[ -d "$HOME/.bash_extras" ]]; then
-
+# Load custom bash files from ~/.config/dotfiles
+if [[ -d "$HOME/.config/dotfiles" ]]; then
     # Load the prep file if it exists
-    if [[ -f "$HOME/.bash_extras/.init" ]]; then
-        . "$HOME/.bash_extras/.init"
+    if [[ -f "$HOME/.config/dotfiles/.init" ]]; then
+        . "$HOME/.config/dotfiles/.init"
     fi
 
     # Load the dotfile config if it exists
-    if [[ -f "$HOME/.bash_extras/.dotfile_config" ]]; then
-        . "$HOME/.bash_extras/.dotfile_config"
+    if [[ -f "$HOME/.config/dotfiles/.dotfile_config.env" ]]; then
+        . "$HOME/.config/dotfiles/.dotfile_config.env"
     fi
 
     # Load all bash files in ~/.bash_extras
-    for file in "$HOME/.bash_extras/.bash_"*; do
+    for file in "$HOME/.config/dotfiles/.bash_"*; do
         if [[ -f "$file" ]]; then
         [ -f "$file" ] && . "$file"
         fi
     done
-
-
 fi
 
 #------------------------------------------
@@ -102,10 +99,10 @@ fnm default $(fnm list | grep 'lts-latest' | awk '{print $2}') >/dev/null
 # - TODO ${BOLD}${RED}..{NC}"
 
 
-if [[ -f "$HOME/.bash_extras/.bash_motd" ]]; then
+if [[ -f "$HOME/.config/dotfiles/.bash_motd" ]]; then
     motd
 else
-    t WARNING "MOTD file not found at $HOME/.bash_extras/.bash_motd\n"
+    t WARNING "MOTD file not found at $HOME/.config/dotfiles/.bash_motd\n"
 fi
 
 if [[ $- == *i* ]] && [ -t 0 ] && command -v twork_motd >/dev/null; then

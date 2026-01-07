@@ -6,5 +6,6 @@
 motd() {
     # Print date in "Friday, 2025-06-05" format
     # Print time in "Time: 17:32:08" format
-    echo "${PINK}Date:${NC} $(date '+%A, %Y-%m-%d')${NC} | ${PINK}Time:${NC} $(date '+%H:%M:%S')${NC}"
+    printf "${PINK}Date:${NC} $(date '+%A, %Y-%m-%d')${NC} \n"
+    printf "${PINK}Time:${NC} $(date '+%H:%M:%S')${NC} \n"
 }

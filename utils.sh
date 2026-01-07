@@ -392,6 +392,8 @@ reset_bashrc() {
 
     . "$HOME/.bashrc"
 
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml" "$HOME/.config/starship.toml"
+
     t DEBUG "reset_bashrc() end"
 }
 

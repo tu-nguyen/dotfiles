@@ -100,7 +100,7 @@ function btt() {
   printf "  ${H}find . -name${NC} ${S}'*.sh'${NC}  → Find files\n"
   printf "%s\n" "$br"
   printf "${H2}process:${NC}\n"
-  printf "  ${H}ps aux${NC}               → List processes\n"
+  printf "  ${H}ps aux${NC}               → List processes (ps -a | grep firefox)\n"
   printf "  ${H}top${NC}                  → Interactive process viewer\n"
   printf "  ${H}kill${NC} ${S}PID${NC}             → Kill process\n"
   printf "%s\n" "$br"
@@ -125,6 +125,10 @@ function btt() {
   printf "  ${H}for i in *; do ... done${NC}\n"
   printf "  ${H}if ...; then ...; fi${NC}\n"
   printf "  ${H}function fname() { ... }${NC}\n"
+  printf "%s\n" "$br"
+  printf "${H2}other:${NC}\n"
+  printf "  ${H}curl${NC}                 → Check connectivity (ping 8.8.8.8) Network troubleshooting 101\n"
+  printf "  ${H}ping${NC}                 → Grab data(curl -O http://example.com/file.txt) Downloads without a browser\n"
   printf "%s\n" "$br"
 }
 

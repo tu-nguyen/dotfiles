@@ -14,15 +14,15 @@ fi
 # --- End Load Configuration ---
 
 # Function to check for sudo availability
-check_sudo() {
+_check_sudo() {
     if ! command -v sudo &> /dev/null; then
         t Error "sudo is not installed. Please install sudo or run as root."
         exit 1
     fi
 }
 
-install_linux_package() {
-    check_sudo
+_install_linux_package() {
+    _check_sudo
     if dpkg -s "$1" &>/dev/null; then
         t SUCCESS "$1 is already installed via apt."
     else
@@ -31,7 +31,7 @@ install_linux_package() {
     fi
 }
 
-install_mac_package() {
+_install_mac_package() {
     if ! command -v brew &> /dev/null; then
         t WARNING "Homebrew not found. Installing Homebrew.."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -47,7 +47,7 @@ install_mac_package() {
     fi
 }
 
-install_pip_package() {
+_install_pip_package() {
     if ! pip3 show "$1" &>/dev/null; then
         t SUCCESS "$1 is already installed via pip."
     else
@@ -58,11 +58,11 @@ install_pip_package() {
 }
 
 # Function to install packages based on OS
-install_package() {
+_install_package() {
     local package_name="$1"
     t "Installing $package_name.."
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
-        install_linux_package "$package_name"
+        _install_linux_package "$package_name"
     elif [[ "$OS_TYPE" == "macos" ]]; then
         if ! command -v brew &> /dev/null; then
             t WARNING "Homebrew not found. Installing Homebrew.."
@@ -294,14 +294,14 @@ clone_or_pull_dotfiles() {
 }
 
 install_packages() {
-    install_package git
-    install_package curl
-    install_package unzip
-    install_package vim
-    # install_package python3
-    # install_package python3-pip
-    install_package make
-    install_package jq
+    _install_package git
+    _install_package curl
+    _install_package unzip
+    _install_package vim
+    # _install_package python3
+    # _install_package python3-pip
+    _install_package make
+    _install_package jq
 
     install_fira_font
     install_starship
@@ -315,13 +315,13 @@ install_packages() {
             return 1
         fi
 
-        install_package coreutils
-        install_package less
-        install_package tree
+        _install_package coreutils
+        _install_package less
+        _install_package tree
 
     elif [[ "$OS_TYPE" == "macos" ]]; then
-        install_package lesspipe
-        install_package htop
+        _install_package lesspipe
+        _install_package htop
         brew install --cask font-fira-code-nerd-font
 
         # Check for python3, but do NOT install it
@@ -338,8 +338,8 @@ install_packages() {
     fi
 
     install_gitstatus
-    install_package htop
-    install_package wget
+    _install_package htop
+    _install_package wget
 
     t SUCCESS "All required packages installed successfully."
     return

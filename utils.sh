@@ -3,9 +3,12 @@
 # --- Start Load Configuration ---
 if [ -z "$DOTFILES_CONFIG_FILE" ]; then
     DOTFILES_CONFIG_FILE="$HOME/.config/dotfiles/.dotfile_config.env"
+    echo "0000000"
 fi
+echo "q"
 
 if [ -f "$DOTFILES_CONFIG_FILE" ]; then
+    echo "1111111"
     source "$DOTFILES_CONFIG_FILE"
 else
     t Error "Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
@@ -365,20 +368,20 @@ reset_bashrc() {
         return
     fi
 
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_colours" "$DOTFILES_CONFIG/.bash_colours"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/init" "$DOTFILES_CONFIG/.init"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_colours" "$DOTFILES_CONFIG_DIR/.bash_colours"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/init" "$DOTFILES_CONFIG_DIR/.init"
 
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_aliases" "$DOTFILES_CONFIG/.bash_aliases"
-    echo "" >> "$DOTFILES_CONFIG/.bash_aliases"
-    echo "alias cd-dot='cd $DOTFILES_REPO_DIR'" >> "$DOTFILES_CONFIG/.bash_aliases"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_aliases" "$DOTFILES_CONFIG_DIR/.bash_aliases"
+    echo "" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
+    echo "alias cd-dot='cd $DOTFILES_REPO_DIR'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
     echo "alias cd-dotfile='cd-dot'"
     echo "alias cd-dotfiles='cd-dot'"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_docker_functions" "$DOTFILES_CONFIG/.bash_docker_functions"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_functions" "$DOTFILES_CONFIG/.bash_functions"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_exports" "$DOTFILES_CONFIG/.bash_exports"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_motd" "$DOTFILES_CONFIG/.bash_motd"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_other" "$DOTFILES_CONFIG/.bash_other"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_tt" "$DOTFILES_CONFIG/.bash_tt"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_docker_functions" "$DOTFILES_CONFIG_DIR/.bash_docker_functions"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_functions" "$DOTFILES_CONFIG_DIR/.bash_functions"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_exports" "$DOTFILES_CONFIG_DIR/.bash_exports"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_motd" "$DOTFILES_CONFIG_DIR/.bash_motd"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_other" "$DOTFILES_CONFIG_DIR/.bash_other"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_tt" "$DOTFILES_CONFIG_DIR/.bash_tt"
 
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bashrc" "$HOME/.bashrc"
 

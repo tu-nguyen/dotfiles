@@ -2,82 +2,101 @@
 
 #------------------------------------------
 # Display a message of the day (MOTD) when starting a new terminal session
-#-------------------------------------------
-motd_short() {
+#------------------------------------------
 
-    USER=$(whoami)
-    HOSTNAME=$(hostname)
-    LEFT_TEXT="${USER}@${HOSTNAME}"
+short_motd() {
+    # ==========================================
+    # MOTD Display Header aka short
+    # ==========================================
 
     # Print date in "Friday, 2025-06-05" format
     # Print time in "Time: 17:32:08" format
-    DATE=$(date '+%a %Y/%m/%d' | tr '[:upper:]' '[:lower:]')
-    TIME=$(date '+%H:%M:%S')
-    RIGHT_TEXT=${DATE}
+    local DATE=$(date '+%a %Y/%m/%d' | tr '[:upper:]' '[:lower:]')
+    local TIME=$(date '+%H:%M:%S')
+    local RIGHT_TEXT=${DATE}
 
-    TERMWIDTH=$(tput cols)
-    PADDING_SIZE=$(( (TERMWIDTH / 3) - ${#LEFT_TEXT} - ${#RIGHT_TEXT} ))
-    SPACES=$(printf '%*s' "$PADDING_SIZE" "")
-
+    local TERMWIDTH=$(tput cols)
+    local PADDING_SIZE=$(( (TERMWIDTH / 3) - ${#LEFT_TEXT} - ${#RIGHT_TEXT} ))
+    local SPACES=$(printf '%*s' "$PADDING_SIZE" "")
 
     echo -e "${PINK}${BOLD}${USER}${WHITE}@${PINK}${BOLD}${HOSTNAME}${SPACES}${DATE}${NC}"
     # echo -e "${PINK}date:   ${NC}${DATE}"
-    # echo -e "${PINK}Time:    ${NC}${TIME}"  Comment out since we always display time
+    # echo -e "${PINK}Time:    ${NC}${TIME}"  # Comment out since we always display time
 }
 
-motd_long() {
-    # User Information
-    USER=$(whoami | tr '[:upper:]' '[:lower:]')
-    FULLNAME=$(getent passwd "$USER" | cut -d: -f5 | cut -d, -f1 | tr '[:upper:]' '[:lower:]')
-    LAST_LOGIN=$(last -n 1 $USER | head -n 1 | awk '{ print $5, $6, $7 }')
-    SHELL_VER=$($SHELL --version | head -n1 | grep -oP '\d+\.\d+\.\d+')
-    SHELL_NAME=$(basename "$SHELL")
-    SHELL_DISPLAY=$(echo "${SHELL_NAME} ${SHELL_VER}")
+long_motd() {
+    # ==========================================
+    # MOTD Display Rest
+    # ==========================================
 
-    # System Information
-    OS_BASE=$(source /etc/os-release && echo "$PRETTY_NAME" | tr '[:upper:]' '[:lower:]')
-    ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
-    if grep -qi Microsoft /proc/version; then
-        # If WSL, try to get Windows version from systeminfo.exe
-        # Note: systeminfo can be slow; using cmd.exe for a faster ver check
-        WIN_MAJOR=$(cmd.exe /c "ver" 2>/dev/null | grep -oP 'Version \K\d+' | tr '[:upper:]' '[:lower:]')
-        OS="${OS_BASE} on windows ${WIN_MAJOR} ${ARCH}"
+    # System Standard
+    local USER=$(whoami | tr '[:upper:]' '[:lower:]')
+
+    # User Info (Mac/Linux compatibility: getent is rare on Mac)
+    if command -v getent >/dev/null; then
+        local FULLNAME=$(getent passwd "$USER" | cut -d: -f5 | cut -d, -f1 | tr '[:upper:]' '[:lower:]')
     else
-        OS="$OS_BASE"
+        local FULLNAME=$(id -P "$USER" | cut -d: -f8 | tr '[:upper:]' '[:lower:]')  # Mac fallback
     fi
-    OS=$(echo "$OS" | tr '[:upper:]' '[:lower:]')
-    HOSTNAME=$(hostname | tr '[:upper:]' '[:lower:]')
-    UPTIME=$(uptime -p | sed 's/up //' | tr '[:upper:]' '[:lower:]')
-    LOAD=$(uptime | awk '{print $8,$9,$10}' | sed 's/,//g')
-    IP_ADDRESS=$(ip addr show | grep -oP 'inet \K[\d.]+' | head -n 1)
-    KERNEL=$(uname -r | tr '[:upper:]' '[:lower:]')
 
-    # Disk Usage
-    DISK_ROOT=$(df -h / | tail -1 | awk '{print $5}')
+    # Shell Info
+    local SHELL_NAME=$(basename "$SHELL")
+    # Note: $SHELL --version works differently for zsh/bash
+    local SHELL_VER=$($SHELL --version 2>/dev/null | head -n1 | grep -oP '\d+\.\d+\.\d+' || echo "unknown")
+    local SHELL_DISPLAY="${SHELL_NAME} ${SHELL_VER}"
 
-    # Get memory info (Convert to MiB)
-    MEM_INFO=$(free -m | awk '/Mem:/ { print $3 "MIB / " $2 "MIB" }')
+    # OS & Architecture
+    local ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
+    if [ -f /etc/os-release ]; then
+        local OS_BASE=$(source /etc/os-release && echo "$PRETTY_NAME" | tr '[:upper:]' '[:lower:]')
+    else
+        local OS_BASE=$(uname -s | tr '[:upper:]' '[:lower:]') # Mac fallback
+    fi
 
-    # Get CPU model (Model, Cores, and Speed)
-    # Pulls model name, core count from nproc, and current MHz from lscpu
-    CPU_MODEL=$(grep 'model name' /proc/cpuinfo | head -1 | cut -d ':' -f 2 | xargs | tr '[:upper:]' '[:lower:]')
-    CPU_CORES=$(nproc)
-    CPU_SPEED_MHZ=$(wmic.exe cpu get MaxClockSpeed | tail -n +2 | tr -d '\r' | xargs)
-    CPU_GHZ=$(echo "$CPU_SPEED_MHZ" | awk '{printf "%.3f", $1/1000}')
-    CPU=$(echo "${CPU_MODEL} (${CPU_CORES}) @ ${CPU_GHZ}GHZ" )
+    # WSL specific logic
+    if grep -qi Microsoft /proc/version 2>/dev/null; then
+        local WIN_MAJOR=$(cmd.exe /c "ver" 2>/dev/null | grep -oP 'Version \K\d+')
+        local OS="${OS_BASE} on windows ${WIN_MAJOR} ${ARCH}"
+    else
+        local OS="$OS_BASE"
+    fi
 
-    # Recent Logins
-    RECENT_LOGINS=$(last -n 5 | awk '{print $1, $3, $5, $6, $7}')
+    # Hardware & Performance
+    local HOSTNAME=$(hostname | tr '[:upper:]' '[:lower:]')
+    local UPTIME=$(uptime -p | sed 's/up //' | tr '[:upper:]' '[:lower:]')
+    local LOAD=$(uptime | awk -F'load average:' '{ print $2 }' | sed 's/,//g' | xargs)
+    local IP_ADDRESS=$(hostname -I 2>/dev/null | awk '{print $1}' || ip addr show | grep -oP 'inet \K[\d.]+' | head -n 1)
+    local KERNEL=$(uname -r | tr '[:upper:]' '[:lower:]')
+    local DISK_ROOT=$(df -h / | tail -1 | awk '{print $5}')
 
-    # Recent Commands
-    LAST_COMMANDS=$(history | tail -n 5 | awk '{print $2, $3, $4, $5, $6, $7}')
+    # Memory (Mac uses 'vm_stat', Linux uses 'free')
+    if command -v free >/dev/null; then
+        local MEM_INFO=$(free -m | awk '/Mem:/ { print $3 "mib / " $2 "mib" }')
+    else
+        local MEM_INFO="N/A (mac)"
+    fi
 
-    # Last Shutdown/Reboot
-    LAST_SHUTDOWN=$(last -x shutdown | head -n 1 | awk '{ print $5, $6, $7, $8 }')
+    # CPU Logic
+    local CPU_CORES=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+    if [ -f /proc/cpuinfo ]; then
+        local CPU_MODEL=$(grep 'model name' /proc/cpuinfo | head -1 | cut -d ':' -f 2 | xargs | tr '[:upper:]' '[:lower:]')
+        local CPU_SPEED_MHZ=$(wmic.exe cpu get MaxClockSpeed 2>/dev/null | tail -n +2 | tr -d '\r' | xargs)
+        if [ -n "$CPU_SPEED_MHZ" ]; then
+            local CPU_GHZ=$(echo "$CPU_SPEED_MHZ" | awk '{printf "%.3f", $1/1000}')
+            local CPU="${CPU_MODEL} (${CPU_CORES}) @ ${CPU_GHZ}ghz"
+        else
+            local CPU="${CPU_MODEL} (${CPU_CORES})"
+        fi
+    else
+        local CPU=$(sysctl -n machdep.cpu.brand_string | tr '[:upper:]' '[:lower:]') # Mac fallback
+    fi
 
-    # ==========================================
-    # MOTD Display (with Formatting)
-    # ==========================================
+    # Misc
+    local LAST_LOGIN=$(last -n 1 $USER | head -n 1 | awk '{ print $5, $6, $7 }')
+    local RECENT_LOGINS=$(last -n 5 | awk '{print $1, $3, $5, $6, $7}')
+    local LAST_COMMANDS=$(history | tail -n 5 | awk '{print $2, $3, $4, $5, $6, $7}')
+    local LAST_SHUTDOWN=$(last -x shutdown | head -n 1 | awk '{ print $5, $6, $7, $8 }')
+
     # echo -e "${PINK}${BOLD}${USER}${WHITE}@${PINK}${BOLD}${HOSTNAME}${NC}"
     echo -e "${WHITE}------------------------------------------${NC}"
     echo -e "${PINK}os:     ${NC}${OS}"
@@ -115,7 +134,7 @@ motd() {
         echo "$CURRENT_TIME" > "$COOLDOWN_FILE"
     fi
     short_motd
-    long_motd_long
+    long_motd
     if [[ $- == *i* ]] && [ -t 0 ] && command -v twork_motd >/dev/null; then
         twork_motd
     fi

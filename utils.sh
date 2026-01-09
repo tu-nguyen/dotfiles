@@ -10,23 +10,31 @@ if [ -z "$DOTFILES_CONFIG_FILE" ]; then
 fi
 
 if [ -f "$DOTFILES_CONFIG_FILE" ]; then
-    source "$DOTFILES_CONFIG_FILE"
+    . "$DOTFILES_CONFIG_FILE"
 else
     echo "[Error] Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
     exit 1
 fi
 # --- End Load Configuration ---
 
-# Function to check for sudo availability
-_check_sudo() {
+# Function to keep sudo alive
+# See: https://gist.github.com/cowboy/3118588
+_sudo_keep() {
     if ! command -v sudo &> /dev/null; then
         t Error "sudo is not installed. Please install sudo or run as root."
         exit 1
     fi
+
+    # Ask for administrator password up-front
+    sudo -v
+
+    # Keep-alive: update existing sudo time stamp if set, otherwise do nothing.
+    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 }
 
+# Function to linux packages via apt install
+# TODO: Add support for arch yoart
 _install_linux_package() {
-    _check_sudo
     if dpkg -s "$1" &>/dev/null; then
         t SUCCESS "$1 is already installed via apt."
     else
@@ -35,14 +43,17 @@ _install_linux_package() {
     fi
 }
 
-_install_mac_package() {
+_install_brew() {
     if ! command -v brew &> /dev/null; then
-        t WARNING "Homebrew not found. Installing Homebrew.."
+        t INFO "Homebrew not found. Installing Homebrew.."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         # Add Homebrew to PATH for current session
         eval "$(/opt/homebrew/bin/brew shellenv)" || eval "$(brew shellenv)"
     fi
+}
 
+_install_mac_package() {
+    _install_brew
     if brew list "$1" &>/dev/null; then
         t SUCCESS "$1 is already installed via brew."
     else
@@ -68,41 +79,52 @@ _install_package() {
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         _install_linux_package "$package_name"
     elif [[ "$OS_TYPE" == "macos" ]]; then
-        if ! command -v brew &> /dev/null; then
-            t WARNING "Homebrew not found. Installing Homebrew.."
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-            # Add Homebrew to PATH for current session
-            eval "$(/opt/homebrew/bin/brew shellenv)" || eval "$(brew shellenv)"
-        fi
-        if ! brew install "$package_name"; then
-            t Warning "Failed to install $package_name using brew. Trying to continue."
-        fi
+        _install_mac_package "$package_name"
     fi
 }
 
-# Function to install (patch) Fira font (Nerd font icons)
-install_fira_font() {
-    # Check if FiraCode is already installed in the font cache
-    if ! fc-list | grep -qi "FiraCode"; then
-        echo "FiraCode Nerd Font not found. Installing.."
+# Function to install (patch) Fira Code (Nerd Font icons)
+_install_fira_font() {
+    t "Installing Fira Code Nerd Font.."
+    local FONT_NAME="FiraCode Nerd Font"
+    local INSTALLED=0
 
-        # Create directory and move into it
-        mkdir -p ~/.local/share/fonts
-        cd ~/.local/share/fonts || exit
-
-        # Download and unzip
-        curl -fLO https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip
-        unzip -o FiraCode.zip
-
-        # Clean up zip and extra files
-        rm FiraCode.zip
-
-        # Update the system font cache
-        fc-cache -fv
-        echo "Installation complete!"
-    else
-        echo "FiraCode Nerd Font is already installed."
+    if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
+        if command -v fc-list >/dev/null; then
+            if fc-list : family | grep -iq "$FONT_NAME"; then
+                INSTALLED=1
+            fi
+        fi
+    elif [[ "$OS_TYPE" == "macos" ]]; then
+        if system_profiler SPFontsDataType | grep -iq "$FONT_NAME"; then
+            INSTALLED=1
+        fi
     fi
+
+    if [[ "$INSTALLED" -eq 1 ]]; then
+        t -e SUCCESS "${FONT_NAME} is already installed. Skipping.."
+        return 0
+    fi
+
+    t INFO "${FONT_NAME} not found. Starting installation..."
+    if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
+        local font_dir="$HOME/.local/share/fonts"
+        mkdir -p "$font_dir"
+
+        t INFO "Downloading FiraCode Nerd Font zip..."
+        curl -fLo "/tmp/FiraCode.zip" https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip
+
+        unzip -o "/tmp/FiraCode.zip" -d "$font_dir"
+        rm "/tmp/FiraCode.zip"
+
+        if command -v fc-cache >/dev/null; then
+            fc-cache -f
+        fi
+    elif [[ "$OS_TYPE" == "macos" ]]; then
+        brew tap homebrew/cask-fonts
+        brew install --cask font-fira-code-nerd-font
+    fi
+    t SUCCESS "Installation complete!"
 
     # TODO: fix windows font installation
     # if [[ "$OS_TYPE" == "wsl" ]]; then
@@ -135,14 +157,14 @@ install_fira_font() {
 }
 
 # Function to install Starship
-install_starship() {
+_install_starship() {
     t "Installing Starship.."
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         if ! command -v starship &> /dev/null; then
-            echo "Starship not found. Installing now.."
+            t INFO "Starship not found. Installing now.."
             curl -sS https://starship.rs/install.sh | sh
         else
-            echo "Starship is already installed at $(command -v starship)"
+            t OK "Starship is already installed at $(command -v starship)"
             starship --version
         fi
     elif [[ "$OS_TYPE" == "macos" ]]; then
@@ -151,11 +173,11 @@ install_starship() {
 }
 
 # Function to install uv
-install_uv() {
+_install_uv() {
     t "Installing uv.."
 
     if ! command -v uv &> /dev/null; then
-        echo "uv not found. Installing now.."
+        t INFO "uv not found. Installing now.."
         curl -LsSf https://astral.sh/uv/install.sh | sh
     else
         echo "uv is already installed at $(command -v starship)"
@@ -164,11 +186,11 @@ install_uv() {
 }
 
 # Function to install Fast Node Manager
-install_fnm() {
+_install_fnm() {
     t "Installing fnm.."
 
     if ! command -v fnm &> /dev/null; then
-        echo "fnm not found. Installing now.."
+        t INFO "fnm not found. Installing now.."
         curl -fsSL https://fnm.vercel.app/install | bash
     else
         echo "fnm is already installed at $(command -v fnm)"
@@ -177,7 +199,7 @@ install_fnm() {
 }
 
 # Function to install Gitstatus
-install_gitstatus() {
+_install_gitstatus() {
     t "Installing Gitstatus.."
     if [ -d "$GITSTATUS_DIR/.git" ]; then
         t "  Gitstatus directory '$GITSTATUS_DIR' already exists. Pulling latest changes.."
@@ -214,13 +236,13 @@ cp_and_source() {
 
     if [[ -f "$target" ]]; then
         t SUCCESS "Copied $file to $target successfully."
-        source "$target"
+        . "$target"
     else
         t ERROR "Failed to copy $file to $target."
     fi
 }
 
-prompt() {
+_prompt() {
     RETURN=0
     local config="$1"
 
@@ -236,7 +258,7 @@ prompt() {
 }
 
 # Function to clone or pull dotfiles repository
-clone_or_pull_dotfiles() {
+_clone_or_pull_dotfiles() {
     t "Managing dotfiles repository.."
     if [ -d "$DOTFILES_REPO_DIR/.git" ]; then
         t "  Dotfiles directory '$DOTFILES_REPO_DIR' already exists."
@@ -298,21 +320,16 @@ clone_or_pull_dotfiles() {
 }
 
 # Function to convert hex to 0-5 scale for ANSI cube
-hex_to_ansi_256() {
+_hex_to_256() {
     local hex=$(echo "$1" | sed 's/#//')
-    local r=$((16#${hex:0:2}))
-    local g=$((16#${hex:2:2}))
-    local b=$((16#${hex:4:2}))
-
-    local r_idx=$(( r * 5 / 255 ))
-    local g_idx=$(( g * 5 / 255 ))
-    local b_idx=$(( b * 5 / 255 ))
-
-    echo $(( 16 + (36 * r_idx) + (6 * g_idx) + b_idx ))
+    local r=$((16#${hex:0:2} * 5 / 255))
+    local g=$((16#${hex:2:2} * 5 / 255))
+    local b=$((16#${hex:4:2} * 5 / 255))
+    echo $((16 + 36*r + 6*g + b))
 }
 
 # Function to convert color, mainly for starship atm
-convert_hex_to_ansi() {
+_convert_hex_to_ansi() {
     local input_file="$1"
     local output_file="${2:-$input_file.converted}"
 
@@ -328,7 +345,7 @@ convert_hex_to_ansi() {
     done
 }
 
-install_packages() {
+_install_packages() {
     _install_package git
     _install_package curl
     _install_package unzip
@@ -338,11 +355,11 @@ install_packages() {
     _install_package make
     _install_package jq
 
-    install_fira_font
-    install_starship
+    _install_fira_font
+    _install_starship
 
-    install_uv
-    install_fnm
+    _install_uv
+    _install_fnm
 
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         if ! command -v apt &>/dev/null; then
@@ -357,7 +374,7 @@ install_packages() {
     elif [[ "$OS_TYPE" == "macos" ]]; then
         _install_package lesspipe
         _install_package htop
-        brew install --cask font-fira-code-nerd-font
+
 
         # Check for python3, but do NOT install it
         if ! command -v python3 &>/dev/null; then
@@ -372,7 +389,7 @@ install_packages() {
         return 1
     fi
 
-    install_gitstatus
+    _install_gitstatus
     _install_package htop
     _install_package wget
 
@@ -380,27 +397,27 @@ install_packages() {
     return
 }
 
-clone_or_pull_dotfiles
+_clone_or_pull_dotfiles
 
 reset_pre() {
     t IMPORTANT "This should be ran at least once!"
-    prompt "run pre_setup"
+    _prompt "run pre_setup"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi
 
-    install_packages
+    _install_packages
 
-    t DEBUG "reset_pre() end"
+    # t DEBUG "reset_pre() end"
 }
 
 reset_bashrc() {
-    prompt "reset .bashrc"
+    _prompt "reset .bashrc"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi
 
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_colours" "$DOTFILES_CONFIG_DIR/.bash_colours"
+    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_style" "$DOTFILES_CONFIG_DIR/.bash_style"
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/init" "$DOTFILES_CONFIG_DIR/.init"
 
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_aliases" "$DOTFILES_CONFIG_DIR/.bash_aliases"
@@ -425,11 +442,11 @@ reset_bashrc() {
         cp "$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml" "$HOME/.config/starship.toml"
     fi
 
-    t DEBUG "reset_bashrc() end"
+    # t DEBUG "reset_bashrc() end"
 }
 
 reset_vimrc() {
-    prompt "reset .vimrc"
+    _prompt "reset .vimrc"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi
@@ -449,18 +466,18 @@ reset_vimrc() {
 
     t "Installing Vim-Plug.."
     if [ ! -f ~/.vim/autoload/plug.vim ]; then
-        echo "Vim-Plug not found. Installing.."
+        t INFO "Vim-Plug not found. Installing.."
         curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
             https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     else
         echo "Vim-Plug is already installed."
     fi
 
-    t DEBUG "reset_vimrc() end"
+    # t DEBUG "reset_vimrc() end"
 }
 
 reset_git_config() {
-    prompt "reset .gitconfig"
+    _prompt "reset .gitconfig"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi
@@ -468,11 +485,11 @@ reset_git_config() {
     chmod +x $DOTFILES_REPO_DIR/setup/git/git_config_setup.sh
     $DOTFILES_REPO_DIR/setup/git/git_config_setup.sh
 
-    t DEBUG "reset_git_config() end"
+    # t DEBUG "reset_git_config() end"
 }
 
 reset_vscode_config() {
-    prompt "reset the vscode configs"
+    _prompt "reset the vscode configs"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi
@@ -480,11 +497,11 @@ reset_vscode_config() {
     chmod +x $DOTFILES_REPO_DIR/setup/vscode/vscode_config_setup.sh
     bash -i $DOTFILES_REPO_DIR/setup/vscode/vscode_config_setup.sh || t WARNING "Some error occured during reset_vscode_config()"
 
-    t DEBUG "reset_vscode_config() end"
+    # t DEBUG "reset_vscode_config() end"
 }
 
 reset_wsl_config() {
-    prompt "reset the wsl configs"
+    _prompt "reset the wsl configs"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi
@@ -496,11 +513,12 @@ reset_wsl_config() {
 
     chmod +x $DOTFILES_REPO_DIR/setup/wsl/wsl_config_setup.sh
     bash -i $DOTFILES_REPO_DIR/setup/wsl/wsl_config_setup.sh  || t WARNING "Some error occured during reset_wsl_config()"
-    t DEBUG "reset_wsl_config() end"
+
+    # t DEBUG "reset_wsl_config() end"
 }
 
 reset_registry() {
-    prompt "reset the registry entries"
+    _prompt "reset the registry entries"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi
@@ -513,22 +531,24 @@ reset_registry() {
     chmod +x $DOTFILES_REPO_DIR/setup/registry/registry_script.ps1
 
     powershell.exe -Command "Start-Process powershell.exe -Verb RunAs -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"$(wslpath -w $DOTFILES_REPO_DIR/setup/registry/registry_script.ps1)\"'"  || t WARNING "Some error occured during reset_registry()"
-    t DEBUG "reset_registry() end"
+
+    # t DEBUG "reset_registry() end"
 }
 
 reset_firefox() {
-    prompt "reset the firefox configs"
+    _prompt "reset the firefox configs"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi
 
     chmod +x $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh
     bash -i $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh || t WARNING "Some error occured during reset_firefox()"
-    t DEBUG "reset_firefox() end"
+
+    # t DEBUG "reset_firefox() end"
 }
 
 reset_ps() {
-    prompt "reset the PowerShell profile"
+    _prompt "reset the PowerShell profile"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi
@@ -540,5 +560,6 @@ reset_ps() {
 
     chmod +x $DOTFILES_REPO_DIR/setup/powershell/ps1_setup.sh
     bash -i $DOTFILES_REPO_DIR/setup/powershell/ps1_setup.sh  || t WARNING "Some error occured during reset_ps()"
-    t DEBUG "reset_ps() end"
+
+    # t DEBUG "reset_ps() end"
 }

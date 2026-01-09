@@ -1,4 +1,4 @@
-# ~/.config/dotfiles/.bash_exports
+#!/bin/bash
 
 shopt -s histappend
 

@@ -1,4 +1,4 @@
-# ~/.bash_extras/.bash_functions
+#!/bin/bash
 
 # Re-run Dotfile installation
 r() {
@@ -32,6 +32,8 @@ r() {
       fi
     fi
 
+    unset BASH_STYLE_LOADED
+
     ./install.sh
 
     if [ "$IS_PROJECT_ROOT" = false ]; then
@@ -40,6 +42,7 @@ r() {
     t SUCCESS "Reset successful!"
 }
 
+# Copy generic .bash_twork starter file
 set-tworktt() {
     if [ -z "$DOTFILES_REPO_DIR" ]; then
 		t ERROR "DOTFILES_REPO_DIR not set, check $HOME/.config/dotfiles/.dotfile_config.env"
@@ -162,15 +165,6 @@ ff() {
   find . -type f -iname '*'"$*"'*' -ls ;
 }
 
-# Function to print all defined colors for testing
-colours_test() {
-    echo -e "${BLACK}BLACK${NC} ${RED}RED${NC} ${GREEN}GREEN${NC} ${YELLOW}YELLOW${NC} ${BLUE}BLUE${NC} ${MAGENTA}MAGENTA${NC} ${CYAN}CYAN${NC} ${WHITE}WHITE${NC} ${GRAY}GRAY${NC}"
-    echo -e "${BRIGHT_RED}BRIGHT_RED${NC} ${BRIGHT_GREEN}BRIGHT_GREEN${NC} ${BRIGHT_YELLOW}BRIGHT_YELLOW${NC} ${BRIGHT_BLUE}BRIGHT_BLUE${NC} ${BRIGHT_MAGENTA}BRIGHT_MAGENTA${NC} ${BRIGHT_CYAN}BRIGHT_CYAN${NC} ${BRIGHT_WHITE}BRIGHT_WHITE${NC}"
-    echo -e "${PINK}PINK${NC} ${PINK_TRUE}PINK_TRUE${NC}"
-    echo -e "${BOLD}BOLD${NC} ${UNDERLINE}UNDERLINE${NC}"
-    echo -e "${ON_BLACK}ON_BLACK${NC} ${ON_RED}ON_RED${NC} ${ON_GREEN}ON_GREEN${NC} ${ON_YELLOW}ON_YELLOW${NC} ${ON_BLUE}ON_BLUE${NC} ${ON_PURPLE}ON_PURPLE${NC} ${ON_CYAN}ON_CYAN${NC} ${ON_WHITE}ON_WHITE${NC}"
-}
-
 # Helper functions
 
 # general
@@ -205,79 +199,83 @@ function status_colour() {
 # Python venv
 # TODO: add args for other txt?
 function venv () {
-    echo "Checking for uv installation.."
+    t INFO "Checking for uv installation.."
     # Check if 'uv' command exists
     if command -v uv &> /dev/null
     then
         # --- UV MODE ---
-        echo "uv found. Using uv for fast environment setup."
+        t INFO "uv found. Using uv for fast environment setup."
 
         # 1. Remove environment
         rm -rf venv
-        echo "Old environment removed."
+        t INFO "Old environment removed."
 
         # 2. Create and activate base environment
         uv venv venv
         source venv/bin/activate
-        echo "Virtual environment created and activated."
+        t OK "Virtual environment created and activated."
 
         # 3. Conditional install for main requirements.txt
         if [ -f requirements.txt ]; then
             uv pip install -r requirements.txt
-            echo "Installed main requirements.txt"
+            t SUCCESS "Installed main requirements.txt"
         else
-            echo "requirements.txt not found.."
+            t INFO "requirements.txt not found.."
         fi
 
         # 4. Conditional install for test requirements-test.txt
         if [ -f requirements-test.txt ]; then
             uv pip install -r requirements-test.txt
-            echo "Installed test requirements-test.txt"
+            t INFO "Installed test requirements-test.txt"
         else
-            echo "requirements-test.txt not found.."
+            t INFO "requirements-test.txt not found.."
         fi
     else
         # --- FALLBACK MODE (Standard VENV + PIP) ---
-        echo "uv not found. Falling back to python -m venv and pip."
+        t WARNING "uv not found. Falling back to python -m venv and pip."
 
         # 1. Remove environment
         rm -rf venv
-        echo "Old environment removed."
+        t INFO "Old environment removed."
 
         # 2. Create and activate base environment using standard venv
         python -m venv venv
         source venv/bin/activate
-        echo "Virtual environment created and activated."
+        t OK "Virtual environment created and activated."
 
         # 3. Conditional sync for main requirements.txt
         if [ -f requirements.txt ]; then
             pip install -r requirements.txt
-            echo "Installed main requirements.txt"
+            t OK "Installed main requirements.txt"
         else
-            echo "requirements.txt not found, skipping main install."
+            t WARNING "requirements.txt not found, skipping main install."
         fi
 
         # 4. Conditional sync for test requirements-test.txt
         if [ -f requirements-test.txt ]; then
             pip install -r requirements-test.txt
-            echo "Installed test requirements-test.txt"
+            t OK "Installed test requirements-test.txt"
         else
-            echo "requirements-test.txt not found, skipping test install."
+            t WARNING "requirements-test.txt not found, skipping test install."
         fi
     fi
 
-    echo "Python executable AFTER VENV activation:"
+    t INFO "Python executable AFTER VENV activation:"
     which python
-    echo "Setup complete. Environment is active."
+    t SUCCESS "Setup complete. Environment is active."
 }
 
 # github related functions
 function gpull() {
-    git pull origin $(git rev-parse --abbrev-ref HEAD)
+    local branch=$(git rev-parse --abbrev-ref HEAD)
+    t INFO "Pulling ${H2}${branch}${NC}.."
+    git pull origin "$branch" --prune
 }
 
 function gpush() {
-    git push origin $(git rev-parse --abbrev-ref HEAD)
+    local branch=$(git rev-parse --abbrev-ref HEAD)
+    t INFO "Pushing ${H2}${branch}${NC} to origin.."
+    git push -u origin "$branch"
 }
 
 # Switch to a specified Git branch with confirmation
@@ -287,11 +285,10 @@ function gco() {
         t "Usage: gco <branch_name>"
         return 1
     fi
-    git checkout $branch
-    if [ $? -eq 0 ]; then
-        t SUCCESS "Switched to branch ${GREEN}$branch${NC}"
+    if git checkout "$branch"; then
+        t SUCCESS "Switched to branch ${H2}$branch${NC}"
     else
-        t ERROR "Failed to switch branch"
+        t ERROR "Could not find branch ${H2}$branch${NC}"
     fi
 }
 
@@ -302,15 +299,14 @@ function gcob() {
         t "Usage: gcob <branch_name>"
         return 1
     fi
-    git checkout $branch
-    if [ $? -eq 0 ]; then
-        t SUCCESS "Switched to branch ${GREEN}$branch${NC}"
+
+    if git checkout "$branch" 2>/dev/null; then
+        t SUCCESS "Switched to existing branch ${H2}$branch${NC}"
     else
-        git checkout -B $branch
-        if [ $? -eq 0 ]; then
-            t SUCCESS "Created and switched to branch ${GREEN}$branch${NC}"
+        if git checkout -b "$branch"; then
+            t SUCCESS "Created and switched to ${H2}$branch${NC}"
         else
-            t ERROR "Failed to create and switch branch"
+            t ERROR "Failed to create branch ${H2}$branch${NC}"
         fi
     fi
 }
@@ -319,20 +315,27 @@ function gcob() {
 function grn() {
     local old_branch=$1
     local new_branch=$2
+
+    if [[ "$old_branch" == "main" || "$old_branch" == "master" ]]; then
+        t ERROR "Refusing to rename core branch: ${H}$old_branch${NC}"
+        return 1
+    fi
+
     if [ -z "$old_branch" ] || [ -z "$new_branch" ]; then
         t "Usage: grn <old_branch_name> <new_branch_name>"
         return 1
     fi
-    git checkout $old_branch
-    git branch -m $new_branch
-    git push origin $new_branch
-    git push origin --delete $old_branch
 
-    if [ $? -eq 0 ]; then
-        t SUCCESS "Branch ${GREEN}$old_branch${NC} renamed to ${GREEN}$new_branch${NC}"
+    if git branch -m "$old_branch" "$new_branch"; then
+        t SUCCESS "Locally renamed ${H}$old_branch${NC} -> ${H2}$new_branch${NC}"
+
+        t INFO "Syncing with origin.."
+        git push origin "$new_branch"
+        git push origin --delete "$old_branch"
+
+        t SUCCESS "Origin sync complete."
     else
-        t SUCCESS "Branch ${GREEN}$old_branch${NC} renamed to ${GREEN}$new_branch${NC}"
-        t INFO "A 'failed to push some refs' error may have occured, this can be ignored."
+        t ERROR "Rename failed. Ensure branch names are correct."
     fi
 }
 
@@ -376,7 +379,7 @@ function print_asana_status() {
 
         if (( SECS_LEFT > 0 )); then
             local DAYS=$(( SECS_LEFT / 86400 ))
-            TIME_REMAINING="TIME REMAINING: ${H}${DAYS}${NC} DAYS"
+            TIME_REMAINING="TIME REMAINING: ${KEY_F}${DAYS}${NC} DAYS"
         fi
     fi
 
@@ -416,7 +419,7 @@ function print_asana_status() {
         while IFS='|' read -r gid comp name; do
             local state="TODO"; [[ "$comp" == "true" ]] && state="DONE"
             local ccolor=$(status_colour "$state")
-            printf -- "    * ${BOLD}${H}%s${NC} [%b%s%b]: %s\n" "$gid" "$ccolor" "$state" "$NC" "$(truncate_text "$name" 42)"
+            printf -- "    * ${HDR_F}%s${NC} [%b%s%b]: %s\n" "$gid" "$ccolor" "$state" "$NC" "$(truncate_text "$name" 42)"
         done
     done
 
@@ -425,7 +428,7 @@ function print_asana_status() {
     while IFS='|' read -r gid comp name; do
         local state="TODO"; [[ "$comp" == "true" ]] && state="DONE"
         local ccolor=$(status_colour "$state")
-        printf "${BOLD}${H}%s${NC} [%b%s%b]: %s\n" "$gid" "$ccolor" "$state" "$NC" "$(truncate_text "$name" 42)"
+        printf "${HDR_F}%s${NC} [%b%s%b]: %s\n" "$gid" "$ccolor" "$state" "$NC" "$(truncate_text "$name" 42)"
     done
 }
 
@@ -479,7 +482,7 @@ function print_azure_status() {
         local HOURS=$(( (SECS_LEFT % 86400) / 3600 ))
         local MINS=$(( (SECS_LEFT % 3600) / 60 ))
 
-        TIME_REMAINING="Time remaining: ${H}${DAYS}${NC} days and ${H}${HOURS}${NC} hours ${H}${MINS}${NC} minutes"
+        TIME_REMAINING="Time remaining: ${KEY_F}${DAYS}${NC} days and ${KEY_F}${HOURS}${NC} hours ${KEY_F}${MINS}${NC} minutes"
     else
         TIME_REMAINING="Time remaining: Ended"
     fi
@@ -539,7 +542,7 @@ function print_azure_status() {
         while IFS='|' read -r cid ctype cstate ctitle; do
             ccolor=$(status_colour "$cstate")
             cshort_title=$(truncate_text "$ctitle" 42)
-            printf -- "   * ${BOLD}${H}%s${NC} %s [%b%s%b]: %s\n" "$cid" "$ctype" "$ccolor" "$cstate" "$NC" "$cshort_title"
+            printf -- "   * ${HDR_F}%s${NC} %s [%b%s%b]: %s\n" "$cid" "$ctype" "$ccolor" "$cstate" "$NC" "$cshort_title"
         done
     done
 
@@ -550,6 +553,6 @@ function print_azure_status() {
     while IFS='|' read -r cid ctype cstate ctitle; do
         ccolor=$(status_colour "$cstate")
         cshort_title=$(truncate_text "$ctitle" 42)
-        printf "${BOLD}${H}%s${NC} %s [%b%s%b]: %s\n" "$cid" "$ctype" "$ccolor" "$cstate" "$NC" "$cshort_title"
+        printf "${HDR_F}%s${NC} %s [%b%s%b]: %s\n" "$cid" "$ctype" "$ccolor" "$cstate" "$NC" "$cshort_title"
     done
 }

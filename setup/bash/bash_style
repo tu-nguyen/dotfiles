@@ -1,0 +1,187 @@
+#!/bin/bash
+
+if [ -n "$BASH_STYLE_LOADED" ]; then
+    return 0
+fi
+BASH_STYLE_LOADED=1
+
+# Color Support Detection
+if [[ "$COLORTERM" == "truecolor" || "$COLORTERM" == "24bit" ]]; then
+    COLOR_MODE="hex"
+elif [[ "$TERM" == *"256color"* ]]; then
+    COLOR_MODE="256"
+else
+    COLOR_MODE="basic"
+fi
+
+# Function to convert hex to 0-5 scale for ANSI cube
+# Same as the one in utils.sh
+_hex_to_256() {
+    local hex=$(echo "$1" | sed 's/#//')
+    local r=$((16#${hex:0:2} * 5 / 255))
+    local g=$((16#${hex:2:2} * 5 / 255))
+    local b=$((16#${hex:4:2} * 5 / 255))
+    echo $((16 + 36*r + 6*g + b))
+}
+
+# Function to set Foreground
+_set_fg() {
+    local hex=$1; local basic=$2
+    if [[ "$COLOR_MODE" == "hex" ]]; then
+        local r=$((16#${hex:1:2})); local g=$((16#${hex:3:2})); local b=$((16#${hex:5:2}))
+        echo -ne "\033[38;2;${r};${g};${b}m"
+    elif [[ "$COLOR_MODE" == "256" ]]; then
+        echo -ne "\033[38;5;$(_hex_to_256 "$hex")m"
+    else
+        tput setaf "$basic" 2>/dev/null || echo -ne "\033[0;3${basic}m"
+    fi
+}
+
+# Set to set Background
+_set_bg() {
+    local hex=$1; local basic=$2
+    if [[ "$COLOR_MODE" == "hex" ]]; then
+        local r=$((16#${hex:1:2})); local g=$((16#${hex:3:2})); local b=$((16#${hex:5:2}))
+        echo -ne "\033[48;2;${r};${g};${b}m"
+    elif [[ "$COLOR_MODE" == "256" ]]; then
+        echo -ne "\033[48;5;$(_hex_to_256 "$hex")m"
+    else
+        echo -ne "\033[4${basic}m"
+    fi
+}
+
+# Text Colors (Foreground)
+BLACK=$(_set_fg '#282828' 0)
+RED=$(_set_fg '#CC241D' 1)
+GREEN=$(_set_fg '#98971A' 2)
+YELLOW=$(_set_fg '#D79921' 3)
+BLUE=$(_set_fg '#458588' 4)
+MAGENTA=$(_set_fg '#B16286' 5)
+CYAN=$(_set_fg '#00FFFF' 6)
+WHITE=$(_set_fg '#EBDBB2' 7)
+GRAY=$(_set_fg '#928374' 8)
+PINK=$(_set_fg '#FFC0CB' 5) # Fallback to Magenta if no pink available
+LIGHT_PINK=$(_set_fg '#FFB6C1' 217)  # Soft, light rose
+DARK_PINK=$(_set_fg '#E75480' 168)   # Deep, punchy rose
+HOT_PINK=$(_set_fg '#FF10F0' 201)   # High-contrast "Neon" pink
+PASTEL_PINK=$(_set_fg '#FFD1DC' 224) # Very soft, creamy pink
+
+# Bright Colors (if your terminal supports them)
+BRIGHT_RED=$(_set_fg '#FB4934' 9)
+BRIGHT_GREEN=$(_set_fg '#B8BB26' 10)
+BRIGHT_YELLOW=$(_set_fg '#FABD2F' 11)
+BRIGHT_BLUE=$(_set_fg '#83A598' 12)
+BRIGHT_MAGENTA=$(_set_fg '#D3869B' 13)
+BRIGHT_CYAN=$(_set_fg '#8EC07C' 14)
+BRIGHT_WHITE=$(_set_fg '#FBF1C7' 15)
+
+# Background
+ON_BLACK=$(_set_bg '#282828' 0)
+ON_RED=$(_set_bg '#CC241D' 1)
+ON_GREEN=$(_set_bg '#98971A' 2)
+ON_YELLOW=$(_set_bg '#D79921' 3)
+ON_BLUE=$(_set_bg '#458588' 4)
+ON_MAGENTA=$(_set_bg '#B16286' 5)
+ON_CYAN=$(_set_bg '#689D6A' 6)
+ON_WHITE=$(_set_bg '#EBDBB2' 7)
+ON_PINK=$(_set_bg '#FF69B4' 5)
+
+# Formatting
+BOLD=$(tput bold 2>/dev/null || echo -e '\033[1m')
+UNDERLINE=$(tput smul 2>/dev/null || echo -e '\033[4m')
+RESET=$(tput sgr0 2>/dev/null || echo -e '\033[0m')
+NC=$RESET
+
+# Status
+OK="${BOLD}${GREEN}"
+INFO="${BOLD}${PINK}"
+WARN="${BOLD}${YELLOW}"
+ERR="${BOLD}${RED}"
+DEBUG="${MAGENTA}"
+ALERT="${BOLD}${WHITE}${ON_RED}"  # Bold White on red background
+
+# Structure Styles
+HDR_F="${BOLD}${PINK}"  # Main header s
+SUB_F="${BOLD}${CYAN}"  # Secondary headers
+KEY_F="${PINK}"  # Labels/Keys
+VAL_F="${WHITE}"  # Data values
+DIM_F="${GRAY}"  # Secondary/Dimmed text
+SEP_F="${GRAY}"  # Separator
+SEL_F="${BOLD}${WHITE}"  # Selection/Choice
+
+# Other
+URL_F="${UNDERLINE}${BLUE}" # Clickable links
+NOTICE_F="${BOLD}${ON_BLUE}${WHITE}" # Attention-grabbing banners
+
+# Backward compat with my old Makefile/settings
+H="${HDR_F}"
+H2="${SUB_F}"
+
+# Example usage
+# echo "${RED}This is red text${NC}"
+# echo "${BOLD}${WHITE}This is bold edwhite text ${NC}"
+# echo "${BLUE}${ON_PURPLE}This is blue text on purple background${NC}"
+
+if [[ "$OSTYPE" == "macos"* ]]; then
+    MOTD_F="${MAGENTA}"
+elif [[ "$OSTYPE" == "wsl" ]]; then
+    MOTD_F="${PINK}"
+else
+    MOTD_F="${PASTEL_PINK}"
+fi
+
+# Theme switcher
+set_theme() {
+    local theme=$1
+
+    case $theme in
+        "cyber")
+            _P_MAIN='#FF10F0' # Neon Pink
+            _P_SUB='#00FFFF'  # Aqua/Cyan
+            _P_ACCENT='#FFD1DC' # Pastel
+            echo "Mood: Cyberpunk active."
+            ;;
+        "nord")
+            _P_MAIN='#88C0D0' # Frost Blue
+            _P_SUB='#81A1C1'  # Arctic Blue
+            _P_ACCENT='#D8DEE9' # Snow White
+            echo "Mood: Arctic chill active."
+            ;;
+        "dracula")
+            _P_MAIN='#BD93F9' # Purple
+            _P_SUB='#50FA7B'  # Green
+            _P_ACCENT='#FF79C6' # Pink
+            echo "Mood: Vampire mode."
+            ;;
+        *)
+            echo "Usage: set_theme [cyber|nord|dracula]"
+            return 1
+            ;;
+    esac
+
+    # Re-assign the core colors using your set_fg helper
+    PINK=$(set_fg "$_P_MAIN" 5)
+    CYAN=$(set_fg "$_P_SUB" 6)
+    PASTEL_PINK=$(set_fg "$_P_ACCENT" 7)
+
+    # Refresh the UI Presets
+    HDR_F="${BOLD}${PINK}"
+    SUB_F="${BOLD}${CYAN}"
+    KEY_F="${PINK}"
+    H="${HDR_F}"
+    H2="${SUB_F}"
+}
+
+# Color Verification Test
+color_test() {
+    echo -e "\n${BOLD}Primary Colors:${RESET}"
+    echo -e "${PINK}PINK ${RED}RED ${GREEN}GREEN ${YELLOW}YELLOW ${BLUE}BLUE ${MAGENTA}MAGENTA ${CYAN}CYAN ${WHITE}WHITE ${GRAY}GRAY ${RESET}"
+
+    echo -e "\n${BOLD}Bright Colors:${RESET}"
+    echo -e "${PASTEL_PINK}PASTEL_PINK ${BRIGHT_RED}B_RED ${BRIGHT_GREEN}B_GREEN ${BRIGHT_YELLOW}B_YELLOW ${BRIGHT_BLUE}B_BLUE ${BRIGHT_MAGENTA}B_MAGENTA ${BRIGHT_CYAN}B_CYAN ${BRIGHT_WHITE}B_WHITE${RESET}"
+
+    echo -e "\n${BOLD}Backgrounds:${RESET}"
+    echo -ne "${PINK_ON_PINK}  ${ON_RED}  ${RESET} ${ON_GREEN}  ${RESET} ${ON_YELLOW}  ${RESET} ${ON_BLUE}  ${RESET} ${ON_PURPLE}  ${RESET} ${ON_CYAN}  ${RESET} ${ON_WHITE}  ${RESET}  ${RESET}\n"
+
+    echo -e "\n${BOLD}Current Mode:${RESET} $COLOR_MODE (TERM: $TERM)\n"
+}

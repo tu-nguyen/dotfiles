@@ -1,4 +1,4 @@
-# ~/.confid/dotfiles/.bash_docker_functions
+#!/bin/bash
 
 alias dk="docker"
 alias dkps="docker ps --format '{{.ID}} - {{.Names}} - {{.Image}} - {{.Status}}'"

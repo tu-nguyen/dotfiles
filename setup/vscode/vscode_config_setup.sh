@@ -21,26 +21,29 @@ t "Copying settings.json for VSCode"
 src=$DOTFILES_REPO_DIR/setup/vscode/vscode-settings.json
 
 if [[ "$OS_TYPE" == "linux" ]]; then
-    t "TBD"
-
+    profile_base_path="$HOME/.config/Code/User"
+    dest="$profile_base_path/settings.json"
 elif [[ "$OS_TYPE" == "wsl" ]]; then
     raw_win_appdata=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:APPDATA" | tr -d '\r\n')
-    raw_win_userprofile=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:USERPROFILE" | tr -d '\r\n')
 
     if [ -n "$raw_win_appdata" ]; then
         profile_base_path=$(wslpath -u "$raw_win_appdata")/Code/User
-    elif [ -n "$raw_win_userprofile" ]; then
-        profile_base_path=$(wslpath -u "$raw_win_userprofile")/AppData/Roaming/Code/User
     else
-        t ERROR "Could not determine Windows USERPROFILE paths." >&2
-        exit 1
+        raw_win_userprofile=$(powershell.exe -NoProfile -NonInteractive -Command "\$Env:USERPROFILE" | tr -d '\r\n')
+        profile_base_path=$(wslpath -u "$raw_win_userprofile")/AppData/Roaming/Code/User
     fi
-
     dest=$profile_base_path/settings.json
-
 elif [[ "$OS_TYPE" == "macos" ]]; then
-    dest="$HOME/Library/Application\ Support/Code/User/settings.json"
-
+    profile_base_path="$HOME/Library/Application Support/Code/User"
+    dest="$profile_base_path/settings.json"
 fi
 
+mkdir -p "$(dirname "$dest")"
+
+# if [ -f "$dest" ]; then
+#     cp "$dest" "${dest}.bak"
+#     t INFO "Backed up existing VS Code settings to settings.json.bak"
+# fi
+
 cp $src $dest
+t OK "VS Code settings synced to: ${VAL_F}$dest${NC}"

@@ -24,13 +24,13 @@ _get_os_type() {
 ENV_LOADED=false
 if [ -f .env ]; then
     echo "[INFO] Configuration loaded from .env"
-    source .env
+    . .env
     ENV_LOADED=true
 else
     DOTFILES_CONFIG_FILE="$HOME/.config/dotfiles/.dotfile_config.env"
     if [[ -f "$DOTFILES_CONFIG_FILE" ]]; then
         echo "[INFO] Configuration loaded from $DOTFILES_CONFIG_FILE"
-        source "$DOTFILES_CONFIG_FILE"
+        . "$DOTFILES_CONFIG_FILE"
         ENV_LOADED=true
     fi
 fi
@@ -84,44 +84,47 @@ echo "DOTFILES_CONFIG_DIR=$DOTFILES_CONFIG_DIR"  >> "$DOTFILES_CONFIG_FILE"
 echo "DOTFILES_CONFIG_FILE=$DOTFILES_CONFIG_FILE"  >> "$DOTFILES_CONFIG_FILE"
 echo "OS_TYPE=$OS_TYPE" >> "$DOTFILES_CONFIG_FILE"
 
-source "$DOTFILES_REPO_DIR/setup/bash/bash_colours" || {
-    echo "Error: Could not source bash_colours"
+unset BASH_STYLE_LOADED
+. "$DOTFILES_REPO_DIR/setup/bash/bash_style" || {
+    echo "Error: Could not source bash_style"
     exit 1
 }
-source "$DOTFILES_REPO_DIR/setup/bash/init" || {
+. "$DOTFILES_REPO_DIR/setup/bash/init" || {
     echo "Error: Could not source init"
     exit 1
 }
-source "$DOTFILES_REPO_DIR/utils.sh" || {
+. "$DOTFILES_REPO_DIR/utils.sh" || {
     echo "Error: Could not source utils.sh"
     exit 1
 }
 
+_sudo_keep
+
 # A menu function to display options
 show_menu() {
     clear
-    printf "${H1}==========================================${NC}\n"
-    printf "     ${H1}Dotfiles Setup -- Choose an Option${NC}   \n"
-    printf "${H1}==========================================${NC}\n"
-    printf "1. Reset Pre-configuration\n"
-    printf "2. Reset .bashrc\n"
-    printf "3. Reset .vimrc\n"
-    printf "4. Reset Git Config\n"
-    printf "5. Reset VS Code Config\n"
-    printf "6. Reset Firefox\n"
-    printf "7. Reset WSL Config ${H2}(WSL only)${NC}\n"
-    printf "8. Run Gaming Registry Tweaks ${H2}(WSL only)${NC}\n"
-    printf "9. Reset PowerShell profile ${H2}(WSL only)${NC}\n"
-    printf "0. Run All of the Above ${H2}(Default)${NC}\n"
-    printf "${RED}x. Exit${NC}\n"
-    printf "==========================================\n"
+    printf "${HDR_F}==========================================${NC}\n"
+    printf "    ${HDR_F}Dotfiles Setup -- Choose an Option${NC}    \n"
+    printf "${HDR_F}==========================================${NC}\n"
+    printf "${SEL_F}1.${NC} Reset Pre-configuration\n"
+    printf "${SEL_F}2.${NC} Reset .bashrc\n"
+    printf "${SEL_F}3.${NC} Reset .vimrc\n"
+    printf "${SEL_F}4.${NC} Reset Git Config\n"
+    printf "${SEL_F}5.${NC} Reset VS Code Config\n"
+    printf "${SEL_F}6.${NC} Reset Firefox\n"
+    printf "${SEL_F}7.${NC} Reset WSL Config ${SUB_F}(WSL only)${NC}\n"
+    printf "${SEL_F}8.${NC} Run Gaming Registry Tweaks ${SUB_F}(WSL only)${NC}\n"
+    printf "${SEL_F}9.${NC} Reset PowerShell profile ${SUB_F}(WSL only)${NC}\n"
+    printf "${SEL_F}0.${NC} Run All of the Above ${SUB_F}(Default)${NC}\n"
+    printf "${BOLD}${RED}x. Exit${NC}\n"
+    printf "${BOLD}${WHITE}==========================================${NC}\n"
 }
 
 t "Setting up configuration files.."
 # User input loop
 while true; do
     show_menu
-    read -p "Enter your choice (press ${H}Enter${NC} for default): " choice
+    read -p "Enter your choice (press ${HDR_F}Enter${NC} for default): " choice
     case $choice in
         1) reset_pre ;;
         2) reset_bashrc ;;
@@ -146,12 +149,12 @@ while true; do
             break
             ;;
         x | X) break ;;
-        *) echo "${RED}Invalid${NC} option, please try again." ;;
+        *) echo "${BOLD}${RED}Invalid${NC} option, please try again." ;;
     esac
-    read -p "Press ${H}Enter${NC} to continue.."
+    read -p "Press ${HDR_F}Enter${NC} to continue.."
 done
 
-echo "${GREEN}Setup script finished.${NC}"
+echo "${OK}Setup script finished.${NC}"
 # reset_post
 
 t IMPORTANT "All done! You may need to exit and reopen!"

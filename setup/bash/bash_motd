@@ -1,4 +1,4 @@
-# ~/.config/dotfiles/.bash_motd
+#!/bin/bash
 
 #------------------------------------------
 # Display a message of the day (MOTD) when starting a new terminal session
@@ -8,6 +8,11 @@ short_motd() {
     # ==========================================
     # MOTD Display Header aka short
     # ==========================================
+    echo -e "${MOTD_F} ------ $OS_TYPE ------ ${NC}"
+
+    local USER=$(whoami | tr '[:upper:]' '[:lower:]')
+    local HOSTNAME=$(hostname | tr '[:upper:]' '[:lower:]')
+    local LEFT_TEXT="${USER}@${HOSTNAME}"
 
     # Print date in "Friday, 2025-06-05" format
     # Print time in "Time: 17:32:08" format
@@ -19,9 +24,9 @@ short_motd() {
     local PADDING_SIZE=$(( (TERMWIDTH / 4) - ${#LEFT_TEXT} - ${#RIGHT_TEXT} ))
     local SPACES=$(printf '%*s' "$PADDING_SIZE" "")
 
-    echo -e "${PINK}${BOLD}${USER}${WHITE}@${PINK}${BOLD}${HOSTNAME}${SPACES}${DATE}${NC}"
-    # echo -e "${PINK}date:   ${NC}${DATE}"
-    # echo -e "${PINK}Time:    ${NC}${TIME}"  # Comment out since we always display time
+    echo -e "${BOLD}${MOTD_F}${USER}${WHITE}@${MOTD_F}${BOLD}${HOSTNAME}${SPACES}${DATE}${NC}"
+    # echo -e "${${MOTD_F}}date:   ${NC}${DATE}"
+    # echo -e "${${MOTD_F}}Time:    ${NC}${TIME}"  # Comment out since we always display time
 }
 
 long_motd() {
@@ -97,20 +102,20 @@ long_motd() {
     local LAST_COMMANDS=$(history | tail -n 5 | awk '{print $2, $3, $4, $5, $6, $7}')
     local LAST_SHUTDOWN=$(last -x shutdown | head -n 1 | awk '{ print $5, $6, $7, $8 }')
 
-    # echo -e "${PINK}${BOLD}${USER}${WHITE}@${PINK}${BOLD}${HOSTNAME}${NC}"
+    # echo -e "${BOLD}${MOTD_F}${USER}${WHITE}@${BOLD}${MOTD_F}${HOSTNAME}${NC}"
     echo -e "${WHITE}------------------------------------------${NC}"
-    echo -e "${PINK}os:     ${NC}${OS}"
-    echo -e "${PINK}kernel: ${NC}${KERNEL}"
-    echo -e "${PINK}uptime: ${NC}${UPTIME}"
-    echo -e "${PINK}shell:  ${NC}${SHELL_DISPLAY}"
-    echo -e "${PINK}cpu:    ${NC}${CPU}"
-    echo -e "${PINK}memory: ${NC}${MEM_INFO}"
+    echo -e "${MOTD_F}os:     ${NC}${OS}"
+    echo -e "${MOTD_F}kernel: ${NC}${KERNEL}"
+    echo -e "${MOTD_F}uptime: ${NC}${UPTIME}"
+    echo -e "${MOTD_F}shell:  ${NC}${SHELL_DISPLAY}"
+    echo -e "${MOTD_F}cpu:    ${NC}${CPU}"
+    echo -e "${MOTD_F}memory: ${NC}${MEM_INFO}"
 }
 
 motd() {
     if [ -z "$DOTFILES_CONFIG_DIR" ]; then
         DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
-        printf "${BOLD}${RED}[WARNING]${NC} DOTFILES_CONFIG_DIR is not set, defaulting to $DOTFILES_CONFIG_DIR"
+        printf "${WARN}[WARNING]${NC} DOTFILES_CONFIG_DIR is not set, defaulting to $DOTFILES_CONFIG_DIR"
     fi
 
     if [ "$1" == "auto" ]; then

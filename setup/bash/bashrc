@@ -33,9 +33,11 @@ if ! shopt -oq posix; then
   fi
 fi
 
-#------------------------------------------
+export COLORTERM=truecolor
+
+# ------------------------------------------
 # Load custom bash files
-#------------------------------------------
+# ------------------------------------------
 # Load custom bash files from ~/.config/dotfiles
 if [ -z "$DOTFILES_CONFIG_DIR" ]; then
     DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
@@ -55,13 +57,25 @@ if [[ -d "$DOTFILES_CONFIG_DIR" ]]; then
     done
 fi
 
-#------------------------------------------
+# ------------------------------------------
 # Setup settings
-#------------------------------------------
+# ------------------------------------------
+
+# Starship
 if command -v starship &> /dev/null; then
     eval "$(starship init bash)"
 fi
 
+# Transient prompt for Starship
+_starship_transient_prompt() {
+  if [[ $? -eq 0 ]]; then
+    printf "${OK_F}❯ ${NC}"
+  else
+    printf "${ERR_F}❯ ${NC}"
+  fi
+}
+
+# fnm
 FNM_PATH="$HOME/.local/share/fnm"
 if [ -d "$FNM_PATH" ]; then
   export PATH="$FNM_PATH:$PATH"
@@ -90,9 +104,20 @@ fnm default $(fnm list | grep 'lts-latest' | awk '{print $2}') >/dev/null
 #     fi
 # fi
 
-#------------------------------------------
+# Set terminal title to: User @ Host : Current Dir
+set_win_title() {
+    # This escape sequence tells the terminal to update the title bar
+    # \033]2; = Start title sequence
+    # \007    = End title sequence
+    echo -ne "\033]2;♥ vvvv | ${PWD##*/}\007"
+}
+
+# Run it every time the prompt appears
+export PROMPT_COMMAND="set_win_title; $PROMPT_COMMAND"
+
+# -----------------------------------------
 # Greeting, motd, and colors
-#------------------------------------------
+# ------------------------------------------
 # TODO
 # echo -e "${BOLD}${CYAN}Hello, World! This is BASH ${BOLD}${RED}${BASH_VERSION%.*}${BOLD}${CYAN}\
 # - TODO ${BOLD}${RED}..{NC}"

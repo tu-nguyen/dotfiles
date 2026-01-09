@@ -2,21 +2,21 @@
 
 # twork ref
 function tworktt() {
-    printf "${BOLD}${H}twork cheatsheet${NC}\n"
+    printf "${HDR_F}twork cheatsheet${NC}\n"
     printf "%s\n" H"$br"
-    printf "${H2}cd${NC}\n"
-    printf "  ${H}cd0${NC} or ${H}cd-example1${NC}\n"
-    printf "  ${H}cd1${NC} or ${H}cd-example2${NC}\n"
-    printf "  ${H}cd2${NC} or ${H}cd-example3${NC}\n"
-    printf "  ${H}cd3${NC} or ${H}cd-example4${NC}\n"
+    printf "${SUB_F}cd${NC}\n"
+    printf "  ${KEY_F}cd0${NC} or ${KEY_F}cd-example1${NC}\n"
+    printf "  ${KEY_F}cd1${NC} or ${KEY_F}cd-example2${NC}\n"
+    printf "  ${KEY_F}cd2${NC} or ${KEY_F}cd-example3${NC}\n"
+    printf "  ${KEY_F}cd3${NC} or ${KEY_F}cd-example4${NC}\n"
     printf "%s\n" "$br"
-    printf "${H2}ssh${NC}\n"
-    printf "  ${H}ssh-example1${NC} (example server 1)\n"
-    printf "  ${H}ssh-example2${NC} (example server 2)\n"
-    printf "  ${H}ssh-example3${NC} (example server 3)\n"
-    printf "  ${H}ssh-example4${NC} (example server 4)\n"
+    printf "${SUB_F}ssh${NC}\n"
+    printf "  ${KEY_F}ssh-example1${NC} (example server 1)\n"
+    printf "  ${KEY_F}ssh-example2${NC} (example server 2)\n"
+    printf "  ${KEY_F}ssh-example3${NC} (example server 3)\n"
+    printf "  ${KEY_F}ssh-example4${NC} (example server 4)\n"
     printf "%s\n" "$br"
-    printf "${H2}twork functions${NC}\n"
+    printf "${SUB_F}twork functions${NC}\n"
 
     # printf "  azr                  → Clear the Azure CLI cache\n"
     # printf "  print_azure_status      → Print current Azure DevOps iter..\n"
@@ -24,8 +24,8 @@ function tworktt() {
  }
 
 twork_motd() {
-    printf "${BOLD}${H}Welcome to twork!${NC}\n"
-    # printf "Run '${BOLD}${H}td${NC}' to display tasks.\n"
+    printf "${WARN}Welcome to twork!${NC}\n"
+    # printf "Run '${HDR_F}td${NC}' to display tasks.\n"
 }
 
 function td() {

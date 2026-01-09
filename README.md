@@ -8,7 +8,7 @@ Typing up "clear" to clear the terminal? Nah, "c".
 
 Tailored to me but if you want..
 
-```sh
+```bash
 git clone https://github.com/tu-nguyen/dotfiles.git
 cd dotfiles
 chmod +x install.sh

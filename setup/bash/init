@@ -15,10 +15,10 @@ else
 fi
 # --- End Load Configuration ---
 
-if [[ -f "$DOTFILES_CONFIG_DIR/.bash_colours" ]]; then
-    . "$DOTFILES_CONFIG_DIR/.bash_colours"
-elif [[ -f "$DOTFILES_REPO_DIR/setup/bash/bash_colours" ]]; then
-    . "$DOTFILES_REPO_DIR/setup/bash/bash_colours"
+if [[ -f "$DOTFILES_CONFIG_DIR/.bash_style" ]]; then
+    . "$DOTFILES_CONFIG_DIR/.bash_style"
+elif [[ -f "$DOTFILES_REPO_DIR/setup/bash/bash_style" ]]; then
+    . "$DOTFILES_REPO_DIR/setup/bash/bash_style"
 else
     echo "[WARNING] Failed to load colours"
 fi
@@ -44,25 +44,25 @@ t() {
   # Determine color and label
   case "$severity" in
     info|INFO)
-      echo -e "${BOLD}${PINK}[INFO]${NC} $message ${NC}"
+      echo -e "${INFO}[INFO]${NC} $message ${NC}"
       ;;
     important|IMPORTANT)
-      echo -e "${BOLD}${PINK}[INFO] $message ${NC}"
+      echo -e "${INFO}[INFO] $message ${NC}"
       ;;
     warn|warning|WARNING)
-      echo -e "${BOLD}${YELLOW}[WARNING]${NC} $message ${NC}"
+      echo -e "${WARN}[WARNING]${NC} $message ${NC}"
       ;;
     err|error|ERR|ERROR)
-      echo -e "${BOLD}${RED}[ERROR]${NC} $message ${NC} ${NC}"
+      echo -e "${ERR}[ERROR]${NC} $message ${NC} ${NC}"
       ;;
     success|ok|SUCCESS|OK)
-      echo -e "${BOLD}${GREEN}[SUCCESS]${NC} $message ${NC}"
+      echo -e "${OK}[OK]${NC} $message ${NC}"
       ;;
     todo|TODO)
-      echo -e "${BOLD}${BRIGHT_MAGENTA}[TODO]${NC} $message ${NC}"
+      echo -e "${ALERT}[TODO]${NC} $message ${NC}"
       ;;
     debug|DEBUG)
-      echo -e "${BOLD}${CYAN}[DEBUG]${NC} $message ${NC}"
+      echo -e "${DEBUG}[DEBUG]${NC} $message ${NC}"
       ;;
     *)
       echo -e "${BOLD}[UNKNOWN]${NC} $severity: $message ${NC}"

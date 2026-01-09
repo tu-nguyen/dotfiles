@@ -109,7 +109,7 @@ set_win_title() {
     # This escape sequence tells the terminal to update the title bar
     # \033]2; = Start title sequence
     # \007    = End title sequence
-    echo -ne "\033]2;♥ vvvv | ${PWD##*/}\007"
+    echo -ne "\033]2;♥ ${PWD##*/}\007"
 }
 
 # Run it every time the prompt appears

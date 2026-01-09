@@ -16,7 +16,7 @@ short_motd() {
     local RIGHT_TEXT=${DATE}
 
     local TERMWIDTH=$(tput cols)
-    local PADDING_SIZE=$(( (TERMWIDTH / 3) - ${#LEFT_TEXT} - ${#RIGHT_TEXT} ))
+    local PADDING_SIZE=$(( (TERMWIDTH / 4) - ${#LEFT_TEXT} - ${#RIGHT_TEXT} ))
     local SPACES=$(printf '%*s' "$PADDING_SIZE" "")
 
     echo -e "${PINK}${BOLD}${USER}${WHITE}@${PINK}${BOLD}${HOSTNAME}${SPACES}${DATE}${NC}"

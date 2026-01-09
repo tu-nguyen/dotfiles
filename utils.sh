@@ -297,43 +297,35 @@ clone_or_pull_dotfiles() {
     cd "$HOME" || { t Error "Failed to return to home directory."; exit 1; }
 }
 
+# Function to convert hex to 0-5 scale for ANSI cube
+hex_to_ansi_256() {
+    local hex=$(echo "$1" | sed 's/#//')
+    local r=$((16#${hex:0:2}))
+    local g=$((16#${hex:2:2}))
+    local b=$((16#${hex:4:2}))
+
+    local r_idx=$(( r * 5 / 255 ))
+    local g_idx=$(( g * 5 / 255 ))
+    local b_idx=$(( b * 5 / 255 ))
+
+    echo $(( 16 + (36 * r_idx) + (6 * g_idx) + b_idx ))
+}
+
 # Function to convert color, mainly for starship atm
 convert_hex_to_ansi() {
     local input_file="$1"
     local output_file="${2:-$input_file.converted}"
 
-    # Function to convert hex to 0-5 scale for ANSI cube
-    # ANSI 256-color cube starts at 16 and ends at 231
-    hex_to_ansi_256() {
-        local hex=$(echo "$1" | sed 's/#//')
-        local r=$((16#${hex:0:2}))
-        local g=$((16#${hex:2:2}))
-        local b=$((16#${hex:4:2}))
-
-        # Map 0-255 range to 0-5 range
-        local r_idx=$(( r * 5 / 255 ))
-        local g_idx=$(( g * 5 / 255 ))
-        local b_idx=$(( b * 5 / 255 ))
-
-        echo $(( 16 + (36 * r_idx) + (6 * g_idx) + b_idx ))
-    }
+    # Create a copy to work on
+    cp "$input_file" "$output_file"
 
     echo "Converting Hex to ANSI 256 for: $input_file"
 
-    # Read the file and find all hex strings like "#ABCDEF"
-    sed -E 's/"(#[0-9a-fA-F]{6})"/\n\1\n/g' "$input_file" | while read -r line; do
-        if [[ "$line" =~ ^#[0-9a-fA-F]{6}$ ]]; then
-            # Convert hex to number
-            ansi_num=$(hex_to_ansi_256 "$line")
-            # Replace the hex with the number string in the final output
-            # Note: Starship supports numbers as strings like "208" or "bold 208"
-            echo -n "$ansi_num"
-        else
-            echo -n "$line"
-        fi
-    done > "$output_file"
-
-    echo "Done! Output saved to: $output_file"
+    grep -oE '#[0-9a-fA-F]{6}' "$input_file" | sort -u | while read -r hex; do
+        ansi=$(hex_to_ansi_256 "$hex")
+        echo "Replacing $hex with $ansi"
+        sed -i '' "s|$hex|$ansi|g" "$output_file"
+    done
 }
 
 install_packages() {

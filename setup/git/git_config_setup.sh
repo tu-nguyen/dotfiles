@@ -63,4 +63,4 @@ git config --global color.branch.remote "#e75480"       # Dark Pink for the clou
 git config --global alias.conflicts "diff --name-only --diff-filter=U"
 git config --global color.diff.meta "#ffd1dc"
 git config --global color.diff.frag "#ff10f0"
-t OK "Git configuration updated!"
+echo -e "Git configuration updated!"

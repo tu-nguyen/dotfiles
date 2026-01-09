@@ -59,7 +59,7 @@ error_symbol = "[󰅚](bold color_red)"
 [os]
 disabled = false
 style = "fg:color_pink"
-
+[os.symbols]
 Windows = "�"
 Ubuntu = "�"
 SUSE = ""

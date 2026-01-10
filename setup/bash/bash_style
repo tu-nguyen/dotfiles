@@ -135,6 +135,12 @@ set_theme() {
     local theme=$1
 
     case $theme in
+        "main")
+            _P_MAIN='#FFC0CB' # Pink
+            _P_SUB='#00FFFF'  # Aqua/Cyan
+            _P_ACCENT='#FFD1DC' # Pastel
+            echo "Mood: Cyberpunk active."
+            ;;
         "cyber")
             _P_MAIN='#FF10F0' # Neon Pink
             _P_SUB='#00FFFF'  # Aqua/Cyan
@@ -152,6 +158,30 @@ set_theme() {
             _P_SUB='#50FA7B'  # Green
             _P_ACCENT='#FF79C6' # Pink
             echo "Mood: Vampire mode."
+            ;;
+        "monokai")
+            _P_MAIN='#F92672'   # Vivid Pink
+            _P_SUB='#A6E22E'    # Bright Green
+            _P_ACCENT='#66D9EF' # Sky Blue
+            echo "Mood: Classic pro mode."
+            ;;
+        "forest")
+            _P_MAIN='#2D5A27'   # Deep Pine
+            _P_SUB='#9BC693'    # Sage
+            _P_ACCENT='#E9FFDB' # Off-white
+            echo "Mood: Woodland focus."
+            ;;
+        "tokyo-night")
+            _P_MAIN='#7AA2F7'   # Storm Blue
+            _P_SUB='#BB9AF7'    # Magenta/Purple
+            _P_ACCENT='#C0CAF5' # Soft Silver
+            echo "Mood: Tokyo neon lights."
+            ;;
+        "matrix")
+            _P_MAIN='#00FF41'   # Matrix Green
+            _P_SUB='#003B00'    # Dark Green
+            _P_ACCENT='#0D0208' # Black
+            echo "Mood: Wake up, Neo."
             ;;
         *)
             echo "Usage: set_theme [cyber|nord|dracula]"

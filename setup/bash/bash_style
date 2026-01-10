@@ -160,9 +160,9 @@ set_theme() {
     esac
 
     # Re-assign the core colors using your set_fg helper
-    PINK=$(set_fg "$_P_MAIN" 5)
-    CYAN=$(set_fg "$_P_SUB" 6)
-    PASTEL_PINK=$(set_fg "$_P_ACCENT" 7)
+    PINK=$(_set_fg "$_P_MAIN" 5)
+    CYAN=$(_set_fg "$_P_SUB" 6)
+    PASTEL_PINK=$(_set_fg "$_P_ACCENT" 7)
 
     # Refresh the UI Presets
     HDR_F="${BOLD}${PINK}"

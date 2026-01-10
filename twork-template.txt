@@ -29,15 +29,16 @@ twork_motd() {
 }
 
 function td() {
-    if [ -z "$FORCE_YES" ]; then
-        read -p "${PINK}Display Tasks?${NC} [y/N] " -n 1 -r
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            RETURN=1
-            return
-        else
-            print_azure_status "RESOURCE_GROUP" "NAME" "TEAM" "SECRET"
-        fi
-    fi
+    print_azure_status
+    # if [ -z "$FORCE_YES" ]; then
+    #     read -p "${PINK}Display Tasks?${NC} [y/N] " -n 1 -r
+    #     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    #         RETURN=1
+    #         return
+    #     else
+    #         print_azure_status "RESOURCE_GROUP" "NAME" "TEAM" "SECRET"
+    #     fi
+    # fi
 }
 
 # twork aliases

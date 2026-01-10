@@ -188,10 +188,10 @@ function truncate_text() {
 function status_colour() {
     local status="$1"
     case "$status" in
-        "To Do"|"New") echo "$PINK" ;;
-        "In Progress"|"Active") echo "$CYAN" ;;
-        "Done"|"Closed"|"Completed"|"Resolved") echo "$GREEN" ;;
-        "Blocked") echo "$RED" ;;
+        "To Do"|"New"|*"On Deck"*|"Story"|"Task") echo "$PINK" ;;
+        "In Progress"|"Active"|*"In Progress"*|"Epic") echo "$CYAN" ;;
+        "Done"|"Closed"|"Completed"|"Resolved"|*"Done"*) echo "$GREEN" ;;
+        "Blocked"|*"In Review"*|"Bug"|"IT") echo "$RED" ;;
         *) echo "$WHITE" ;;
     esac
 }
@@ -494,22 +494,23 @@ function print_asana_status() {
     local PROJECT_NAME=$(echo "$PROJECT_JSON" | jq -r '.data.name // "Unknown Project"')
     local DUE_ON=$(echo "$PROJECT_JSON" | jq -r '.data.due_on')
 
-    # # Calculate Time Remaining (Handling empty due dates)
-    # local TIME_REMAINING="TIME REMAINING: ENDED"
-    # if [[ "$DUE_ON" != "null" && -n "$DUE_ON" ]]; then
-    #     local END=$(date -d "$DUE_ON" +%s 2>/dev/null || date -j -f "%Y-%m-%d" "$DUE_ON" +%s)
-    #     local NOW=$(date +%s)
-    #     local SECS_LEFT=$((END - NOW))
-    #     if (( SECS_LEFT > 0 )); then
-    #         local DAYS=$(( SECS_LEFT / 86400 ))
-    #         TIME_REMAINING="TIME REMAINING: ${KEY_F}${DAYS}${NC} DAYS"
-    #     fi
-    # fi
+    # Calculate Time Remaining (Handling empty due dates)
+    local TIME_REMAINING="TIME REMAINING: ENDED"
+    if [[ "$DUE_ON" != "null" && -n "$DUE_ON" ]]; then
+        local END=$(date -d "$DUE_ON" +%s 2>/dev/null || date -j -f "%Y-%m-%d" "$DUE_ON" +%s)
+        local NOW=$(date +%s)
+        local SECS_LEFT=$((END - NOW))
+        if (( SECS_LEFT > 0 )); then
+            local DAYS=$(( SECS_LEFT / 86400 ))
+            TIME_REMAINING="TIME REMAINING: ${KEY_F}${DAYS}${NC} DAYS"
+        fi
+    fi
 
     # Print Header (Uppercase to match your previous style)
     local DISPLAY_DATE=$(echo "$DUE_ON" | tr '[:lower:]' '[:upper:]')
     echo -e "\n${H2}CURRENT ASANA PROJECT: $PROJECT_NAME (DUE: $DISPLAY_DATE)${NC}"
-    # echo -e "${H}${TIME_REMAINING}${NC}\n"
+    echo -e "${H}${TIME_REMAINING}${NC}"
+    printf "%s\n" "$br"
 
     # Get Your (hopefully) GID
     local ME_GID=$(curl -sS -L --stderr /dev/null -H "$AUTH_HDR" "https://app.asana.com/api/1.0/users/me" | jq -r '.data.gid')
@@ -534,7 +535,7 @@ function print_asana_status() {
         ( first(.custom_fields[]? | select(.name == "RECON") | .display_value) // "---" ) as $id |
         ( [ .memberships[]? | select(.project.name | contains("Sprint")) ] | .[0].section.name // "No Section" ) as $s |
         "\($s)|\($id)|\($p)|\($t)|\(.name)|\(.gid)"
-    ' | sed '/^$/d')
+    ')
 
     if [[ -z "$TASKS_DATA" ]]; then
         echo -e "${KEY_F}NO TASKS ASSIGNED TO YOU.${NC}"
@@ -544,7 +545,7 @@ function print_asana_status() {
     local TOTAL_POINTS=0
 
     # Display
-    while IFS='|' read -u 3 -r r_sec r_tid r_pts r_type r_name r_gid; do
+    while IFS='|' read -r r_sec r_tid r_pts r_type r_name r_gid; do
         TOTAL_POINTS=$((TOTAL_POINTS + r_pts))
 
         # No emojis smh my head
@@ -552,30 +553,11 @@ function print_asana_status() {
 
         # Clean and trunc
         local clean_name=$(echo "$r_name" | sed -E "s/^${r_tid}[[:space:]]*[|:-]*[[:space:]]*//")
-
         [[ -z "$clean_name" ]] && clean_name="$r_name"
 
         local display_name=$(truncate_text "$clean_name" 15)
-
-        # Status/Section
-        local s_color="${NC}"
-        case "$clean_section" in
-            *"In Progress"*)      s_color="${H2}" ;;
-            *"In Review"*)        s_color="${H}"  ;;
-            *"On Deck"*)          s_color="${KEY_F}" ;;
-            *"Done"*)             s_color="${DIM_F}" ;;
-            *)                    s_color="${WHITE}" ;;
-        esac
-
-        # Task Type
-        local t_color="${NC}"
-        case "$r_type" in
-            "Bug")   t_color="${ERR}" ;;
-            "Story") t_color="${H}"   ;;
-            "Epic")  t_color="${H2}"  ;;
-            "IT")    t_color="${KEY_F}" ;;
-            *)       t_color="${NC}"  ;;
-        esac
+        local s_color=$(status_colour "$clean_section")
+        local t_color=$(status_colour "$r_type")
 
         # --- OUTPUT ---
         # FML FML FML FML FML FML
@@ -584,16 +566,14 @@ function print_asana_status() {
         id="${r_gid#*|}"
         title=$(echo "$title" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
         id=$(echo "$id" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-        trunct_title=$(truncate_text "$title" 28)
+        trunct_title=$(truncate_text "$title" 32)
         # Ignore this pls
 
-        printf "${SEP_F}${s_color}%-12s${SEP_F}>${NC} ${BOLD}%-10s${NC} %b%-6s${NC} ${KEY_F}(%s pts)${NC}%s|%s| ${DIM_F}%s${NC}\n" \
-            "$clean_section" "$r_tid" "$t_color" "$r_type" "$r_pts" "$display_name" "$trunct_title" "$id"
+        printf "${BOLD}$s_color%-12s>${NC} %-10s${NC} $t_color%-5s (%s pts)${NC} %s[ ${BLUE}%s${NC} ] ${DIM_F}%s${NC}\n" \
+            "$clean_section" "$r_tid" "$r_type" "$r_pts" "$trunct_title" "$id"
 
-    done 3< <(echo "$TASKS_DATA")
+    done <<< "$TASKS_DATA"
 
     # Summary
     echo -e "\n${H2_F}TOTAL WORKLOAD: ${H_F}${TOTAL_POINTS}${H2_F} POINTS${NC}"
-    echo -ne "\033[0m"
-    sleep 0.01
 }

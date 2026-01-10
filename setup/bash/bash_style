@@ -184,7 +184,6 @@ set_theme() {
             echo "Mood: Wake up, Neo."
             ;;
         *)
-        "monokai")
             echo "Usage: set_theme [main|cyber|nord|dracula|monokai|forest|tokyo-night|matrix]"
             return 1
             ;;

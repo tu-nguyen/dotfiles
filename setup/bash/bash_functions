@@ -364,19 +364,16 @@ function print_asana_status() {
 
     # Get Project/Iteration Details
     local PROJECT_API="https://app.asana.com/api/1.0/projects/$PROJECT_GID"
-    local PROJECT_JSON
-    PROJECT_JSON=$(curl -s -H "$AUTH_HDR" "$PROJECT_API")
-
-    local PROJECT_NAME=$(echo "$PROJECT_JSON" | jq -r '.data.name')
+    local PROJECT_JSON=$(curl -s -H "$AUTH_HDR" "$PROJECT_API")
+    local PROJECT_NAME=$(echo "$PROJECT_JSON" | jq -r '.data.name // "Unknown Project"')
     local DUE_ON=$(echo "$PROJECT_JSON" | jq -r '.data.due_on')
 
     # Calculate Time Remaining (Handling empty due dates)
     local TIME_REMAINING="TIME REMAINING: ENDED"
-    if [[ "$DUE_ON" != "null" ]]; then
+    if [[ "$DUE_ON" != "null" && -n "$DUE_ON" ]]; then
         local END=$(date -d "$DUE_ON" +%s 2>/dev/null || date -j -f "%Y-%m-%d" "$DUE_ON" +%s)
         local NOW=$(date +%s)
         local SECS_LEFT=$((END - NOW))
-
         if (( SECS_LEFT > 0 )); then
             local DAYS=$(( SECS_LEFT / 86400 ))
             TIME_REMAINING="TIME REMAINING: ${KEY_F}${DAYS}${NC} DAYS"
@@ -385,24 +382,23 @@ function print_asana_status() {
 
     # Print Header (Uppercase to match your previous style)
     local DISPLAY_DATE=$(echo "$DUE_ON" | tr '[:lower:]' '[:upper:]')
-    echo -e "\n${BOLD}${CYAN}CURRENT ASANA PROJECT: $PROJECT_NAME (DUE: $DISPLAY_DATE)${NC}"
-    echo -e "${PINK}${TIME_REMAINING}${NC}\n"
+    echo -e "\n${H2}CURRENT ASANA PROJECT: $PROJECT_NAME (DUE: $DISPLAY_DATE)${NC}"
+    echo -e "${H}${TIME_REMAINING}${NC}\n"
 
-    # Get User GID (The "@Me" equivalent)
+    # Get Your (hopefully) GID
     local ME_GID=$(curl -s -H "$AUTH_HDR" "https://app.asana.com/api/1.0/users/me" | jq -r '.data.gid')
 
-    # Fetch Tasks assigned to user in this project
+    # Fetch Tasks (Added assignee.gid to opt_fields)
     # Note: Asana requires opt_fields to get statuses and parents in one go
-    local TASKS_API="https://app.asana.com/api/1.0/tasks?project=$PROJECT_GID&completed_since=now&opt_fields=name,completed,resource_subtype,parent.name,parent.gid,memberships.section.name"
-    local TASKS_JSON
-    TASKS_JSON=$(curl -s -H "$AUTH_HDR" "$TASKS_API")
+    local TASKS_API="https://app.asana.com/api/1.0/tasks?project=$PROJECT_GID&completed_since=now&opt_fields=name,completed,assignee.gid,parent.name,parent.gid"
+    local TASKS_JSON=$(curl -s -H "$AUTH_HDR" "$TASKS_API")
 
-    # Filter tasks assigned to you (Asana's task list API can be broad)
+    # Filter tasks assigned to you (pls)
     # We use jq to group by parent GID
-    local MY_TASKS=$(echo "$TASKS_JSON" | jq -c --arg me "$ME_GID" '.data[]')
+    local MY_TASKS=$(echo "$TASKS_JSON" | jq -c --arg me "$ME_GID" '.data[] | select(.assignee.gid == $me)')
 
     if [[ -z "$MY_TASKS" ]]; then
-        echo -e "${YEL}NO TASKS FOUND FOR YOU IN THIS PROJECT.${NC}"
+        echo -e "${KEY_F}NO TASKS FOUND FOR YOU IN THIS PROJECT.${NC}"
         return 0
     fi
 
@@ -413,13 +409,13 @@ function print_asana_status() {
     # Process Parent Groups
     for pgid in $PARENT_GIDS; do
         local P_NAME=$(echo "$MY_TASKS" | jq -r --arg pgid "$pgid" 'select(.parent.gid == $pgid) | .parent.name' | head -1)
-        printf "${BOLD}  -- %s [PARENT]: %s${NC}\n" "$pgid" "$(truncate_text "$P_NAME" 42)"
+        printf "${BOLD}${SEP_F}  -- %s [PARENT]: %s${NC}\n" "$pgid" "$(truncate_text "$P_NAME" 42)"
 
         echo "$MY_TASKS" | jq -r --arg pgid "$pgid" 'select(.parent.gid == $pgid) | "\(.gid)|\(.completed)|\(.name)"' |
         while IFS='|' read -r gid comp name; do
             local state="TODO"; [[ "$comp" == "true" ]] && state="DONE"
             local ccolor=$(status_colour "$state")
-            printf -- "    * ${HDR_F}%s${NC} [%b%s%b]: %s\n" "$gid" "$ccolor" "$state" "$NC" "$(truncate_text "$name" 42)"
+            printf -- "    * ${KEY_F}%s${NC} [%b%s%b]: %s\n" "$gid" "$ccolor" "$state" "$NC" "$(truncate_text "$name" 42)"
         done
     done
 
@@ -428,7 +424,7 @@ function print_asana_status() {
     while IFS='|' read -r gid comp name; do
         local state="TODO"; [[ "$comp" == "true" ]] && state="DONE"
         local ccolor=$(status_colour "$state")
-        printf "${HDR_F}%s${NC} [%b%s%b]: %s\n" "$gid" "$ccolor" "$state" "$NC" "$(truncate_text "$name" 42)"
+        printf "${KEY_F}%s${NC} [%b%s%b]: %s\n" "$gid" "$ccolor" "$state" "$NC" "$(truncate_text "$name" 42)"
     done
 }
 

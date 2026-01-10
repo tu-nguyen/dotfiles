@@ -121,7 +121,7 @@ motd() {
     if [ "$1" == "auto" ]; then
         COOLDOWN_FILE="$DOTFILES_CONFIG_DIR/okfetch_last_run_${USER}"
         CURRENT_TIME=$(date +%s)
-        COOLDOWN_TIME=2520
+        COOLDOWN_TIME=1169
 
         if [ -f "$COOLDOWN_FILE" ]; then
             LAST_RUN=$(cat "$COOLDOWN_FILE")
@@ -140,7 +140,7 @@ motd() {
     fi
     short_motd
     long_motd
-    if [[ $- == *i* ]] && [ -t 0 ] && command -v twork_motd >/dev/null; then
-        twork_motd
+    if [[ $- == *i* ]] && [ -t 0 ] && command -v td >/dev/null; then
+        td
     fi
 }

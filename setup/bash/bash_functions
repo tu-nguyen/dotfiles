@@ -176,9 +176,9 @@ function now() {
 # Truncate text to a maximum length
 function truncate_text() {
     local text="$1"
-    local maxlen="${2:-60}"
-    if (( ${#text} > maxlen )); then
-        echo "${text:0:maxlen}.."
+    local maxlen="${2:-30}"
+    if [ ${#text} -gt "$maxlen" ]; then
+        echo "${text:0:$((maxlen-3))}.."
     else
         echo "$text"
     fi
@@ -494,72 +494,106 @@ function print_asana_status() {
     local PROJECT_NAME=$(echo "$PROJECT_JSON" | jq -r '.data.name // "Unknown Project"')
     local DUE_ON=$(echo "$PROJECT_JSON" | jq -r '.data.due_on')
 
-    # Calculate Time Remaining (Handling empty due dates)
-    local TIME_REMAINING="TIME REMAINING: ENDED"
-    if [[ "$DUE_ON" != "null" && -n "$DUE_ON" ]]; then
-        local END=$(date -d "$DUE_ON" +%s 2>/dev/null || date -j -f "%Y-%m-%d" "$DUE_ON" +%s)
-        local NOW=$(date +%s)
-        local SECS_LEFT=$((END - NOW))
-        if (( SECS_LEFT > 0 )); then
-            local DAYS=$(( SECS_LEFT / 86400 ))
-            TIME_REMAINING="TIME REMAINING: ${KEY_F}${DAYS}${NC} DAYS"
-        fi
-    fi
+    # # Calculate Time Remaining (Handling empty due dates)
+    # local TIME_REMAINING="TIME REMAINING: ENDED"
+    # if [[ "$DUE_ON" != "null" && -n "$DUE_ON" ]]; then
+    #     local END=$(date -d "$DUE_ON" +%s 2>/dev/null || date -j -f "%Y-%m-%d" "$DUE_ON" +%s)
+    #     local NOW=$(date +%s)
+    #     local SECS_LEFT=$((END - NOW))
+    #     if (( SECS_LEFT > 0 )); then
+    #         local DAYS=$(( SECS_LEFT / 86400 ))
+    #         TIME_REMAINING="TIME REMAINING: ${KEY_F}${DAYS}${NC} DAYS"
+    #     fi
+    # fi
 
     # Print Header (Uppercase to match your previous style)
     local DISPLAY_DATE=$(echo "$DUE_ON" | tr '[:lower:]' '[:upper:]')
     echo -e "\n${H2}CURRENT ASANA PROJECT: $PROJECT_NAME (DUE: $DISPLAY_DATE)${NC}"
-    echo -e "${H}${TIME_REMAINING}${NC}\n"
+    # echo -e "${H}${TIME_REMAINING}${NC}\n"
 
     # Get Your (hopefully) GID
-    local ME_GID=$(curl -s -H "$AUTH_HDR" "https://app.asana.com/api/1.0/users/me" | jq -r '.data.gid')
-
-    # Fetch Tasks (Added assignee.gid to opt_fields)
-    # Note: Asana requires opt_fields to get statuses and parents in one go
-    local TASKS_API="https://app.asana.com/api/1.0/tasks?project=$PROJECT_GID&completed_since=now&opt_fields=name,completed,assignee.gid,parent.name,parent.gid"
-    local TASKS_JSON=$(curl -s -H "$AUTH_HDR" "$TASKS_API")
+    local ME_GID=$(curl -sS -L --stderr /dev/null -H "$AUTH_HDR" "https://app.asana.com/api/1.0/users/me" | jq -r '.data.gid')
 
     # Filter tasks assigned to you (pls)
-    # We use jq to group by parent GID
     # local MY_TASKS=$(echo "$TASKS_JSON" | jq -c --arg me "$ME_GID" '.data[] | select(.assignee.gid == $me)')
-    local MY_TASKS_DATA=$(echo "$TASKS_JSON" | jq -r --arg me "$ME_GID" '
-        .data[] | select(.assignee.gid == $me) |
-        ( (.custom_fields[]? | select(.name == "Story Points") | .number_value) // 0 ) as $pts |
-        ( (.custom_fields[]? | select(.name == "Ticket Type") | .display_value) // "Task" ) as $type |
-        ( (.custom_fields[]? | select(.name == "RECON") | .display_value) // "---" ) as $tid |
-        "\(.gid)|\(.completed)|\($pts)|\($type)|\($tid)|\(.name)"
-    ')
+    # local MY_TASKS_DATA=$(echo "$TASKS_JSON" | jq -r --arg me "$ME_GID" --arg pgid "$PROJECT_GID" '
+    local TASKS_API="https://app.asana.com/api/1.0/tasks?project=$PROJECT_GID&opt_fields=name,completed,assignee.gid,custom_fields.name,custom_fields.display_value,custom_fields.number_value,memberships.project.name,memberships.section.name"
+    # local TASKS_JSON=$(curl -s -H "$AUTH_HDR" "$TASKS_API")
 
-    if [[ -z "$MY_TASKS_DATA" ]]; then
-        echo -e "${KEY_F}NO TASKS FOUND FOR YOU IN THIS PROJECT.${NC}"
+    # # DEBUG check
+    # if [[ $(echo "$TASKS_JSON" | jq '.data | length') -eq 0 ]]; then
+    #     t ERROR "Asana returned 0 tasks for GID $PROJECT_GID. Check if tasks are subtasks."
+    #     return 1
+    # fi
+
+    # JQ Filter
+    local TASKS_DATA=$(curl -s -H "$AUTH_HDR" "$TASKS_API" | jq -r --arg me "$ME_GID" '
+        .data[] | select(.assignee.gid == $me) |
+        ( (.custom_fields[]? | select(.name | contains("Story Points")) | .number_value) // 0 ) as $p |
+        ( (.custom_fields[]? | select(.name | contains("Ticket Type")) | .display_value) // "Task" ) as $t |
+        ( first(.custom_fields[]? | select(.name == "RECON") | .display_value) // "---" ) as $id |
+        ( [ .memberships[]? | select(.project.name | contains("Sprint")) ] | .[0].section.name // "No Section" ) as $s |
+        "\($s)|\($id)|\($p)|\($t)|\(.name)|\(.gid)"
+    ' | sed '/^$/d')
+
+    if [[ -z "$TASKS_DATA" ]]; then
+        echo -e "${KEY_F}NO TASKS ASSIGNED TO YOU.${NC}"
         return 0
     fi
 
     local TOTAL_POINTS=0
 
     # Display
-    echo "$MY_TASKS_DATA" | while IFS='|' read -r gid comp pts type tid name; do
-        # Status Logic
-        local state="TODO"; [[ "$comp" == "true" ]] && state="DONE"
-        local ccolor=$(status_colour "$state")
+    while IFS='|' read -u 3 -r r_sec r_tid r_pts r_type r_name r_gid; do
+        TOTAL_POINTS=$((TOTAL_POINTS + r_pts))
 
-        TOTAL_POINTS=$((TOTAL_POINTS + pts))
+        # No emojis smh my head
+        local clean_section=$(echo "$r_sec" | sed 's/[^[:alnum:][:space:]]//g' | xargs)
 
-        # Color coding the Ticket Type
-        local t_color="${NC}"
-        case "$type" in
-            "Bug")   t_color="${ERR}" ;;
-            "Story") t_color="${H}" ;;
-            "Epic")  t_color="${H2}" ;;
-            "IT")    t_color="${KEY_F}" ;;
+        # Clean and trunc
+        local clean_name=$(echo "$r_name" | sed -E "s/^${r_tid}[[:space:]]*[|:-]*[[:space:]]*//")
+
+        [[ -z "$clean_name" ]] && clean_name="$r_name"
+
+        local display_name=$(truncate_text "$clean_name" 15)
+
+        # Status/Section
+        local s_color="${NC}"
+        case "$clean_section" in
+            *"In Progress"*)      s_color="${H2}" ;;
+            *"In Review"*)        s_color="${H}"  ;;
+            *"On Deck"*)          s_color="${KEY_F}" ;;
+            *"Done"*)             s_color="${DIM_F}" ;;
+            *)                    s_color="${WHITE}" ;;
         esac
 
-        # Print formatted line
-        # Format: [POINTS] TYPE | TASK-ID | Name
-        printf "${KEY_F}%-15s${NC} [%b%s%b] (%s pts) %b%-6s${NC} | ${BOLD}%-10s${NC} %s\n" \
-            "$gid" "$ccolor" "$state" "$NC" "$pts" "$t_color" "$type" "$tid" "$(truncate_text "$name" 45)"
-    done
+        # Task Type
+        local t_color="${NC}"
+        case "$r_type" in
+            "Bug")   t_color="${ERR}" ;;
+            "Story") t_color="${H}"   ;;
+            "Epic")  t_color="${H2}"  ;;
+            "IT")    t_color="${KEY_F}" ;;
+            *)       t_color="${NC}"  ;;
+        esac
+
+        # --- OUTPUT ---
+        # FML FML FML FML FML FML
+        display_name=""
+        title="${r_gid%|*}"
+        id="${r_gid#*|}"
+        title=$(echo "$title" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+        id=$(echo "$id" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+        trunct_title=$(truncate_text "$title" 28)
+        # Ignore this pls
+
+        printf "${SEP_F}${s_color}%-12s${SEP_F}>${NC} ${BOLD}%-10s${NC} %b%-6s${NC} ${KEY_F}(%s pts)${NC}%s|%s| ${DIM_F}%s${NC}\n" \
+            "$clean_section" "$r_tid" "$t_color" "$r_type" "$r_pts" "$display_name" "$trunct_title" "$id"
+
+    done 3< <(echo "$TASKS_DATA")
 
     # Summary
-    echo -e "\n${H2}TOTAL WORKLOAD: ${H}${TOTAL_POINTS}${H2} POINTS${NC}\n"
+    echo -e "\n${H2_F}TOTAL WORKLOAD: ${H_F}${TOTAL_POINTS}${H2_F} POINTS${NC}"
+    echo -ne "\033[0m"
+    sleep 0.01
 }

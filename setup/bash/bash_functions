@@ -351,83 +351,6 @@ function grn() {
     fi
  }
 
- # Print current Asana project details and tasks assigned to the user
-function print_asana_status() {
-    if [[ $# -lt 2 ]]; then
-        echo "Usage: print_asana_status <PROJECT_GID> <ASANA_PAT>"
-        return 1
-    fi
-
-    local PROJECT_GID="$1"
-    local ASANA_PAT="$2"
-    local AUTH_HDR="Authorization: Bearer $ASANA_PAT"
-
-    # Get Project/Iteration Details
-    local PROJECT_API="https://app.asana.com/api/1.0/projects/$PROJECT_GID"
-    local PROJECT_JSON=$(curl -s -H "$AUTH_HDR" "$PROJECT_API")
-    local PROJECT_NAME=$(echo "$PROJECT_JSON" | jq -r '.data.name // "Unknown Project"')
-    local DUE_ON=$(echo "$PROJECT_JSON" | jq -r '.data.due_on')
-
-    # Calculate Time Remaining (Handling empty due dates)
-    local TIME_REMAINING="TIME REMAINING: ENDED"
-    if [[ "$DUE_ON" != "null" && -n "$DUE_ON" ]]; then
-        local END=$(date -d "$DUE_ON" +%s 2>/dev/null || date -j -f "%Y-%m-%d" "$DUE_ON" +%s)
-        local NOW=$(date +%s)
-        local SECS_LEFT=$((END - NOW))
-        if (( SECS_LEFT > 0 )); then
-            local DAYS=$(( SECS_LEFT / 86400 ))
-            TIME_REMAINING="TIME REMAINING: ${KEY_F}${DAYS}${NC} DAYS"
-        fi
-    fi
-
-    # Print Header (Uppercase to match your previous style)
-    local DISPLAY_DATE=$(echo "$DUE_ON" | tr '[:lower:]' '[:upper:]')
-    echo -e "\n${H2}CURRENT ASANA PROJECT: $PROJECT_NAME (DUE: $DISPLAY_DATE)${NC}"
-    echo -e "${H}${TIME_REMAINING}${NC}\n"
-
-    # Get Your (hopefully) GID
-    local ME_GID=$(curl -s -H "$AUTH_HDR" "https://app.asana.com/api/1.0/users/me" | jq -r '.data.gid')
-
-    # Fetch Tasks (Added assignee.gid to opt_fields)
-    # Note: Asana requires opt_fields to get statuses and parents in one go
-    local TASKS_API="https://app.asana.com/api/1.0/tasks?project=$PROJECT_GID&completed_since=now&opt_fields=name,completed,assignee.gid,parent.name,parent.gid"
-    local TASKS_JSON=$(curl -s -H "$AUTH_HDR" "$TASKS_API")
-
-    # Filter tasks assigned to you (pls)
-    # We use jq to group by parent GID
-    local MY_TASKS=$(echo "$TASKS_JSON" | jq -c --arg me "$ME_GID" '.data[] | select(.assignee.gid == $me)')
-
-    if [[ -z "$MY_TASKS" ]]; then
-        echo -e "${KEY_F}NO TASKS FOUND FOR YOU IN THIS PROJECT.${NC}"
-        return 0
-    fi
-
-    # Group by Parent (Subtask logic)
-    # Get unique parents
-    local PARENT_GIDS=$(echo "$MY_TASKS" | jq -r 'select(.parent != null) | .parent.gid' | sort -u)
-
-    # Process Parent Groups
-    for pgid in $PARENT_GIDS; do
-        local P_NAME=$(echo "$MY_TASKS" | jq -r --arg pgid "$pgid" 'select(.parent.gid == $pgid) | .parent.name' | head -1)
-        printf "${BOLD}${SEP_F}  -- %s [PARENT]: %s${NC}\n" "$pgid" "$(truncate_text "$P_NAME" 42)"
-
-        echo "$MY_TASKS" | jq -r --arg pgid "$pgid" 'select(.parent.gid == $pgid) | "\(.gid)|\(.completed)|\(.name)"' |
-        while IFS='|' read -r gid comp name; do
-            local state="TODO"; [[ "$comp" == "true" ]] && state="DONE"
-            local ccolor=$(status_colour "$state")
-            printf -- "    * ${KEY_F}%s${NC} [%b%s%b]: %s\n" "$gid" "$ccolor" "$state" "$NC" "$(truncate_text "$name" 42)"
-        done
-    done
-
-    # Orphan Tasks (Top-level tasks with no parent)
-    echo "$MY_TASKS" | jq -r 'select(.parent == null) | "\(.gid)|\(.completed)|\(.name)"' |
-    while IFS='|' read -r gid comp name; do
-        local state="TODO"; [[ "$comp" == "true" ]] && state="DONE"
-        local ccolor=$(status_colour "$state")
-        printf "${KEY_F}%s${NC} [%b%s%b]: %s\n" "$gid" "$ccolor" "$state" "$NC" "$(truncate_text "$name" 42)"
-    done
-}
-
 # Print current Azure DevOps iteration details and tasks assigned to the user
 function print_azure_status() {
     if [[ $# -lt 4 ]]; then
@@ -550,5 +473,85 @@ function print_azure_status() {
         ccolor=$(status_colour "$cstate")
         cshort_title=$(truncate_text "$ctitle" 42)
         printf "${HDR_F}%s${NC} %s [%b%s%b]: %s\n" "$cid" "$ctype" "$ccolor" "$cstate" "$NC" "$cshort_title"
+    done
+}
+
+
+ # Print current Asana project details and tasks assigned to the user
+function print_asana_status() {
+    if [[ $# -lt 2 ]]; then
+        echo "Usage: print_asana_status <PROJECT_GID> <ASANA_PAT>"
+        return 1
+    fi
+
+    local PROJECT_GID="$1"
+    local ASANA_PAT="$2"
+    local AUTH_HDR="Authorization: Bearer $ASANA_PAT"
+
+    # Get Project/Iteration Details
+    local PROJECT_API="https://app.asana.com/api/1.0/projects/$PROJECT_GID"
+    local PROJECT_JSON=$(curl -s -H "$AUTH_HDR" "$PROJECT_API")
+    local PROJECT_NAME=$(echo "$PROJECT_JSON" | jq -r '.data.name // "Unknown Project"')
+    local DUE_ON=$(echo "$PROJECT_JSON" | jq -r '.data.due_on')
+
+    # Calculate Time Remaining (Handling empty due dates)
+    local TIME_REMAINING="TIME REMAINING: ENDED"
+    if [[ "$DUE_ON" != "null" && -n "$DUE_ON" ]]; then
+        local END=$(date -d "$DUE_ON" +%s 2>/dev/null || date -j -f "%Y-%m-%d" "$DUE_ON" +%s)
+        local NOW=$(date +%s)
+        local SECS_LEFT=$((END - NOW))
+        if (( SECS_LEFT > 0 )); then
+            local DAYS=$(( SECS_LEFT / 86400 ))
+            TIME_REMAINING="TIME REMAINING: ${KEY_F}${DAYS}${NC} DAYS"
+        fi
+    fi
+
+    # Print Header (Uppercase to match your previous style)
+    local DISPLAY_DATE=$(echo "$DUE_ON" | tr '[:lower:]' '[:upper:]')
+    echo -e "\n${H2}CURRENT ASANA PROJECT: $PROJECT_NAME (DUE: $DISPLAY_DATE)${NC}"
+    echo -e "${H}${TIME_REMAINING}${NC}\n"
+
+    # Get Your (hopefully) GID
+    local ME_GID=$(curl -s -H "$AUTH_HDR" "https://app.asana.com/api/1.0/users/me" | jq -r '.data.gid')
+
+    # Fetch Tasks (Added assignee.gid to opt_fields)
+    # Note: Asana requires opt_fields to get statuses and parents in one go
+    local TASKS_API="https://app.asana.com/api/1.0/tasks?project=$PROJECT_GID&completed_since=now&opt_fields=name,completed,assignee.gid,parent.name,parent.gid"
+    local TASKS_JSON=$(curl -s -H "$AUTH_HDR" "$TASKS_API")
+
+    # Filter tasks assigned to you (pls)
+    # We use jq to group by parent GID
+    local MY_TASKS_DATA=$(echo "$TASKS_JSON" | jq -r --arg me "$ME_GID" '
+        .data[] | select(.assignee.gid == $me) |
+        ( .custom_fields[] | select(.name == "Story Points") | .number_value // 0 ) as $pts |
+        ( .custom_fields[] | select(.name == "Ticket Type") | .display_value // "Task" ) as $type |
+        ( .custom_fields[] | select(.name == "RECON") | .display_value // "---" ) as $tid |
+        "\(.gid)|\(.completed)|\($pts)|\($type)|\($tid)|\(.name)"
+    ')
+
+    if [[ -z "$MY_TASKS" ]]; then
+        echo -e "${KEY_F}NO TASKS FOUND FOR YOU IN THIS PROJECT.${NC}"
+        return 0
+    fi
+
+    # Display
+    echo "$MY_TASKS_DATA" | while IFS='|' read -r gid comp pts type tid name; do
+        # Status Logic
+        local state="TODO"; [[ "$comp" == "true" ]] && state="DONE"
+        local ccolor=$(status_colour "$state")
+
+        # Color coding the Ticket Type
+        local t_color="${NC}"
+        case "$type" in
+            "Bug")   t_color="${ERR_}" ;;
+            "Story") t_color="${H}" ;;
+            "Epic")  t_color="${H2}" ;;
+            "IT")    t_color="${KEY_F}" ;;
+        esac
+
+        # Print formatted line
+        # Format: [POINTS] TYPE | TASK-ID | Name
+        printf "${KEY_F}%-15s${NC} [%b%s%b] (%s pts) %b%-6s${NC} | ${BOLD}%-10s${NC} %s\n" \
+            "$gid" "$ccolor" "$state" "$NC" "$pts" "$t_color" "$type" "$tid" "$(truncate_text "$name" 45)"
     done
 }

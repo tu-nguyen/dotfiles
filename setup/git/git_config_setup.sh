@@ -56,7 +56,7 @@ git config --global alias.ll "log --graph --pretty=format:'%C(#ffd1dc)%h%Creset 
 git config --global alias.la "!git config -l | grep alias | cut -c 7-"
 
 git config --global color.ui true
-git config --global color.branch.current "#ffv0cb bold" # Pink for where you are
+git config --global color.branch.current "#ffc0cb bold" # Pink for where you are
 git config --global color.branch.local "#689d6a"        # Aqua for other branches
 git config --global color.branch.remote "#e75480"       # Dark Pink for the cloud
 

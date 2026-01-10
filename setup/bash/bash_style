@@ -184,7 +184,8 @@ set_theme() {
             echo "Mood: Wake up, Neo."
             ;;
         *)
-            echo "Usage: set_theme [cyber|nord|dracula]"
+        "monokai")
+            echo "Usage: set_theme [main|cyber|nord|dracula|monokai|forest|tokyo-night|matrix]"
             return 1
             ;;
     esac

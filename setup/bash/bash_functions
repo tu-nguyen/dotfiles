@@ -524,9 +524,9 @@ function print_asana_status() {
     # local MY_TASKS=$(echo "$TASKS_JSON" | jq -c --arg me "$ME_GID" '.data[] | select(.assignee.gid == $me)')
     local MY_TASKS_DATA=$(echo "$TASKS_JSON" | jq -r --arg me "$ME_GID" '
         .data[] | select(.assignee.gid == $me) |
-        ( .custom_fields[] | select(.name == "Story Points") | .number_value // 0 ) as $pts |
-        ( .custom_fields[] | select(.name == "Ticket Type") | .display_value // "Task" ) as $type |
-        ( .custom_fields[] | select(.name == "TASK") | .display_value // "---" ) as $tid |
+        ( (.custom_fields[]? | select(.name == "Story Points") | .number_value) // 0 ) as $pts |
+        ( (.custom_fields[]? | select(.name == "Ticket Type") | .display_value) // "Task" ) as $type |
+        ( (.custom_fields[]? | select(.name == "RECON") | .display_value) // "---" ) as $tid |
         "\(.gid)|\(.completed)|\($pts)|\($type)|\($tid)|\(.name)"
     ')
 
@@ -535,19 +535,23 @@ function print_asana_status() {
         return 0
     fi
 
+    local TOTAL_POINTS=0
+
     # Display
     echo "$MY_TASKS_DATA" | while IFS='|' read -r gid comp pts type tid name; do
         # Status Logic
         local state="TODO"; [[ "$comp" == "true" ]] && state="DONE"
         local ccolor=$(status_colour "$state")
 
+        TOTAL_POINTS=$((TOTAL_POINTS + pts))
+
         # Color coding the Ticket Type
         local t_color="${NC}"
         case "$type" in
-            "Bug")   t_color="${ERR_F}" ;; # Red
-            "Story") t_color="${H_F}" ;;   # Pink
-            "Epic")  t_color="${H2_F}" ;;  # Aqua/Cyan
-            "IT")    t_color="${KEY_F}" ;; # Pastel
+            "Bug")   t_color="${ERR}" ;;
+            "Story") t_color="${H}" ;;
+            "Epic")  t_color="${H2}" ;;
+            "IT")    t_color="${KEY_F}" ;;
         esac
 
         # Print formatted line
@@ -555,4 +559,7 @@ function print_asana_status() {
         printf "${KEY_F}%-15s${NC} [%b%s%b] (%s pts) %b%-6s${NC} | ${BOLD}%-10s${NC} %s\n" \
             "$gid" "$ccolor" "$state" "$NC" "$pts" "$t_color" "$type" "$tid" "$(truncate_text "$name" 45)"
     done
+
+    # Summary
+    echo -e "\n${H2}TOTAL WORKLOAD: ${H}${TOTAL_POINTS}${H2} POINTS${NC}\n"
 }

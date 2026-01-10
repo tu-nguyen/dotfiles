@@ -521,15 +521,16 @@ function print_asana_status() {
 
     # Filter tasks assigned to you (pls)
     # We use jq to group by parent GID
+    # local MY_TASKS=$(echo "$TASKS_JSON" | jq -c --arg me "$ME_GID" '.data[] | select(.assignee.gid == $me)')
     local MY_TASKS_DATA=$(echo "$TASKS_JSON" | jq -r --arg me "$ME_GID" '
         .data[] | select(.assignee.gid == $me) |
         ( .custom_fields[] | select(.name == "Story Points") | .number_value // 0 ) as $pts |
         ( .custom_fields[] | select(.name == "Ticket Type") | .display_value // "Task" ) as $type |
-        ( .custom_fields[] | select(.name == "RECON") | .display_value // "---" ) as $tid |
+        ( .custom_fields[] | select(.name == "TASK") | .display_value // "---" ) as $tid |
         "\(.gid)|\(.completed)|\($pts)|\($type)|\($tid)|\(.name)"
     ')
 
-    if [[ -z "$MY_TASKS" ]]; then
+    if [[ -z "$MY_TASKS_DATA" ]]; then
         echo -e "${KEY_F}NO TASKS FOUND FOR YOU IN THIS PROJECT.${NC}"
         return 0
     fi
@@ -543,10 +544,10 @@ function print_asana_status() {
         # Color coding the Ticket Type
         local t_color="${NC}"
         case "$type" in
-            "Bug")   t_color="${ERR_}" ;;
-            "Story") t_color="${H}" ;;
-            "Epic")  t_color="${H2}" ;;
-            "IT")    t_color="${KEY_F}" ;;
+            "Bug")   t_color="${ERR_F}" ;; # Red
+            "Story") t_color="${H_F}" ;;   # Pink
+            "Epic")  t_color="${H2_F}" ;;  # Aqua/Cyan
+            "IT")    t_color="${KEY_F}" ;; # Pastel
         esac
 
         # Print formatted line

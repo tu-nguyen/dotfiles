@@ -102,7 +102,7 @@ _install_fira_font() {
     fi
 
     if [[ "$INSTALLED" -eq 1 ]]; then
-        t -e SUCCESS "${FONT_NAME} is already installed. Skipping.."
+        t SUCCESS "${FONT_NAME} is already installed. Skipping.."
         return 0
     fi
 

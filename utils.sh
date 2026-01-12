@@ -498,7 +498,7 @@ reset_vscode_config() {
     fi
 
     chmod +x $DOTFILES_REPO_DIR/setup/vscode/vscode_config_setup.sh
-    bash -i $DOTFILES_REPO_DIR/setup/vscode/vscode_config_setup.sh || t WARNING "Some error occured during reset_vscode_config()"
+    $DOTFILES_REPO_DIR/setup/vscode/vscode_config_setup.sh || t WARNING "Some error occured during reset_vscode_config()"
 
     t SUCCESS "reset_vscode_config() completed!"
 }
@@ -515,7 +515,7 @@ reset_wsl_config() {
     fi
 
     chmod +x $DOTFILES_REPO_DIR/setup/wsl/wsl_config_setup.sh
-    bash -i $DOTFILES_REPO_DIR/setup/wsl/wsl_config_setup.sh  || t WARNING "Some error occured during reset_wsl_config()"
+    $DOTFILES_REPO_DIR/setup/wsl/wsl_config_setup.sh  || t WARNING "Some error occured during reset_wsl_config()"
 
     t SUCCESS "reset_wsl_config() completed!"
 }
@@ -545,7 +545,7 @@ reset_firefox() {
     fi
 
     chmod +x $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh
-    bash -i $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh || t WARNING "Some error occured during reset_firefox()"
+    $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh || t WARNING "Some error occured during reset_firefox()"
 
     t SUCCESS "reset_firefox() completed!"
 }
@@ -562,7 +562,7 @@ reset_ps() {
     fi
 
     chmod +x $DOTFILES_REPO_DIR/setup/powershell/ps1_setup.sh
-    bash -i $DOTFILES_REPO_DIR/setup/powershell/ps1_setup.sh  || t WARNING "Some error occured during reset_ps()"
+    $DOTFILES_REPO_DIR/setup/powershell/ps1_setup.sh  || t WARNING "Some error occured during reset_ps()"
 
     t SUCCESS "reset_ps() completed!"
 }

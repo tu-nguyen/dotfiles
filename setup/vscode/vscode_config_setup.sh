@@ -45,5 +45,5 @@ mkdir -p "$(dirname "$dest")"
 #     t INFO "Backed up existing VS Code settings to settings.json.bak"
 # fi
 
-cp $src $dest
+cpp -q "$src" "$dest"
 t OK "VS Code settings synced to: ${VAL_F}$dest${NC}"

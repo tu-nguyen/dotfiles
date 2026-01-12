@@ -450,7 +450,7 @@ reset_bashrc() {
     . "$HOME/.bashrc"
 
     if [[ "$OS_TYPE" == "macos" ]]; then
-        convert_hex_to_ansi "$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml" "$HOME/.config/starship.toml"
+        _convert_hex_to_ansi "$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml" "$HOME/.config/starship.toml"
     else
         cpp -q "$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml" "$HOME/.config/starship.toml"
     fi

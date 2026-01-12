@@ -75,7 +75,6 @@ _install_pip_package() {
 # Function to install packages based on OS
 _install_package() {
     local package_name="$1"
-    t "Installing $package_name.."
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         _install_linux_package "$package_name"
     elif [[ "$OS_TYPE" == "macos" ]]; then

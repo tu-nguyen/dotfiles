@@ -1,6 +1,9 @@
 #!/bin/bash
 
 pre_r() {
+    unset DOTFILES_LOADED
+    unset BASH_STYLE_LOADED
+
     if [[ "$(pwd)" == *"/dotfiles" ]]; then
         IS_PROJECT_ROOT=true
         DOTFILES_REPO_DIR=$(pwd)

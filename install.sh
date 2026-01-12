@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+unset DOTFILES_LOADED
+unset BASH_STYLE_LOADED
+
 _get_os_type() {
     if [ -z "$OS_TYPE" ]; then
         echo "[INFO] Detecting OS.." >&2

@@ -49,17 +49,30 @@ export LC_CTYPE=en_US.UTF-8
 # ------------------------------------------
 # Dynamically loads all .bash_* files from your custom dotfiles directory (~/.config/dotfiles).
 
-: "${DOTFILES_CONFIG_DIR:=$HOME/.config/dotfiles}"
+if [[ -z "$DOTFILES_LOADED" ]]; then
+    export DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
 
-if [[ -d "$DOTFILES_CONFIG_DIR" ]]; then
-    # Load .init first for global variables/helper functions
     [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 
     # Iterate through all bash modular files
     for file in "$DOTFILES_CONFIG_DIR"/.bash_*; do
-        [[ -f "$file" ]] && . "$file"
+        [[ "$file" == *"/.bash_style" ]] && continue
+        [[ "$file" == *"/.init" ]] && continue
+        [[ -f "$file" && -r "$file" ]] && . "$file"
     done
+
+    export DOTFILES_LOADED=1
 fi
+
+# if [[ -d "$DOTFILES_CONFIG_DIR" ]]; then
+#     # Load .init first for global variables/helper functions
+#     [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
+
+#     # Iterate through all bash modular files
+#     for file in "$DOTFILES_CONFIG_DIR"/.bash_*; do
+#         [[ -f "$file" ]] && . "$file"
+#     done
+# fi
 
 # ------------------------------------------
 # Tools & Prompt
@@ -134,3 +147,5 @@ if [[ -f "$DOTFILES_CONFIG_DIR/.bash_motd" ]]; then
 else
     [[ $(type -t t) == "function" ]] && t WARNING "MOTD file not found at $DOTFILES_CONFIG_DIR/.bash_motd\n"
 fi
+
+alias now='unset DOTFILES_LOADED BASH_STYLE_LOADED && source ~/.bashrc'

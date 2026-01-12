@@ -19,7 +19,30 @@ fi
 
 # Copy file with a progress bar, also exists in .bash_functions
 cpp() {
-    rsync -ah --info=progress2 "$1" "$2"
+    local quiet=false
+    local src=""
+    local dest=""
+
+    if [[ "$1" == "-q" ]]; then
+        quiet=true
+        src="$2"
+        dest="$3"
+    else
+        src="$1"
+        dest="$2"
+    fi
+
+    if [[ -z "$src" ]] || [[ -z "$dest" ]]; then
+        t ERR "Usage: cpp [-q] <source> <destination>"
+        return 1
+    fi
+
+    rsync -ah --info=progress2 "$src" "$dest"
+
+    if [ "$quiet" = true ]; then
+        printf "\033[1A\r\033[K"
+        t OK "Transfer of $(basename "$dest") complete."
+    fi
 }
 
 # Function to keep sudo alive
@@ -167,7 +190,7 @@ _install_starship() {
             curl -sS https://starship.rs/install.sh | sh
         else
             t OK "Starship is already installed at $(command -v starship)"
-            starship --version
+            t OK "Version: $(starship -V)"
         fi
     elif [[ "$OS_TYPE" == "macos" ]]; then
         _install_mac_package install starship
@@ -181,7 +204,7 @@ _install_uv() {
         curl -LsSf https://astral.sh/uv/install.sh | sh
     else
         t OK "uv is already installed at $(command -v uv)"
-        uv --version
+        t OK "Version: $(uv --version)"
     fi
 }
 
@@ -193,7 +216,7 @@ _install_fnm() {
         curl -fsSL https://fnm.vercel.app/install | bash
     else
         t OK "fnm is already installed at $(command -v fnm)"
-        fnm --version
+        t OK "Version: $(fnm --version)"
     fi
 }
 
@@ -228,16 +251,9 @@ cp_and_source() {
         return 1
     fi
 
-    if [[ -f "$target" ]]; then
-        t WARNING "File $target exists. Removing it before copying."
-        rm "$target"
-    fi
-
-    t "Copying $file to $target"
-    cpp "$file" "$target"
+    cpp -q "$file" "$target"
 
     if [[ -f "$target" ]]; then
-        t SUCCESS "Copied $file to $target successfully."
         . "$target"
     else
         t ERROR "Failed to copy $file to $target."
@@ -423,8 +439,8 @@ reset_bashrc() {
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_aliases" "$DOTFILES_CONFIG_DIR/.bash_aliases"
     echo "" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
     echo "alias cd-dot='cd $DOTFILES_REPO_DIR'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
-    echo "alias cd-dotfile='cd-dot'"
-    echo "alias cd-dotfiles='cd-dot'"
+    echo "alias cd-dotfile='cd-dot'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
+    echo "alias cd-dotfiles='cd-dot'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_docker_functions" "$DOTFILES_CONFIG_DIR/.bash_docker_functions"
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_functions" "$DOTFILES_CONFIG_DIR/.bash_functions"
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_exports" "$DOTFILES_CONFIG_DIR/.bash_exports"
@@ -439,7 +455,7 @@ reset_bashrc() {
     if [[ "$OS_TYPE" == "macos" ]]; then
         convert_hex_to_ansi "$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml" "$HOME/.config/starship.toml"
     else
-        cpp "$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml" "$HOME/.config/starship.toml"
+        cpp -q "$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml" "$HOME/.config/starship.toml"
     fi
 
     t SUCCESS "reset_bashrc() completed!"
@@ -451,26 +467,14 @@ reset_vimrc() {
         return
     fi
 
-    if [[ -f "$HOME/.vimrc" ]]; then
-        t WARNING "Deleting old .vimrc"
-        rm $HOME/.vimrc
-    fi
+    cpp -q "$DOTFILES_REPO_DIR/setup/vim/vimrc" "$HOME/.vimrc"
 
-    if [[ -d "$HOME/.vim/bundle" ]]; then
-        t WARNING "Deleting old .vim/bundle"
-        rm -rf $HOME/.vim/bundle
-    fi
-
-    cpp "$DOTFILES_REPO_DIR/setup/vim/vimrc" "$HOME/.vimrc"
-    t SUCCESS "Linked $DOTFILES_REPO_DIR/setup/vim/vimrc to $HOME/.vimrc successfully."
-
-    t "Installing Vim-Plug.."
     if [ ! -f ~/.vim/autoload/plug.vim ]; then
-        t INFO "Vim-Plug not found. Installing.."
+        t "Installing Vim-Plug.."
         curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
             https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     else
-        echo "Vim-Plug is already installed."
+        t OK "Vim-Plug is already installed."
     fi
 
     t SUCCESS "reset_vimrc() completed!"

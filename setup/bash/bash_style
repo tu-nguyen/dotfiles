@@ -17,21 +17,32 @@ fi
 # Function to convert hex to 0-5 scale for ANSI cube
 # Same as the one in utils.sh
 _hex_to_256() {
-    local hex=$(echo "$1" | sed 's/#//')
-    local r=$((16#${hex:0:2} * 5 / 255))
-    local g=$((16#${hex:2:2} * 5 / 255))
-    local b=$((16#${hex:4:2} * 5 / 255))
-    echo $((16 + 36*r + 6*g + b))
+    local hex=${1##}
+    local r=$((16#${hex:0:2}))
+    local g=$((16#${hex:2:2}))
+    local b=$((16#${hex:4:2}))
+    if [ "$r" -eq "$g" ] && [ "$g" -eq "$b" ]; then
+        echo $(( 232 + (r * 23) / 255 ))
+    else
+        echo $((16 + 36*r + 6*g + b))
+    fi
 }
 
 # Function to set Foreground
 _set_fg() {
     local hex=$1; local basic=$2
-    if [[ "$COLOR_MODE" == "hex" ]]; then
+
+    # Auto-detect Apple Terminal (No TrueColor support)
+    if [[ "$TERM_PROGRAM" == "Apple_Terminal" ]]; then
+        echo -ne "\033[38;5;$(_hex_to_256 "$hex")m"
+    # TrueColor Mode
+    elif [[ "$COLOR_MODE" == "hex" ]]; then
         local r=$((16#${hex:1:2})); local g=$((16#${hex:3:2})); local b=$((16#${hex:5:2}))
         echo -ne "\033[38;2;${r};${g};${b}m"
+    # 256 Color Mode
     elif [[ "$COLOR_MODE" == "256" ]]; then
         echo -ne "\033[38;5;$(_hex_to_256 "$hex")m"
+    # Fallback to ANSI 16
     else
         tput setaf "$basic" 2>/dev/null || echo -ne "\033[0;3${basic}m"
     fi
@@ -40,7 +51,10 @@ _set_fg() {
 # Set to set Background
 _set_bg() {
     local hex=$1; local basic=$2
-    if [[ "$COLOR_MODE" == "hex" ]]; then
+
+    if [[ "$TERM_PROGRAM" == "Apple_Terminal" ]]; then
+        echo -ne "\033[48;5;$(_hex_to_256 "$hex")m"
+    elif [[ "$COLOR_MODE" == "hex" ]]; then
         local r=$((16#${hex:1:2})); local g=$((16#${hex:3:2})); local b=$((16#${hex:5:2}))
         echo -ne "\033[48;2;${r};${g};${b}m"
     elif [[ "$COLOR_MODE" == "256" ]]; then

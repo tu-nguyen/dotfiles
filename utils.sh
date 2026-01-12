@@ -272,7 +272,6 @@ _prompt() {
             return
         fi
     fi
-    echo ""
 }
 
 # Function to clone or pull dotfiles repository

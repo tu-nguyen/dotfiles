@@ -254,6 +254,7 @@ _clone_or_pull_dotfiles() {
         t "${SUB_F}dotfiles${NC} directory '$DOTFILES_REPO_DIR' already exists."
         # Navigate to the dotfiles directory
         cd "$DOTFILES_REPO_DIR" || { t Error "Failed to change directory to $DOTFILES_REPO_DIR. Aborting."; exit 1; }
+        printf "\033[1A\r\033[K"
 
         local stashed_changes=false
         # Check if there are any uncommitted changes (staged or unstaged)
@@ -283,6 +284,7 @@ _clone_or_pull_dotfiles() {
             fi
             # Return to home directory before exiting on error
             cd "$HOME" || { t Error "Failed to return to home directory after pull error."; }
+            printf "\033[1A\r\033[K"
             exit 1
         fi
 
@@ -307,6 +309,7 @@ _clone_or_pull_dotfiles() {
     fi
     # Always return to home directory at the end of the function
     cd "$HOME" || { t Error "Failed to return to home directory."; exit 1; }
+    printf "\033[1A\r\033[K"
 }
 
 # Function to convert hex to 0-5 scale for ANSI cube

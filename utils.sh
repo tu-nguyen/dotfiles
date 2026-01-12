@@ -348,13 +348,13 @@ _convert_hex_to_ansi() {
     local output_file="${2:-$input_file.converted}"
 
     # Create a copy to work on
-    cp "$input_file" "$output_file"
+    cpp "$input_file" "$output_file"
 
-    echo "Converting Hex to ANSI 256 for: $input_file"
+    t "Converting Hex to ANSI 256 for: $input_file"
 
     grep -oE '#[0-9a-fA-F]{6}' "$input_file" | sort -u | while read -r hex; do
-        ansi=$(hex_to_ansi_256 "$hex")
-        echo "Replacing $hex with $ansi"
+        ansi=$(_hex_to_ansi_256 "$hex")
+        t "Replacing $hex with $ansi"
         sed -i '' "s|$hex|$ansi|g" "$output_file"
     done
 }

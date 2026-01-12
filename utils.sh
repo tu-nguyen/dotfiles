@@ -189,8 +189,7 @@ _install_starship() {
             t "Installing Starship.."
             curl -sS https://starship.rs/install.sh | sh
         else
-            t OK "Starship is already installed at $(command -v starship)"
-            t OK "Version: $(starship -V)"
+            t OK "$(starship -V) is already installed at $(command -v starship)"
         fi
     elif [[ "$OS_TYPE" == "macos" ]]; then
         _install_mac_package starship
@@ -203,8 +202,7 @@ _install_uv() {
         t "Installing uv.."
         curl -LsSf https://astral.sh/uv/install.sh | sh
     else
-        t OK "uv is already installed at $(command -v uv)"
-        t OK "Version: $(uv --version)"
+        t OK "$(uv --version) is already installed at $(command -v uv)"
     fi
 }
 
@@ -215,8 +213,7 @@ _install_fnm() {
         t "Installing fnm.."
         curl -fsSL https://fnm.vercel.app/install | bash
     else
-        t OK "fnm is already installed at $(command -v fnm)"
-        t OK "Version: $(fnm --version)"
+        t OK "$(fnm --version) is already installed at $(command -v fnm)"
     fi
 }
 

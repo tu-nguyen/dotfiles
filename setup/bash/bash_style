@@ -52,39 +52,44 @@ _set_bg() {
 
 # Text Colors (Foreground)
 BLACK=$(_set_fg '#282828' 0)
-RED=$(_set_fg '#CC241D' 1)
-GREEN=$(_set_fg '#98971A' 2)
-YELLOW=$(_set_fg '#D79921' 3)
-BLUE=$(_set_fg '#458588' 4)
-MAGENTA=$(_set_fg '#B16286' 5)
-CYAN=$(_set_fg '#00FFFF' 6)
-WHITE=$(_set_fg '#EBDBB2' 7)
+RED=$(_set_fg '#cc241d' 1)
+GREEN=$(_set_fg '#689d6a' 2)
+YELLOW=$(_set_fg '#d79921' 3)
+BLUE=$(_set_fg '#0000ff' 4)
+MAGENTA=$(_set_fg '#b16286' 5)
+CYAN=$(_set_fg '#00ffff' 6)
+WHITE=$(_set_fg '#ffffff' 7)
 GRAY=$(_set_fg '#928374' 8)
-PINK=$(_set_fg '#FFC0CB' 5) # Fallback to Magenta if no pink available
-LIGHT_PINK=$(_set_fg '#FFB6C1' 217)  # Soft, light rose
-DARK_PINK=$(_set_fg '#E75480' 168)   # Deep, punchy rose
-HOT_PINK=$(_set_fg '#FF10F0' 201)   # High-contrast "Neon" pink
-PASTEL_PINK=$(_set_fg '#FFD1DC' 224) # Very soft, creamy pink
+PINK=$(_set_fg '#ffc0cb' 5) # Fallback to Magenta if no pink available
+LIGHT_PINK=$(_set_fg '#ffb6C1' 217)  # Soft, light rose
+DARK_PINK=$(_set_fg '#e75480' 168)   # Deep, punchy rose
+HOT_PINK=$(_set_fg '#ff10f0' 201)   # High-contrast "Neon" pink
+PASTEL_PINK=$(_set_fg '#ffd1dc' 224) # Very soft, creamy pink
 
 # Bright Colors (if your terminal supports them)
-BRIGHT_RED=$(_set_fg '#FB4934' 9)
-BRIGHT_GREEN=$(_set_fg '#B8BB26' 10)
-BRIGHT_YELLOW=$(_set_fg '#FABD2F' 11)
-BRIGHT_BLUE=$(_set_fg '#83A598' 12)
-BRIGHT_MAGENTA=$(_set_fg '#D3869B' 13)
-BRIGHT_CYAN=$(_set_fg '#8EC07C' 14)
-BRIGHT_WHITE=$(_set_fg '#FBF1C7' 15)
+BRIGHT_RED=$(_set_fg '#fb4934' 9)
+BRIGHT_GREEN=$(_set_fg '#b8bb26' 10)
+BRIGHT_YELLOW=$(_set_fg '#fabd2f' 11)
+BRIGHT_BLUE=$(_set_fg '#83a598' 12)
+BRIGHT_MAGENTA=$(_set_fg '#d3869b' 13)
+BRIGHT_CYAN=$(_set_fg '#41fdfe' 14)
 
 # Background
 ON_BLACK=$(_set_bg '#282828' 0)
-ON_RED=$(_set_bg '#CC241D' 1)
-ON_GREEN=$(_set_bg '#98971A' 2)
-ON_YELLOW=$(_set_bg '#D79921' 3)
-ON_BLUE=$(_set_bg '#458588' 4)
-ON_MAGENTA=$(_set_bg '#B16286' 5)
-ON_CYAN=$(_set_bg '#689D6A' 6)
-ON_WHITE=$(_set_bg '#EBDBB2' 7)
-ON_PINK=$(_set_bg '#FF69B4' 5)
+ON_RED=$(_set_bg '#cc241d' 1)
+ON_GREEN=$(_set_bg '#689d6a' 2)
+ON_YELLOW=$(_set_bg '#d79921' 3)
+ON_BLUE=$(_set_bg '#0000ff' 4)
+ON_MAGENTA=$(_set_bg '#b16286' 5)
+ON_CYAN=$(_set_bg '#00ffff' 6)
+ON_WHITE=$(_set_bg '#ffffff' 7)
+ON_PINK=$(_set_bg '#ffc0cb' 5)
+ON_BRIGHT_RED=$(_set_bg '#fb4934' 9)
+ON_BRIGHT_GREEN=$(_set_bg '#b8bb26' 10)
+ON_BRIGHT_YELLOW=$(_set_bg '#fabd2f' 11)
+ON_BRIGHT_BLUE=$(_set_bg '#83a598' 12)
+ON_BRIGHT_MAGENTA=$(_set_bg '#d3869b' 13)
+ON_BRIGHT_CYAN=$(_set_bg '#41fdfe' 14)
 
 # Formatting
 BOLD=$(tput bold 2>/dev/null || echo -e '\033[1m')
@@ -93,7 +98,8 @@ RESET=$(tput sgr0 2>/dev/null || echo -e '\033[0m')
 NC=$RESET
 
 # Status
-OK="${BOLD}${GREEN}"
+OK="${GREEN}${BOLD}"
+SUCCESS="${BOLD}${GREEN}"
 INFO="${BOLD}${PINK}"
 WARN="${BOLD}${YELLOW}"
 ERR="${BOLD}${RED}"
@@ -110,12 +116,14 @@ SEP_F="${GRAY}"  # Separator
 SEL_F="${BOLD}${WHITE}"  # Selection/Choice
 
 # Other
-URL_F="${UNDERLINE}${BLUE}" # Clickable links
 NOTICE_F="${BOLD}${ON_BLUE}${WHITE}" # Attention-grabbing banners
+URL_F="${UNDERLINE}${BLUE}" # Links
 
 # Backward compat with my old Makefile/settings
 H="${HDR_F}"
 H2="${SUB_F}"
+S="${KEY_F}"
+S2="${VAL_F}"
 
 # Example usage
 # echo "${RED}This is red text${NC}"
@@ -136,51 +144,51 @@ set_theme() {
 
     case $theme in
         "main")
-            _P_MAIN='#FFC0CB' # Pink
-            _P_SUB='#00FFFF'  # Aqua/Cyan
-            _P_ACCENT='#FFD1DC' # Pastel
+            _P_MAIN='#ffc0cb' # Pink
+            _P_SUB='#00ffff'  # Aqua/Cyan
+            _P_ACCENT='#ffd1dc' # Pastel
             echo "Mood: Cyberpunk active."
             ;;
         "cyber")
-            _P_MAIN='#FF10F0' # Neon Pink
-            _P_SUB='#00FFFF'  # Aqua/Cyan
-            _P_ACCENT='#FFD1DC' # Pastel
+            _P_MAIN='#ff10f0' # Neon Pink
+            _P_SUB='#00ffff'  # Aqua/Cyan
+            _P_ACCENT='#ffd1dc' # Pastel
             echo "Mood: Cyberpunk active."
             ;;
         "nord")
-            _P_MAIN='#88C0D0' # Frost Blue
-            _P_SUB='#81A1C1'  # Arctic Blue
-            _P_ACCENT='#D8DEE9' # Snow White
+            _P_MAIN='#88c0d0' # Frost Blue
+            _P_SUB='#81a1c1'  # Arctic Blue
+            _P_ACCENT='#d8dee9' # Snow White
             echo "Mood: Arctic chill active."
             ;;
         "dracula")
-            _P_MAIN='#BD93F9' # Purple
-            _P_SUB='#50FA7B'  # Green
-            _P_ACCENT='#FF79C6' # Pink
+            _P_MAIN='#bd93f9' # Purple
+            _P_SUB='#50fa7b'  # Green
+            _P_ACCENT='#ff79c6' # Pink
             echo "Mood: Vampire mode."
             ;;
         "monokai")
-            _P_MAIN='#F92672'   # Vivid Pink
-            _P_SUB='#A6E22E'    # Bright Green
-            _P_ACCENT='#66D9EF' # Sky Blue
+            _P_MAIN='#f92672'   # Vivid Pink
+            _P_SUB='#a6e22e'    # Bright Green
+            _P_ACCENT='#66D9ef' # Sky Blue
             echo "Mood: Classic pro mode."
             ;;
         "forest")
-            _P_MAIN='#2D5A27'   # Deep Pine
-            _P_SUB='#9BC693'    # Sage
-            _P_ACCENT='#E9FFDB' # Off-white
+            _P_MAIN='#2d5a27'   # Deep Pine
+            _P_SUB='#9bc693'    # Sage
+            _P_ACCENT='#e9ffdb' # Off-white
             echo "Mood: Woodland focus."
             ;;
         "tokyo-night")
-            _P_MAIN='#7AA2F7'   # Storm Blue
-            _P_SUB='#BB9AF7'    # Magenta/Purple
-            _P_ACCENT='#C0CAF5' # Soft Silver
+            _P_MAIN='#7aa2f7'   # Storm Blue
+            _P_SUB='#bb9af7'    # Magenta/Purple
+            _P_ACCENT='#c0caf5' # Soft Silver
             echo "Mood: Tokyo neon lights."
             ;;
         "matrix")
-            _P_MAIN='#00FF41'   # Matrix Green
-            _P_SUB='#003B00'    # Dark Green
-            _P_ACCENT='#0D0208' # Black
+            _P_MAIN='#00ss41'   # Matrix Green
+            _P_SUB='#003b00'    # Dark Green
+            _P_ACCENT='#0Dd0208' # Black
             echo "Mood: Wake up, Neo."
             ;;
         *)
@@ -204,14 +212,16 @@ set_theme() {
 
 # Color Verification Test
 color_test() {
-    echo -e "\n${BOLD}Primary Colors:${RESET}"
-    echo -e "${PINK}PINK ${RED}RED ${GREEN}GREEN ${YELLOW}YELLOW ${BLUE}BLUE ${MAGENTA}MAGENTA ${CYAN}CYAN ${WHITE}WHITE ${GRAY}GRAY ${RESET}"
-
-    echo -e "\n${BOLD}Bright Colors:${RESET}"
-    echo -e "${PASTEL_PINK}PASTEL_PINK ${BRIGHT_RED}B_RED ${BRIGHT_GREEN}B_GREEN ${BRIGHT_YELLOW}B_YELLOW ${BRIGHT_BLUE}B_BLUE ${BRIGHT_MAGENTA}B_MAGENTA ${BRIGHT_CYAN}B_CYAN ${BRIGHT_WHITE}B_WHITE${RESET}"
-
-    echo -e "\n${BOLD}Backgrounds:${RESET}"
-    echo -ne "${PINK_ON_PINK}  ${ON_RED}  ${RESET} ${ON_GREEN}  ${RESET} ${ON_YELLOW}  ${RESET} ${ON_BLUE}  ${RESET} ${ON_PURPLE}  ${RESET} ${ON_CYAN}  ${RESET} ${ON_WHITE}  ${RESET}  ${RESET}\n"
-
-    echo -e "\n${BOLD}Current Mode:${RESET} $COLOR_MODE (TERM: $TERM)\n"
+    echo -e "${BOLD}Current Mode:${NC} $COLOR_MODE (TERM: $TERM)\n"
+    echo -e "${BOLD}Primary Colors: ${NC}${PINK}PINK ${RED}RED ${GREEN}GREEN ${YELLOW}YELLOW ${BLUE}BLUE ${MAGENTA}MAGENTA ${CYAN}CYAN ${WHITE}WHITE ${GRAY}GRAY ${NC}\n"
+    echo -e "${BOLD}Bright Colors: ${NC}${PASTEL_PINK}PASTEL_PINK ${BRIGHT_RED}B_RED ${BRIGHT_GREEN}B_GREEN ${BRIGHT_YELLOW}B_YELLOW ${BRIGHT_BLUE}B_BLUE ${BRIGHT_MAGENTA}B_MAGENTA ${BRIGHT_CYAN}B_CYAN\n"
+    echo -e "${BOLD}Backgrounds: ${NC}${ON_PINK}ON_PINK${NC} ${ON_RED}ON_RED${NC} ${ON_GREEN}ON_GREEN${NC} ${ON_YELLOW}ON_YELLOW${NC} ${ON_BLUE}ON_BLUE${NC} ${ON_MAGENTA}ON_MAGENTA${NC} ${ON_CYAN}ON_CYAN${NC} ${ON_WHITE}ON_WHITE${NC}\n"
+    echo -e "${BOLD}Current Setting:${NC}"
+    echo -e "${OK}OK         ${HDR_F}HDR_F${NC}         ${H}H${NC}"
+    echo -e "${SUCCESS}SUCCESS${NC}    ${SUB_F}SUB_F${NC}         ${H2}H2${NC}"
+    echo -e "${INFO}INFO${NC}       ${KEY_F}KEY_F${NC}         ${S}S${NC}"
+    echo -e "${WARN}WARN${NC}       ${VAL_F}VAL_F${NC}         ${S2}S2${NC}"
+    echo -e "${ERR}ERR${NC}        ${DIM_F}DIM_F${NC}         ${NOTICE_F}NOTICE_F${NC}"
+    echo -e "${DEBUG}DEBUG${NC}      ${SEP_F}SEP_F${NC}         ${URL_F}URL_F${NC}"
+    echo -e "${ALERT}ALERT${NC}      ${SEL_F}SEL_F${NC}"
 }

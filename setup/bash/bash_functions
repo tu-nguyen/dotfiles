@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Re-run Dotfile installation
-r() {
+pre_r() {
     if [[ "$(pwd)" == *"/dotfiles" ]]; then
         IS_PROJECT_ROOT=true
         DOTFILES_REPO_DIR=$(pwd)
@@ -33,13 +32,30 @@ r() {
     fi
 
     unset BASH_STYLE_LOADED
+}
 
-    ./install.sh
-
+post_r() {
     if [ "$IS_PROJECT_ROOT" = false ]; then
       popd > /dev/null
     fi
     t SUCCESS "Reset successful!"
+}
+# Re-run Dotfile installation
+r() {
+    pre_r
+
+    ./install.sh
+
+    post_r
+}
+
+# Re-run just bashrc installation
+rr() {
+    pre_r
+
+    FORCE_YES=1 ./install.sh skip
+
+    post_r
 }
 
 # Copy generic .bash_twork starter file

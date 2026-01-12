@@ -412,7 +412,8 @@ reset_pre() {
 }
 
 reset_bashrc() {
-    _prompt "reset .bashrc"
+    echo "test: $1"
+    _prompt "reset .bashrc" "$1"
     if [[ $RETURN -ne 0 ]]; then
         return
     fi

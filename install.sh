@@ -121,40 +121,48 @@ show_menu() {
 }
 
 t "Setting up configuration files.."
-# User input loop
-while true; do
-    show_menu
-    read -p "Enter your choice (press ${HDR_F}Enter${NC} for default): " choice
-    case $choice in
-        1) reset_pre ;;
-        2) reset_bashrc ;;
-        3) reset_vimrc ;;
-        4) reset_git_config ;;
-        5) reset_vscode_config ;;
-        6) reset_firefox ;;
-        7) reset_wsl_config ;;
-        8) reset_registry ;;
-        9) reset_ps ;;
-        "" | 0)
-            echo "Running ${RED}all${NC} dotfiles resets.."
-            reset_pre
-            reset_bashrc
-            reset_vimrc
-            reset_git_config
-            reset_vscode_config
-            reset_firefox
-            reset_wsl_config
-            reset_registry
-            reset_ps
-            break
-            ;;
-        x | X) break ;;
-        *) echo "${BOLD}${RED}Invalid${NC} option, please try again." ;;
-    esac
-    read -p "Press ${HDR_F}Enter${NC} to continue.."
-done
 
-echo "${OK}Setup script finished.${NC}"
-# reset_post
+if [[ $# -eq 0 ]]; then
+    # User input loop
+    while true; do
+        show_menu
+        read -p "Enter your choice (press ${HDR_F}Enter${NC} for default): " choice
+        case $choice in
+            1) reset_pre ;;
+            2) reset_bashrc ;;
+            3) reset_vimrc ;;
+            4) reset_git_config ;;
+            5) reset_vscode_config ;;
+            6) reset_firefox ;;
+            7) reset_wsl_config ;;
+            8) reset_registry ;;
+            9) reset_ps ;;
+            "" | 0)
+                echo "Running ${RED}all${NC} dotfiles resets.."
+                reset_pre
+                reset_bashrc
+                reset_vimrc
+                reset_git_config
+                reset_vscode_config
+                reset_firefox
+                reset_wsl_config
+                reset_registry
+                reset_ps
+                break
+                ;;
+            x | X) break ;;
+            *) echo "${BOLD}${RED}Invalid${NC} option, please try again." ;;
+        esac
+        read -p "Press ${HDR_F}Enter${NC} to continue.."
+    done
+
+    echo "${OK}Setup script finished.${NC}"
+    # reset_post
+else
+    # currently any arg will trigger this
+    # TODO: decide if we want other shortcuts
+    reset_bashrc
+    . $HOME/.bashrc
+fi
 
 t IMPORTANT "All done! You may need to exit and reopen!"

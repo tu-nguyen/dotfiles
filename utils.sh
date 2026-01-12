@@ -17,6 +17,11 @@ else
 fi
 # --- End Load Configuration ---
 
+# Copy file with a progress bar, also exists in .bash_functions
+cpp() {
+    rsync -ah --info=progress2 "$1" "$2"
+}
+
 # Function to keep sudo alive
 # See: https://gist.github.com/cowboy/3118588
 _sudo_keep() {
@@ -84,7 +89,6 @@ _install_package() {
 
 # Function to install (patch) Fira Code (Nerd Font icons)
 _install_fira_font() {
-    t "Installing Fira Code Nerd Font.."
     local FONT_NAME="FiraCode Nerd Font"
     local INSTALLED=0
 
@@ -105,7 +109,7 @@ _install_fira_font() {
         return 0
     fi
 
-    t INFO "${FONT_NAME} not found. Starting installation..."
+    t "Installing ${FONT_NAME}.."
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         local font_dir="$HOME/.local/share/fonts"
         mkdir -p "$font_dir"
@@ -157,63 +161,62 @@ _install_fira_font() {
 
 # Function to install Starship
 _install_starship() {
-    t "Installing Starship.."
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         if ! command -v starship &> /dev/null; then
-            t INFO "Starship not found. Installing now.."
+            t "Installing Starship.."
             curl -sS https://starship.rs/install.sh | sh
         else
             t OK "Starship is already installed at $(command -v starship)"
             starship --version
         fi
     elif [[ "$OS_TYPE" == "macos" ]]; then
-        brew install starship
+        _install_mac_package install starship
     fi
 }
 
 # Function to install uv
 _install_uv() {
-    t "Installing uv.."
-
     if ! command -v uv &> /dev/null; then
-        t INFO "uv not found. Installing now.."
+        t "Installing uv.."
         curl -LsSf https://astral.sh/uv/install.sh | sh
     else
-        echo "uv is already installed at $(command -v starship)"
+        t OK "uv is already installed at $(command -v uv)"
         uv --version
     fi
 }
 
 # Function to install Fast Node Manager
 _install_fnm() {
-    t "Installing fnm.."
 
     if ! command -v fnm &> /dev/null; then
-        t INFO "fnm not found. Installing now.."
+        t "Installing fnm.."
         curl -fsSL https://fnm.vercel.app/install | bash
     else
-        echo "fnm is already installed at $(command -v fnm)"
+        t OK "fnm is already installed at $(command -v fnm)"
         fnm --version
     fi
 }
 
 # Function to install Gitstatus
 _install_gitstatus() {
-    t "Installing Gitstatus.."
+    local original_dir=$(pwd)
+    local installed_or_updated="installed"
     if [ -d "$GITSTATUS_DIR/.git" ]; then
-        t "  Gitstatus directory '$GITSTATUS_DIR' already exists. Pulling latest changes.."
+        t "Gitstatus directory '$GITSTATUS_DIR' already exists. Pulling latest changes.."
         cd "$GITSTATUS_DIR"
         if ! git pull origin master; then
             t Warning "Failed to pull Gitstatus. Using existing version."
         fi
+        local installed_or_updated="updated"
     else
-        t "  Cloning Gitstatus repository to '$GITSTATUS_DIR'.."
+        t "Cloning Gitstatus repository to '$GITSTATUS_DIR'.."
         if ! git clone https://github.com/romkatv/gitstatus.git "$GITSTATUS_DIR"; then
             t Error" Failed to clone Gitstatus repository."
         fi
+        local installed_or_updated=installed
     fi
-    cd "$HOME" # Return to home directory
-    t "Gitstatus installed/updated successfully."
+    cd "$original_dir"
+    t OK "Gitstatus $installed_or_updated successfully!"
 }
 
 cp_and_source() {
@@ -231,7 +234,7 @@ cp_and_source() {
     fi
 
     t "Copying $file to $target"
-    cp "$file" "$target"
+    cpp "$file" "$target"
 
     if [[ -f "$target" ]]; then
         t SUCCESS "Copied $file to $target successfully."
@@ -349,18 +352,19 @@ _install_packages() {
     _install_package curl
     _install_package unzip
     _install_package vim
-    # _install_package python3
-    # _install_package python3-pip
     _install_package make
     _install_package jq
     _install_package colordiff
+    _install_package wget
 
+    _install_gitstatus
     _install_fira_font
     _install_starship
 
     _install_uv
     _install_fnm
 
+    # For both Linux & WSL only
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         if ! command -v apt &>/dev/null; then
             t ERROR "apt package manager not found. Please install it first."
@@ -371,10 +375,10 @@ _install_packages() {
         _install_package less
         _install_package tree
 
+    # macOS only
     elif [[ "$OS_TYPE" == "macos" ]]; then
         _install_package lesspipe
         _install_package htop
-
 
         # Check for python3, but do NOT install it
         if ! command -v python3 &>/dev/null; then
@@ -388,10 +392,6 @@ _install_packages() {
         t ERROR "Unsupported OS: $OS_TYPE. Please install the required packages manually."
         return 1
     fi
-
-    _install_gitstatus
-    _install_package htop
-    _install_package wget
 
     t SUCCESS "All required packages installed successfully."
     return
@@ -439,7 +439,7 @@ reset_bashrc() {
     if [[ "$OS_TYPE" == "macos" ]]; then
         convert_hex_to_ansi "$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml" "$HOME/.config/starship.toml"
     else
-        cp "$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml" "$HOME/.config/starship.toml"
+        cpp "$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml" "$HOME/.config/starship.toml"
     fi
 
     t SUCCESS "reset_bashrc() completed!"
@@ -461,7 +461,7 @@ reset_vimrc() {
         rm -rf $HOME/.vim/bundle
     fi
 
-    cp  "$DOTFILES_REPO_DIR/setup/vim/vimrc" "$HOME/.vimrc"
+    cpp "$DOTFILES_REPO_DIR/setup/vim/vimrc" "$HOME/.vimrc"
     t SUCCESS "Linked $DOTFILES_REPO_DIR/setup/vim/vimrc to $HOME/.vimrc successfully."
 
     t "Installing Vim-Plug.."

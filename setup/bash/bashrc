@@ -138,4 +138,6 @@ else
     [[ $(type -t t) == "function" ]] && t WARNING "MOTD file not found at $DOTFILES_CONFIG_DIR/.bash_motd\n"
 fi
 
+unset DOTFILES_LOADED
+unset BASH_STYLE_LOADED
 alias now='unset DOTFILES_LOADED BASH_STYLE_LOADED && source ~/.bashrc'

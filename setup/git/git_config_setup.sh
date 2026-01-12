@@ -15,15 +15,10 @@
 #     echo "[Error] Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
 #     exit 1
 # fi
+
+DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
+[[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 # # --- End Load Configuration ---
-
-if [[ -z "$DOTFILES_LOADED" ]]; then
-    export DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
-
-    [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
-
-    export DOTFILES_LOADED=1
-fi
 
 # git config --global user.name "Tu Nguyen"
 # git config --global user.email "tu.t.nguyen93@gmail.com"

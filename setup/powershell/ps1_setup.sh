@@ -15,15 +15,10 @@ else
     echo "[Error] Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
     exit 1
 fi
+
+DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
+[[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 # --- End Load Configuration ---
-
-if [[ -z "$DOTFILES_LOADED" ]]; then
-    export DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
-
-    [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
-
-    export DOTFILES_LOADED=1
-fi
 
 src=$DOTFILES_REPO_DIR/setup/powershell/Microsoft.PowerShell_profile.ps1
 

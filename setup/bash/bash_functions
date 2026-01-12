@@ -443,7 +443,7 @@ function print_azure_status() {
     # Print header with time remaining
     local ITERATION_END_DATE="${ITERATION_END%%T*}"
 
-    echo -e "\n${BOLD}${CYAN}Current Twork Iteration: $ITERATION_NAME ($ITERATION_START → $ITERATION_END_DATE)${NC}"
+    echo -e "${BOLD}${CYAN}Current Twork Iteration: $ITERATION_NAME ($ITERATION_START → $ITERATION_END_DATE)${NC}"
     echo "$TIME_REMAINING"
 
     # Query all tasks/chores assigned to you in current iteration
@@ -542,7 +542,7 @@ function print_asana_status() {
 
     # Print Header (Uppercase to match your previous style)
     local DISPLAY_DATE=$(echo "$DUE_ON" | tr '[:lower:]' '[:upper:]')
-    echo -e "\n${H2}CURRENT ASANA PROJECT: $PROJECT_NAME (DUE: $DISPLAY_DATE)${NC}"
+    echo -e "${H2}CURRENT ASANA PROJECT: $PROJECT_NAME (DUE: $DISPLAY_DATE)${NC}"
     echo -e "${H}${TIME_REMAINING}${NC}"
     printf "%s\n" "$br"
 
@@ -609,5 +609,5 @@ function print_asana_status() {
     done <<< "$TASKS_DATA"
 
     # Summary
-    echo -e "\n${H2_F}TOTAL WORKLOAD: ${H_F}${TOTAL_POINTS}${H2_F} POINTS${NC}"
+    echo -e "${H2_F}TOTAL WORKLOAD: ${H_F}${TOTAL_POINTS}${H2_F} POINTS${NC}"
 }

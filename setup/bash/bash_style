@@ -44,8 +44,12 @@ _set_fg() {
     local hex_in=$1; local basic=$2
     local hex="${hex_in#\#}" # Strip #
 
+    # Apple Terminal (Force 256)
+    if [[ "$TERM_PROGRAM" == "Apple_Terminal" ]]; then
+        echo -ne "\033[38;5;$(_hex_to_256 "$hex")m"
+
     # 256 Mode
-    if [[ "$COLOR_MODE" == "256" ]]; then
+    elif [[ "$COLOR_MODE" == "256" ]]; then
         echo -ne "\033[38;5;$(_hex_to_256 "$hex")m"
 
     # Hex Mode
@@ -55,11 +59,7 @@ _set_fg() {
         local b=$((16#${hex:4:2}))
         echo -ne "\033[38;2;${r};${g};${b}m"
 
-    # Apple Terminal (Force 256)
-    elif [[ "$TERM_PROGRAM" == "Apple_Terminal" ]]; then
-        echo -ne "\033[38;5;$(_hex_to_256 "$hex")m"
-
-    Fallback to Standard ANSI
+    # Fallback to Standard ANSI
     else
         tput setaf "$basic" 2>/dev/null || echo -ne "\033[3${basic}m"
     fi
@@ -70,15 +70,15 @@ _set_bg() {
     local hex_in=$1; local basic=$2
     local hex="${hex_in#\#}" # Strip #
 
-    if [[ "$COLOR_MODE" == "256" ]]; then
+    if [[ "$TERM_PROGRAM" == "Apple_Terminal" ]]; then
+        echo -ne "\033[48;5;$(_hex_to_256 "$hex")m"
+    elif [[ "$COLOR_MODE" == "256" ]]; then
         echo -ne "\033[48;5;$(_hex_to_256 "$hex")m"
     elif [[ "$COLOR_MODE" == "hex" ]]; then
         local r=$((16#${hex:0:2}))
         local g=$((16#${hex:2:2}))
         local b=$((16#${hex:4:2}))
         echo -ne "\033[48;2;${r};${g};${b}m"
-    elif [[ "$TERM_PROGRAM" == "Apple_Terminal" ]]; then
-        echo -ne "\033[48;5;$(_hex_to_256 "$hex")m"
     else
         tput setab "$basic" 2>/dev/null || echo -ne "\033[4${basic}m"
     fi

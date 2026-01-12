@@ -39,7 +39,7 @@ t() {
         severity="INFO"
         message="$1"
     else
-        severity="${1^^}" # Bash 4+ converts to UPPSERCASE
+        severity=$(echo "$severity_raw" | tr '[:lower:]' '[:upper:]')
         message="$2"
     fi
 

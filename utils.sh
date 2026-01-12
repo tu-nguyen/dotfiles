@@ -408,11 +408,10 @@ reset_pre() {
 
     _install_packages
 
-    # t DEBUG "reset_pre() end"
+    t SUCCESS "reset_pre() completed!"
 }
 
 reset_bashrc() {
-    echo "test: $1"
     _prompt "reset .bashrc" "$1"
     if [[ $RETURN -ne 0 ]]; then
         return
@@ -443,7 +442,7 @@ reset_bashrc() {
         cp "$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml" "$HOME/.config/starship.toml"
     fi
 
-    # t DEBUG "reset_bashrc() end"
+    t SUCCESS "reset_bashrc() completed!"
 }
 
 reset_vimrc() {
@@ -474,7 +473,7 @@ reset_vimrc() {
         echo "Vim-Plug is already installed."
     fi
 
-    # t DEBUG "reset_vimrc() end"
+    t SUCCESS "reset_vimrc() completed!"
 }
 
 reset_git_config() {
@@ -486,7 +485,7 @@ reset_git_config() {
     chmod +x $DOTFILES_REPO_DIR/setup/git/git_config_setup.sh
     $DOTFILES_REPO_DIR/setup/git/git_config_setup.sh
 
-    # t DEBUG "reset_git_config() end"
+    t SUCCESS "reset_git_config() completed!"
 }
 
 reset_vscode_config() {
@@ -498,7 +497,7 @@ reset_vscode_config() {
     chmod +x $DOTFILES_REPO_DIR/setup/vscode/vscode_config_setup.sh
     bash -i $DOTFILES_REPO_DIR/setup/vscode/vscode_config_setup.sh || t WARNING "Some error occured during reset_vscode_config()"
 
-    # t DEBUG "reset_vscode_config() end"
+    t SUCCESS "reset_vscode_config() completed!"
 }
 
 reset_wsl_config() {
@@ -515,7 +514,7 @@ reset_wsl_config() {
     chmod +x $DOTFILES_REPO_DIR/setup/wsl/wsl_config_setup.sh
     bash -i $DOTFILES_REPO_DIR/setup/wsl/wsl_config_setup.sh  || t WARNING "Some error occured during reset_wsl_config()"
 
-    # t DEBUG "reset_wsl_config() end"
+    t SUCCESS "reset_wsl_config() completed!"
 }
 
 reset_registry() {
@@ -533,7 +532,7 @@ reset_registry() {
 
     powershell.exe -Command "Start-Process powershell.exe -Verb RunAs -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"$(wslpath -w $DOTFILES_REPO_DIR/setup/registry/registry_script.ps1)\"'"  || t WARNING "Some error occured during reset_registry()"
 
-    # t DEBUG "reset_registry() end"
+    t SUCCESS "reset_registry() completed!"
 }
 
 reset_firefox() {
@@ -545,7 +544,7 @@ reset_firefox() {
     chmod +x $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh
     bash -i $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh || t WARNING "Some error occured during reset_firefox()"
 
-    # t DEBUG "reset_firefox() end"
+    t SUCCESS "reset_firefox() completed!"
 }
 
 reset_ps() {
@@ -562,5 +561,5 @@ reset_ps() {
     chmod +x $DOTFILES_REPO_DIR/setup/powershell/ps1_setup.sh
     bash -i $DOTFILES_REPO_DIR/setup/powershell/ps1_setup.sh  || t WARNING "Some error occured during reset_ps()"
 
-    # t DEBUG "reset_ps() end"
+    t SUCCESS "reset_ps() completed!"
 }

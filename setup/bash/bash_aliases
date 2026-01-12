@@ -56,11 +56,13 @@ if (( EUID != 0 )); then
         alias iptlist='sudo pfctl -s rules'
         alias firewall='sudo pfctl -s info'
     else
-        alias ipt='sudo /sbin/iptables'
-        alias iptlist='sudo /sbin/iptables -L -n -v --line-numbers'
-        alias iptlistin='sudo /sbin/iptables -L INPUT -n -v --line-numbers'
-        alias iptlistout='sudo /sbin/iptables -L OUTPUT -n -v --line-numbers'
-        alias iptlistfw='sudo /sbin/iptables -L FORWARD -n -v --line-numbers'
+        IPT_BIN=$(command -v iptables 2>/dev/null || echo "/usr/sbin/iptables")
+
+        alias ipt="sudo $IPT_BIN"
+        alias iptlist="sudo $IPT_BIN -L -n -v --line-numbers"
+        alias iptlistin="sudo $IPT_BIN -L INPUT -n -v --line-numbers"
+        alias iptlistout="sudo $IPT_BIN -L OUTPUT -n -v --line-numbers"
+        alias iptlistfw="sudo $IPT_BIN -L FORWARD -n -v --line-numbers"
         alias firewall=iptlist
     fi
 fi

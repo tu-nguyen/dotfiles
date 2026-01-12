@@ -367,6 +367,7 @@ _install_packages() {
         _install_package coreutils
         _install_package less
         _install_package tree
+        _install_package iptables
 
     # macOS only
     elif [[ "$OS_TYPE" == "macos" ]]; then

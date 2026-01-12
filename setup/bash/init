@@ -45,13 +45,13 @@ t() {
 
     # Define color and label mapping
     case "$severity" in
-        INFO)           color="${INFO}";  label="[  INFO   ]" ;;
-        IMPORTANT)      color="${INFO}";  label="[  INFO   ]" ;;
-        WARN|WARNING)   color="${WARN}";  label="[ WARNING ]" ;;
-        ERR|ERROR)      color="${ERR}";   label="[  ERROR  ]" ;;
-        SUCCESS|OK)     color="${OK}";    label="[   OK    ]" ;;
-        TODO)           color="${ALERT}"; label="[  TODO   ]" ;;
-        DEBUG)          color="${DEBUG}"; label="[  DEBUG  ]" ;;
+        INFO)           color="${INFO}";  label="[  INFO  ]" ;;
+        IMPORTANT)      color="${INFO}";  label="[  INFO  ]" ;;
+        WARN|WARNING)   color="${WARN}";  label="[  WARN  ]" ;;
+        ERR|ERROR)      color="${ERR}";   label="[  ERR   ]" ;;
+        SUCCESS|OK)     color="${OK}";    label="[   OK   ]" ;;
+        TODO)           color="${ALERT}"; label="[  TODO  ]" ;;
+        DEBUG)          color="${DEBUG}"; label="[  DEBUG ]" ;;
         *)              color="${BOLD}";  label="[ $severity ]" ;;
     esac
 

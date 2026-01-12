@@ -64,16 +64,6 @@ if [[ -z "$DOTFILES_LOADED" ]]; then
     export DOTFILES_LOADED=1
 fi
 
-# if [[ -d "$DOTFILES_CONFIG_DIR" ]]; then
-#     # Load .init first for global variables/helper functions
-#     [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
-
-#     # Iterate through all bash modular files
-#     for file in "$DOTFILES_CONFIG_DIR"/.bash_*; do
-#         [[ -f "$file" ]] && . "$file"
-#     done
-# fi
-
 # ------------------------------------------
 # Tools & Prompt
 # ------------------------------------------

@@ -65,7 +65,7 @@ _set_fg() {
     fi
 }
 
-# Set to set Background
+# Function to set Background
 _set_bg() {
     local hex_in=$1; local basic=$2
     local hex="${hex_in#\#}" # Strip #
@@ -84,80 +84,87 @@ _set_bg() {
     fi
 }
 
-# Text Colors (Foreground)
-BLACK=$(_set_fg '#282828' 0)
-RED=$(_set_fg '#cc241d' 1)
-GREEN=$(_set_fg '#689d6a' 2)
-YELLOW=$(_set_fg '#d79921' 3)
-BLUE=$(_set_fg '#0000ff' 4)
-MAGENTA=$(_set_fg '#b16286' 5)
-CYAN=$(_set_fg '#00ffff' 6)
-WHITE=$(_set_fg '#ffffff' 7)
-GRAY=$(_set_fg '#928374' 8)
-PINK=$(_set_fg '#ffc0cb' 5) # Fallback to Magenta if no pink available
-LIGHT_PINK=$(_set_fg '#ffb6C1' 217)  # Soft, light rose
-DARK_PINK=$(_set_fg '#e75480' 168)   # Deep, punchy rose
-HOT_PINK=$(_set_fg '#ff10f0' 201)   # High-contrast "Neon" pink
-PASTEL_PINK=$(_set_fg '#ffd1dc' 224) # Very soft, creamy pink
-
-# Bright Colors (if your terminal supports them)
-BRIGHT_RED=$(_set_fg '#fb4934' 9)
-BRIGHT_GREEN=$(_set_fg '#b8bb26' 10)
-BRIGHT_YELLOW=$(_set_fg '#fabd2f' 11)
-BRIGHT_BLUE=$(_set_fg '#83a598' 12)
-BRIGHT_MAGENTA=$(_set_fg '#d3869b' 13)
-BRIGHT_CYAN=$(_set_fg '#41fdfe' 14)
-
-# Background
-ON_BLACK=$(_set_bg '#282828' 0)
-ON_RED=$(_set_bg '#cc241d' 1)
-ON_GREEN=$(_set_bg '#689d6a' 2)
-ON_YELLOW=$(_set_bg '#d79921' 3)
-ON_BLUE=$(_set_bg '#0000ff' 4)
-ON_MAGENTA=$(_set_bg '#b16286' 5)
-ON_CYAN=$(_set_bg '#00ffff' 6)
-ON_WHITE=$(_set_bg '#ffffff' 7)
-ON_PINK=$(_set_bg '#ffc0cb' 5)
-ON_BRIGHT_RED=$(_set_bg '#fb4934' 9)
-ON_BRIGHT_GREEN=$(_set_bg '#b8bb26' 10)
-ON_BRIGHT_YELLOW=$(_set_bg '#fabd2f' 11)
-ON_BRIGHT_BLUE=$(_set_bg '#83a598' 12)
-ON_BRIGHT_MAGENTA=$(_set_bg '#d3869b' 13)
-ON_BRIGHT_CYAN=$(_set_bg '#41fdfe' 14)
+# Function to Attribute
+_set_attr() {
+    tput "$1" 2>/dev/null || echo -ne "$2"
+}
 
 # Formatting
-BOLD=$(tput bold 2>/dev/null || echo -e '\033[1m')
-UNDERLINE=$(tput smul 2>/dev/null || echo -e '\033[4m')
-RESET=$(tput sgr0 2>/dev/null || echo -e '\033[0m')
-NC=$RESET
+readonly NC=$(_set_attr "sgr0" "\033[0m")
+readonly RESET=$(_set_attr "sgr0" "\033[0m")
+readonly BOLD=$(_set_attr "bold" "\033[1m")
+readonly DIM=$(_set_attr "dim" "\033[2m")
+readonly ITALIC=$(_set_attr "sitm" "\033[3m")
+readonly UNDERLINE=$(_set_attr "smul" "\033[4m")
+
+# Text Colors (Foreground)
+readonly BLACK=$(_set_fg '#282828' 0)
+readonly RED=$(_set_fg '#cc241d' 1)
+readonly GREEN=$(_set_fg '#689d6a' 2)
+readonly YELLOW=$(_set_fg '#d79921' 3)
+readonly BLUE=$(_set_fg '#0000ff' 4)
+readonly MAGENTA=$(_set_fg '#b16286' 5)
+readonly CYAN=$(_set_fg '#00ffff' 6)
+readonly WHITE=$(_set_fg '#ffffff' 7)
+readonly GRAY=$(_set_fg '#928374' 8)
+readonly PINK=$(_set_fg '#ffc0cb' 5) # Fallback to Magenta if no pink available
+readonly LIGHT_PINK=$(_set_fg '#ffb6C1' 217)  # Soft, light rose
+readonly DARK_PINK=$(_set_fg '#e75480' 168)   # Deep, punchy rose
+readonly HOT_PINK=$(_set_fg '#ff10f0' 201)   # High-contrast "Neon" pink
+readonly PASTEL_PINK=$(_set_fg '#ffd1dc' 224) # Very soft, creamy pink
+
+# Bright Colors (if your terminal supports them)
+readonly BRIGHT_RED=$(_set_fg '#fb4934' 9)
+readonly BRIGHT_GREEN=$(_set_fg '#b8bb26' 10)
+readonly BRIGHT_YELLOW=$(_set_fg '#fabd2f' 11)
+readonly BRIGHT_BLUE=$(_set_fg '#83a598' 12)
+readonly BRIGHT_MAGENTA=$(_set_fg '#d3869b' 13)
+readonly BRIGHT_CYAN=$(_set_fg '#41fdfe' 14)
+
+# Background
+readonly ON_BLACK=$(_set_bg '#282828' 0)
+readonly ON_RED=$(_set_bg '#cc241d' 1)
+readonly ON_GREEN=$(_set_bg '#689d6a' 2)
+readonly ON_YELLOW=$(_set_bg '#d79921' 3)
+readonly ON_BLUE=$(_set_bg '#0000ff' 4)
+readonly ON_MAGENTA=$(_set_bg '#b16286' 5)
+readonly ON_CYAN=$(_set_bg '#00ffff' 6)
+readonly ON_WHITE=$(_set_bg '#ffffff' 7)
+readonly ON_PINK=$(_set_bg '#ffc0cb' 5)
+readonly ON_BRIGHT_RED=$(_set_bg '#fb4934' 9)
+readonly ON_BRIGHT_GREEN=$(_set_bg '#b8bb26' 10)
+readonly ON_BRIGHT_YELLOW=$(_set_bg '#fabd2f' 11)
+readonly ON_BRIGHT_BLUE=$(_set_bg '#83a598' 12)
+readonly ON_BRIGHT_MAGENTA=$(_set_bg '#d3869b' 13)
+readonly ON_BRIGHT_CYAN=$(_set_bg '#41fdfe' 14)
 
 # Status
-OK="${GREEN}${BOLD}"
-SUCCESS="${BOLD}${GREEN}"
-INFO="${BOLD}${PINK}"
-WARN="${BOLD}${YELLOW}"
-ERR="${BOLD}${RED}"
-DEBUG="${MAGENTA}"
-ALERT="${BOLD}${WHITE}${ON_RED}"  # Bold White on red background
+export OK="${GREEN}${BOLD}"
+export SUCCESS="${BOLD}${GREEN}"
+export INFO="${BOLD}${PINK}"
+export WARN="${BOLD}${YELLOW}"
+export ERR="${BOLD}${RED}"
+export DEBUG="${DIM}"
+export ALERT="${BOLD}${WHITE}${ON_RED}"  # Bold White on red background
 
 # Structure Styles
-HDR_F="${BOLD}${PINK}"  # Main header s
-SUB_F="${BOLD}${CYAN}"  # Secondary headers
-KEY_F="${PINK}"  # Labels/Keys
-VAL_F="${WHITE}"  # Data values
-DIM_F="${GRAY}"  # Secondary/Dimmed text
-SEP_F="${GRAY}"  # Separator
-SEL_F="${BOLD}${WHITE}"  # Selection/Choice
+export HDR_F="${BOLD}${PINK}"  # Main header s
+export SUB_F="${BOLD}${CYAN}"  # Secondary headers
+export KEY_F="${PINK}"  # Labels/Keys
+export VAL_F="${WHITE}"  # Data values
+export DIM_F="${DIM}"  # Data values
+export SEP_F="${GRAY}"  # Separator
+export SEL_F="${BOLD}${WHITE}"  # Selection/Choice
 
 # Other
-NOTICE_F="${BOLD}${ON_BLUE}${WHITE}" # Attention-grabbing banners
-URL_F="${UNDERLINE}${BLUE}" # Links
+export NOTICE_F="${BOLD}${ON_BLUE}${WHITE}" # Attention-grabbing banners
+export URL_F="${UNDERLINE}${BLUE}" # Links
 
 # Backward compat with my old Makefile/settings
-H="${HDR_F}"
-H2="${SUB_F}"
-S="${KEY_F}"
-S2="${VAL_F}"
+export H="${HDR_F}"
+export H2="${SUB_F}"
+export S="${KEY_F}"
+export S2="${VAL_F}"
 
 # Example usage
 # echo "${RED}This is red text${NC}"
@@ -165,11 +172,11 @@ S2="${VAL_F}"
 # echo "${BLUE}${ON_PURPLE}This is blue text on purple background${NC}"
 
 if [[ "$OSTYPE" == "macos"* ]]; then
-    MOTD_F="${MAGENTA}"
+    export MOTD_F="${MAGENTA}"
 elif [[ "$OSTYPE" == "wsl" ]]; then
-    MOTD_F="${PINK}"
+    export MOTD_F="${PINK}"
 else
-    MOTD_F="${PASTEL_PINK}"
+    export MOTD_F="${PASTEL_PINK}"
 fi
 
 # Theme switcher
@@ -232,16 +239,16 @@ set_theme() {
     esac
 
     # Re-assign the core colors using your set_fg helper
-    PINK=$(_set_fg "$_P_MAIN" 5)
-    CYAN=$(_set_fg "$_P_SUB" 6)
-    PASTEL_PINK=$(_set_fg "$_P_ACCENT" 7)
+    NEW_HDR_F=$(_set_fg "$_P_MAIN" 5)
+    NEW_SUB_F=$(_set_fg "$_P_SUB" 6)
+    NEW_KEY_FK=$(_set_fg "$_P_ACCENT" 7)
 
     # Refresh the UI Presets
-    HDR_F="${BOLD}${PINK}"
-    SUB_F="${BOLD}${CYAN}"
-    KEY_F="${PINK}"
-    H="${HDR_F}"
-    H2="${SUB_F}"
+    export HDR_F="${BOLD}${NEW_HDR_F}"
+    export SUB_F="${BOLD}${NEW_SUB_F}"
+    export KEY_F="${NEW_KEY_FK}"
+    export H="${HDR_F}"
+    export H2="${SUB_F}"
 }
 
 # Color Verification Test

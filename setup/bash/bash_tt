@@ -1,5 +1,9 @@
 #!/bin/bash
+# ========================================== #
+# CHEATSHEET & HELP SYSTEM
+# ========================================== #
 
+# Separators
 br="${HDR_F}---------------------------------------------------------------------${NC}"
 
 # Generalized function printer
@@ -222,6 +226,13 @@ function gtt() {
   # printf "  ${KEY_F}todo${NC}                 → todo\n"
   # printf "  ${KEY_F}todo${NC}                 → todo\n"
   printf "%s\n" "$br"
+}
+
+function gttt() {
+    printf "${HDR_F}Git Aliases (Active)${NC}\n"
+    printf "%s\n" "$br"
+    alias | grep 'git' | sed "s/alias //g" | sed "s/='/\t→ /g" | sed "s/'//g"
+    printf "%s\n" "$br"
 }
 
 

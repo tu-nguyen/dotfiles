@@ -39,7 +39,7 @@ t() {
         severity="INFO"
         message="$1"
     else
-        severity=$(echo "$severity_raw" | tr '[:lower:]' '[:upper:]')
+        severity=$(echo "$1" | tr '[:lower:]' '[:upper:]')
         message="$2"
     fi
 

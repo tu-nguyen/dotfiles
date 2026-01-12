@@ -168,4 +168,6 @@ else
     . $HOME/.bashrc
 fi
 
+clear
+
 t OK "All done! You may need to exit and reopen!"

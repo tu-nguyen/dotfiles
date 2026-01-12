@@ -119,7 +119,7 @@ motd() {
     fi
 
     if [ "$1" == "auto" ]; then
-        COOLDOWN_FILE="$DOTFILES_CONFIG_DIR/okfetch_last_run_${USER}"
+        COOLDOWN_FILE="$DOTFILES_CONFIG_DIR/.okfetch_last_run_${USER}"
         CURRENT_TIME=$(date +%s)
         COOLDOWN_TIME=1169
 

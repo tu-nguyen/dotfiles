@@ -1,36 +1,73 @@
 #!/bin/bash
 
+# ------------------------------------------
+# History Configuration
+# ------------------------------------------
 shopt -s histappend
-
-export LANG=en_US.UTF-8
+export HISTCONTROL=ignoredups:ignorespace  # Don't save duplicates or lines starting with space
+export HISTSIZE=10000                      # Commands to remember in the current session
+export HISTFILESIZE=20000                  # Commands to keep in the history file
+# Sync history across all open terminals after every command
 export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
-export TERM="screen-256color"
-export HISTCONTROL=ignoredups:ignorespace
-export HISTFILESIZE=10000
-export HISTSIZE=500
 
-# export PATH=$PATH:$HOME/.local/bin
-# export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH
-export PYTHONPATH="$(which python3):$PYTHONPATH"
-export JAVA_HOME="/usr/"
-export ANDROID_HOME=/opt/android-sdk
-
+# ------------------------------------------
+# System & Localization
+# ------------------------------------------
+export LANG=en_US.UTF-8
 export VISUAL=vim
 export EDITOR=vim
 
-# Color for manpages in less makes manpages a little easier to read
-export LESS_TERMCAP_mb=$'\E[01;31m'
-export LESS_TERMCAP_md=$'\E[01;31m'
-export LESS_TERMCAP_me=$'\E[0m'
-export LESS_TERMCAP_se=$'\E[0m'
-export LESS_TERMCAP_so=$'\E[01;44;33m'
-export LESS_TERMCAP_ue=$'\E[0m'
-export LESS_TERMCAP_us=$'\E[01;32m'
-
-if [[ "$(uname)" == "Darwin" ]]; then
-  export PATH="$HOME/Library/Python/3.12/bin:$PATH"
-  export PATH="/opt/homebrew/bin:$PATH"
-  # export PATH=/Users/$(whoami)/.local/bin:$PATH
-  export PATH="/opt/homebrew/opt/python@3.12/libexec/bin:$PATH"
-  export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
+# Only set TERM if it's not already set to something modern
+# (Forcing screen-256color can break TrueColor support in some terminals)
+if [[ "$TERM" == "dumb" ]] || [[ -z "$TERM" ]]; then
+    export TERM="xterm-256color"
 fi
+
+# ------------------------------------------
+# Path & Language Settings
+# ------------------------------------------
+path_append() {
+    if [[ -d "$1" ]] && [[ ":$PATH:" != *":$1:"* ]]; then
+        export PATH="$PATH:$1"
+    fi
+}
+
+path_prepend() {
+    if [[ -d "$1" ]] && [[ ":$PATH:" != *":$1:"* ]]; then
+        export PATH="$1:$PATH"
+    fi
+}
+
+# Standard Paths
+path_prepend "$HOME/.local/bin"
+
+# Language Specifics
+export JAVA_HOME="/usr/"                   # Note: Usually /usr/lib/jvm/default-java on Linux
+export ANDROID_HOME=/opt/android-sdk
+
+# export PATH=$PATH:$HOME/.local/bin
+# export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH
+# export PYTHONPATH="$(which python3):$PYTHONPATH"
+
+# ------------------------------------------
+# macOS Specifics (Darwin)
+# ------------------------------------------
+if [[ "$(uname)" == "Darwin" ]]; then
+    path_prepend "/opt/homebrew/bin"
+    path_prepend "/opt/homebrew/opt/make/libexec/gnubin"
+    path_prepend "/opt/homebrew/opt/python@3.12/libexec/bin"
+    path_prepend "$HOME/Library/Python/3.12/bin"
+fi
+
+# ------------------------------------------
+# UI & Pager (less)
+# ------------------------------------------
+
+# Colorized man pages for better readability
+export LESS_TERMCAP_mb=$'\E[01;31m'      # start blink
+export LESS_TERMCAP_md=$'\E[01;31m'      # start bold
+export LESS_TERMCAP_me=$'\E[0m'          # end mode
+export LESS_TERMCAP_se=$'\E[0m'          # end standout
+export LESS_TERMCAP_so=$'\E[01;44;33m'   # start standout (blue/yellow)
+export LESS_TERMCAP_ue=$'\E[0m'          # end underline
+export LESS_TERMCAP_us=$'\E[01;32m'      # start underline (green)

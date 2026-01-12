@@ -5,89 +5,100 @@
 # TODO add comments later
 # ========================================== #
 
-# If not running interactively, don't do anything
+# ------------------------------------------
+# Pre-flight checks & Shell options
+# ------------------------------------------
+
+# Guard: If not running interactively, don't do anything to avoid breaking non-interactive scripts
 [[ $- != *i* ]] && return
 
-set -o vi
-set -o ignoreeof
+# Input/Output behavior
+set -o vi            # Use vi-style line editing
+set -o ignoreeof     # Prevent Ctrl-D from accidentally exiting the shell
 
-shopt -s dotglob
-shopt -s nullglob
-shopt -s checkwinsize
-shopt -s cdspell
-shopt -s cdable_vars
-shopt -s checkhash
-shopt -s sourcepath
-shopt -s no_empty_cmd_completion
-shopt -s cmdhist
-shopt -s histappend histreedit histverify
+# Shell Options (shopt)
+shopt -s dotglob                # Include filenames beginning with a '.' in glob patterns
+shopt -s nullglob               # If a pattern matches nothing, expand to nothing instead of the pattern itself
+shopt -s checkwinsize           # Update LINES and COLUMNS after each command if terminal size changed
+shopt -s cdspell                # Correct minor typos in directory names during 'cd'
+shopt -s cdable_vars            # If an argument to 'cd' isn't a dir, assume it's a variable name
+shopt -s checkhash              # Always check if a hashed command exists before executing
+shopt -s sourcepath             # Force 'source' to use the PATH to find files
+shopt -s no_empty_cmd_completion # Don't look for commands on PATH when trying to complete an empty line
+shopt -s cmdhist                # Save multi-line commands as a single history entry
+shopt -s histappend             # Append to history file instead of overwriting
+shopt -s histreedit             # Allow user to re-edit a failed history substitution
+shopt -s histverify             # Load history substitution into the editing buffer instead of executing immediately
 
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
+# Enable Programmable Completion
 if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
 fi
 
+# Environment Variables (Locale & Color)
 export COLORTERM=truecolor
+export LANG=en_US.UTF-8
+export LC_CTYPE=en_US.UTF-8
 
 # ------------------------------------------
 # Load custom bash files
 # ------------------------------------------
-# Load custom bash files from ~/.config/dotfiles
-if [ -z "$DOTFILES_CONFIG_DIR" ]; then
-    DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
-fi
+# Dynamically loads all .bash_* files from your custom dotfiles directory (~/.config/dotfiles).
+
+: "${DOTFILES_CONFIG_DIR:=$HOME/.config/dotfiles}"
 
 if [[ -d "$DOTFILES_CONFIG_DIR" ]]; then
-    # Load the prep file if it exists
-    if [[ -f "$DOTFILES_CONFIG_DIR/.init" ]]; then
-        . "$DOTFILES_CONFIG_DIR/.init"
-    fi
+    # Load .init first for global variables/helper functions
+    [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 
-    # Load all bash files in DOTFILES_CONFIG_DIR
-    for file in "$DOTFILES_CONFIG_DIR/.bash_"*; do
-        if [[ -f "$file" ]]; then
-            [ -f "$file" ] && . "$file"
-        fi
+    # Iterate through all bash modular files
+    for file in "$DOTFILES_CONFIG_DIR"/.bash_*; do
+        [[ -f "$file" ]] && . "$file"
     done
 fi
 
 # ------------------------------------------
-# Setup settings
+# Tools & Prompt
 # ------------------------------------------
 
-# Starship
+# Starship Prompt: Cross-shell customizable prompt
 if command -v starship &> /dev/null; then
     eval "$(starship init bash)"
 fi
 
 # Transient prompt for Starship
 _starship_transient_prompt() {
-  if [[ $? -eq 0 ]]; then
-    printf "${OK_F}❯ ${NC}"
-  else
-    printf "${ERR_F}❯ ${NC}"
-  fi
+    if [[ $? -eq 0 ]]; then
+        printf "${OK_F}❯ ${NC}"
+    else
+        printf "${ERR_F}❯ ${NC}"
+    fi
 }
 
-# fnm
+# FNM (Fast Node Manager) with 24-hour Auto-Update check
 FNM_PATH="$HOME/.local/share/fnm"
-if [ -d "$FNM_PATH" ]; then
-  export PATH="$FNM_PATH:$PATH"
-  eval "`fnm env`"
-fi
-
-if command -v fnm &> /dev/null; then
+if [[ -d "$FNM_PATH" ]]; then
+    export PATH="$FNM_PATH:$PATH"
     eval "$(fnm env --use-on-cd --shell bash)"
-fi
 
-fnm install --lts &>/dev/null
-fnm default $(fnm list | grep 'lts-latest' | awk '{print $2}') >/dev/null
+    # Check for Node LTS updates once every 24 hours (86400 seconds)
+    TIMESTAMP_FILE="$DOTFILES_CONFIG_DIR/.node_update_timestamp"
+    CURRENT_TIME=$(date +%s)
+    UPDATE_INTERVAL=86400
+
+    if [[ ! -f "$TIMESTAMP_FILE" ]] || (( CURRENT_TIME - $(cat "$TIMESTAMP_FILE") > UPDATE_INTERVAL )); then
+        # Determine latest LTS and set as default
+        LTS_VER=$(fnm list | grep 'lts-latest' | awk '{print $2}')
+        if [[ -n "$LTS_VER" ]]; then
+            fnm default "$LTS_VER" >/dev/null
+            echo "$CURRENT_TIME" > "$TIMESTAMP_FILE"
+        fi
+    fi
+fi
 
 # function _update_ps1() {
 #     PS1=$(powerline-shell $?)
@@ -104,26 +115,22 @@ fnm default $(fnm list | grep 'lts-latest' | awk '{print $2}') >/dev/null
 #     fi
 # fi
 
-# Set terminal title to: User @ Host : Current Dir
+# Window Title: Sets terminal tab title to "♥ CurrentDir"
 set_win_title() {
-    # This escape sequence tells the terminal to update the title bar
-    # \033]2; = Start title sequence
-    # \007    = End title sequence
     echo -ne "\033]2;♥ ${PWD##*/}\007"
 }
 
-# Run it every time the prompt appears
+# Update window title and maintain existing PROMPT_COMMAND logic
 export PROMPT_COMMAND="set_win_title; $PROMPT_COMMAND"
 
 # -----------------------------------------
 # Greeting, motd, and colors
 # ------------------------------------------
-# TODO
-# echo -e "${BOLD}${CYAN}Hello, World! This is BASH ${BOLD}${RED}${BASH_VERSION%.*}${BOLD}${CYAN}\
-# - TODO ${BOLD}${RED}..{NC}"
 
+# Display the Message of the Day if the 'motd' command is available
 if [[ -f "$DOTFILES_CONFIG_DIR/.bash_motd" ]]; then
+    # Assuming 'motd' is a function or alias defined in your .bash_ files
     motd auto
 else
-    t WARNING "MOTD file not found at $DOTFILES_CONFIG_DIR/.bash_motd\n"
+    [[ $(type -t t) == "function" ]] && t WARNING "MOTD file not found at $DOTFILES_CONFIG_DIR/.bash_motd\n"
 fi

@@ -1,17 +1,18 @@
+# ========================================== #
+# DOTFILES INITIALIZATION (.init)
+# ========================================== #
+# This file sets up the core environment variables and helper functions
+# used by the rest of the shell configuration.
+
 # --- Start Load Configuration ---
-if [ -z "$DOTFILES_CONFIG_DIR" ]; then
-    DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
-fi
+: "${DOTFILES_CONFIG_DIR:=$HOME/.config/dotfiles}"
+: "${DOTFILES_CONFIG_FILE:=$DOTFILES_CONFIG_DIR/.dotfile_config.env}"
 
-if [ -z "$DOTFILES_CONFIG_FILE" ]; then
-    DOTFILES_CONFIG_FILE="$DOTFILES_CONFIG_DIR/.dotfile_config.env"
-fi
-
-if [ -f "$DOTFILES_CONFIG_FILE" ]; then
+if [[ -f "$DOTFILES_CONFIG_FILE" ]]; then
     source "$DOTFILES_CONFIG_FILE"
 else
-    echo "[Error] Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
-    exit 1
+    echo -e "\e[31m[Error]\e[0m Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
+    return 1 2>/dev/null || exit 1
 fi
 # --- End Load Configuration ---
 
@@ -20,52 +21,41 @@ if [[ -f "$DOTFILES_CONFIG_DIR/.bash_style" ]]; then
 elif [[ -f "$DOTFILES_REPO_DIR/setup/bash/bash_style" ]]; then
     . "$DOTFILES_REPO_DIR/setup/bash/bash_style"
 else
-    echo "[WARNING] Failed to load colours"
+    echo "\e[31m[WARNING]\e[0m Failed to load shell colors/styles"
 fi
 
 t() {
-  # t "System started"                  # [INFO] System started
-  # t WARNING "Disk space low"          # [WARNING] Disk space low
-  # t ERROR "Failed to connect to DB"   # [ERROR] Failed to connect to DB
-  # t                                   # Hello world
-  local severity message color
+    # t "System started"                  # [INFO] System started
+    # t WARNING "Disk space low"          # [WARNING] Disk space low
+    # t ERROR "Failed to connect to DB"   # [ERROR] Failed to connect to DB
+    # t                                   # Hello world
+    local severity message color label
+    local timestamp=$(date +"%H:%M:%S")
 
-  if [[ $# -eq 0 ]]; then
-    echo -e "${GREEN}Hello world${NC}"
-    return
-  elif [[ $# -eq 1 ]]; then
-    severity="INFO"
-    message="$1"
-  else
-    severity="${1}"  # Convert to uppercase
-    message="$2"
-  fi
+    if [[ $# -eq 0 ]]; then
+        echo -e "${GREEN}Hello world${NC}"
+        return
+    elif [[ $# -eq 1 ]]; then
+        severity="INFO"
+        message="$1"
+    else
+        severity="${1^^}" # Bash 4+ converts to UPPSERCASE
+        message="$2"
+    fi
 
-  # Determine color and label
-  case "$severity" in
-    info|INFO)
-      echo -e "${INFO}[INFO]${NC} $message ${NC}"
-      ;;
-    important|IMPORTANT)
-      echo -e "${INFO}[INFO] $message ${NC}"
-      ;;
-    warn|warning|WARNING)
-      echo -e "${WARN}[WARNING]${NC} $message ${NC}"
-      ;;
-    err|error|ERR|ERROR)
-      echo -e "${ERR}[ERROR]${NC} $message ${NC} ${NC}"
-      ;;
-    success|ok|SUCCESS|OK)
-      echo -e "${OK}[OK]${NC} $message ${NC}"
-      ;;
-    todo|TODO)
-      echo -e "${ALERT}[TODO]${NC} $message ${NC}"
-      ;;
-    debug|DEBUG)
-      echo -e "${DEBUG}[DEBUG]${NC} $message ${NC}"
-      ;;
-    *)
-      echo -e "${BOLD}[UNKNOWN]${NC} $severity: $message ${NC}"
-      ;;
-  esac
+    # Define color and label mapping
+    case "$severity" in
+        INFO)      color="${INFO}";  label="[INFO]" ;;
+        IMPORTANT) color="${INFO}";  label="[INFO]" ;;
+        WARN|WARNING) color="${WARN}";  label="[WARNING]" ;;
+        ERR|ERROR) color="${ERR}";   label="[ERROR]" ;;
+        SUCCESS|OK) color="${OK}";    label="[OK]" ;;
+        TODO)      color="${ALERT}"; label="[TODO]" ;;
+        DEBUG)     color="${DEBUG}"; label="[DEBUG]" ;;
+        *)         color="${BOLD}";  label="[$severity]" ;;
+    esac
+
+    # Output formatted message
+    # Format: [HH:MM:SS] [LABEL] Message
+    echo -e "${DEBUG}${timestamp}${NC} ${color}${label}${NC} ${message}${NC}"
 }

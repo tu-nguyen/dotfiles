@@ -17,10 +17,19 @@ else
 fi
 # --- End Load Configuration ---
 
+if [[ -z "$DOTFILES_LOADED" ]]; then
+    export DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
+
+    [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
+
+    export DOTFILES_LOADED=1
+fi
+
 if [[ -f "/etc/wsl.conf" ]]; then
     t "Replacing wsl.conf for WSL"
 else
     t "Copying wsl.conf for WSL"
 fi
 
-sudo cp $DOTFILES_REPO_DIR/setup/wsl/wsl.conf  /etc/wsl.conf
+sudo cpp $DOTFILES_REPO_DIR/setup/wsl/wsl.conf  /etc/wsl.conf
+t OK "WSL settings synced to: ${VAL_F}/etc/wsl.conf${NC}"

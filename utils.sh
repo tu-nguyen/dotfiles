@@ -17,33 +17,13 @@ else
 fi
 # --- End Load Configuration ---
 
-# Copy file with a progress bar, also exists in .bash_functions
-cpp() {
-    local quiet=false
-    local src=""
-    local dest=""
+if [[ -z "$DOTFILES_LOADED" ]]; then
+    export DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
 
-    if [[ "$1" == "-q" ]]; then
-        quiet=true
-        src="$2"
-        dest="$3"
-    else
-        src="$1"
-        dest="$2"
-    fi
+    [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 
-    if [[ -z "$src" ]] || [[ -z "$dest" ]]; then
-        t ERR "Usage: cpp [-q] <source> <destination>"
-        return 1
-    fi
-
-    rsync -ah --info=progress2 "$src" "$dest"
-
-    if [ "$quiet" = true ]; then
-        printf "\033[1A\r\033[K"
-        t OK "Transfer of $(basename "$dest") complete."
-    fi
-}
+    export DOTFILES_LOADED=1
+fi
 
 # Function to keep sudo alive
 # See: https://gist.github.com/cowboy/3118588

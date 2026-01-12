@@ -59,3 +59,31 @@ t() {
     # Format: [HH:MM:SS] [LABEL] Message
     echo -e "${DEBUG}${timestamp}${NC} ${color}${label}${NC} ${message}${NC}"
 }
+
+# Copy file with a progress bar, also exists in .bash_functions
+cpp() {
+    local quiet=false
+    local src=""
+    local dest=""
+
+    if [[ "$1" == "-q" ]]; then
+        quiet=true
+        src="$2"
+        dest="$3"
+    else
+        src="$1"
+        dest="$2"
+    fi
+
+    if [[ -z "$src" ]] || [[ -z "$dest" ]]; then
+        t ERR "Usage: cpp [-q] <source> <destination>"
+        return 1
+    fi
+
+    rsync -ah --info=progress2 "$src" "$dest"
+
+    if [ "$quiet" = true ]; then
+        printf "\033[1A\r\033[K"
+        t OK "Transfer of $(basename "$dest") complete."
+    fi
+}

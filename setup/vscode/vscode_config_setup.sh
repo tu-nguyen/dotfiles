@@ -17,6 +17,14 @@ else
 fi
 # --- End Load Configuration ---
 
+if [[ -z "$DOTFILES_LOADED" ]]; then
+    export DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
+
+    [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
+
+    export DOTFILES_LOADED=1
+fi
+
 t "Copying settings.json for VSCode"
 src=$DOTFILES_REPO_DIR/setup/vscode/vscode-settings.json
 

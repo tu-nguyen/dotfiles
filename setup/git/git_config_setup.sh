@@ -17,6 +17,14 @@
 # fi
 # # --- End Load Configuration ---
 
+if [[ -z "$DOTFILES_LOADED" ]]; then
+    export DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
+
+    [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
+
+    export DOTFILES_LOADED=1
+fi
+
 # git config --global user.name "Tu Nguyen"
 # git config --global user.email "tu.t.nguyen93@gmail.com"
 
@@ -63,4 +71,4 @@ git config --global color.branch.remote "#e75480"       # Dark Pink for the clou
 git config --global alias.conflicts "diff --name-only --diff-filter=U"
 git config --global color.diff.meta "#ffd1dc"
 git config --global color.diff.frag "#ff10f0"
-echo -e "Git configuration updated!"
+t OK "Git configuration updated!"

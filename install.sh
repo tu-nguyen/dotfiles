@@ -168,4 +168,4 @@ else
     . $HOME/.bashrc
 fi
 
-t IMPORTANT "All done! You may need to exit and reopen!"
+t OK "All done! You may need to exit and reopen!"

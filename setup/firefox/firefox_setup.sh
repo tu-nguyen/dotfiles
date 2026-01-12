@@ -22,6 +22,14 @@ else
 fi
 # --- End Load Configuration ---
 
+if [[ -z "$DOTFILES_LOADED" ]]; then
+    export DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
+
+    [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
+
+    export DOTFILES_LOADED=1
+fi
+
 # Function to check if a specific Firefox add-on is installed and enabled
 # Arguments:
 #   $1: Full path to the Firefox profile directory
@@ -183,31 +191,30 @@ setup_userchrome_css() {
     t "Ensured 'chrome' directory exists at: $chrome_dir"
 
     # Copy the userChrome.css file
-    cp "$source_css_path" "$dest_css_path"
+    cpp -q "$source_css_path" "$dest_css_path"
     if [ $? -eq 0 ]; then
-        t "Successfully copied userChrome.css from '$source_css_path' to '$dest_css_path'"
-        echo ""
-        echo "IMPORTANT: For userChrome.css to work, you need to enable it in Firefox:"
-        echo "1. Open Firefox."
-        echo "2. Type 'about:config' in the address bar and press Enter."
-        echo "3. Accept the risk warning."
-        echo "4. Search for 'toolkit.legacyUserProfileCustomizations.stylesheets'."
-        echo "5. Toggle its value to 'true'."
-        echo "6. Restart Firefox completely."
+        t OK "Successfully copied userChrome.css from to '$(basename $dest_css_path)'"
+        t "IMPORTANT: For userChrome.css to work, you need to enable it in Firefox:"
+        echo "  1. Open Firefox."
+        echo "  2. Type 'about:config' in the address bar and press Enter."
+        echo "  3. Accept the risk warning."
+        echo "  4. Search for 'toolkit.legacyUserProfileCustomizations.stylesheets'."
+        echo "  5. Toggle its value to 'true'."
+        echo "  6. Restart Firefox completely."
     else
-        echo "Error copying userChrome.css from '$source_css_path' to '$dest_css_path'" >&2
+        t ERROR "Error copying userChrome.css from '$source_css_path' to '$dest_css_path'" >&2
         return 1
     fi
 }
 
 # Main execution
-echo "Attempting to set up userChrome.css for Firefox.."
+t "Attempting to set up userChrome.css for Firefox.."
 
 FF_PATH=$(find_firefox_path)
 FF_PROFILE=$(check_base_path)
 
 if [ $? -eq 0 ] && [ -n "$FF_PROFILE" ]; then
-    echo "Found Firefox profile: $FF_PROFILE"
+    t "Found Firefox profile: $FF_PROFILE"
     # Check for Tree Style Tab
     TST_ADDON_ID="treestyletab@piro.sakura.ne.jp"
     if check_addon_installed "$FF_PROFILE" "$TST_ADDON_ID"; then

@@ -354,6 +354,7 @@ _install_packages() {
     # _install_package python3-pip
     _install_package make
     _install_package jq
+    _install_package colordiff
 
     _install_fira_font
     _install_starship

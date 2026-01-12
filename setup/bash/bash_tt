@@ -8,21 +8,29 @@ br="${HDR_F}--------------------------------------------------------------------
 
 # Generalized function printer
 function print_tt() {
-  local file="$1"
-  if [[ ! -f "$file" ]]; then
-    echo "File not found: $file"
-    return 1
-  fi
+    local file="$1"
+    if [[ ! -f "$file" ]]; then
+        echo "File not found: $file"
+        return 1
+    fi
 
-  awk -v h="$H" -v nc="$NC" '
-  BEGIN { comment="" }
-  /^#/ { comment = $0; next }
-  /^[a-zA-Z_][a-zA-Z0-9_]* *\(\) *\{/ {
-      gsub(/^# *|^## */, "", comment)
-      sub(/ *\(\) *\{/, "", $0)
-      printf "  %s%-20s%s → %s\n", h, $0, nc, comment
-      comment=""
-  }' "$file"
+    awk -v h="$H" -v nc="$NC" '
+    BEGIN { comment="" }
+    # Store the comment and move to next line
+    /^#/ { comment = $0; next }
+    # Match function definitions, but exclude specific names
+    /^[a-zA-Z_][a-zA-Z0-9_]* *\(\) *\{/ {
+        # Skip if function name is ..
+        if ($0 ~ /^(pre_r|post_r) *\(\)/) {
+            comment=""
+            next
+        }
+
+        gsub(/^# *|^## */, "", comment)
+        sub(/ *\(\) *\{/, "", $0)
+        printf "  %s%-20s%s → %s\n", h, $0, nc, comment
+        comment=""
+    }' "$file"
 }
 
 function tt() {
@@ -85,7 +93,7 @@ function tt() {
 
   printf "%s\n" "$br"
   printf "${SUB_F}reminder${NC}      \n"
-  printf "  ${KEY_F}cd-dotfiles${NC}          → to acd to original dotfiles dir\n"
+  printf "  ${KEY_F}cd-dot${NC}               → to acd to original dotfiles dir\n"
 }
 
 function btt() {

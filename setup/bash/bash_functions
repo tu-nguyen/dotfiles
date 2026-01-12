@@ -40,6 +40,7 @@ post_r() {
     fi
     t SUCCESS "Reset successful!"
 }
+
 # Re-run Dotfile installation
 r() {
     pre_r

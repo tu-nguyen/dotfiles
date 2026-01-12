@@ -7,6 +7,17 @@
 # ------------------------------------------
 # Functions (Aliasing with Arguments)
 # ------------------------------------------
+
+# Compare and pipe to less while preserving colors
+dless() {
+    if command -v colordiff >/dev/null 2>&1; then
+        colordiff -u "$1" "$2" | less -R
+    else
+        diff -u "$1" "$2" | less
+    fi
+}
+
+# Create a directory and move into it immediately
 mkcd() {
     mkdir -p "$1" && cd "$1" || return
 }
@@ -15,18 +26,29 @@ mkcd() {
 # Safety & Administrative
 # ------------------------------------------
 
-# Escalation & Updates
+# Escalation shortcuts
+alias root='sudo -i'
+alias su='sudo -i'
+alias svi='sudo vi'
+
+# Automatic sudo for system commands if not root
 if (( EUID != 0 )); then
     alias reboot='sudo reboot'
+    alias ipt='sudo /sbin/iptables'
     # Detect package manager
     if command -v apt-get &>/dev/null; then
         alias update='sudo apt-get update && sudo apt-get upgrade'
     elif command -v pacman &>/dev/null; then
         alias update='sudo pacman -Syu'
     fi
-    alias root='sudo -i'
-    alias su='sudo -i'
 fi
+
+# display all rules #
+alias iptlist='sudo /sbin/iptables -L -n -v --line-numbers'
+alias iptlistin='sudo /sbin/iptables -L INPUT -n -v --line-numbers'
+alias iptlistout='sudo /sbin/iptables -L OUTPUT -n -v --line-numbers'
+alias iptlistfw='sudo /sbin/iptables -L FORWARD -n -v --line-numbers'
+alias firewall=iptlist
 
 # macOS compatibility for timeout
 [[ "$(uname)" == "Darwin" ]] && alias timeout=gtimeout
@@ -40,6 +62,7 @@ alias chgrp='chgrp --preserve-root'
 alias cp='cp -iv'
 alias ln='ln -iv'
 alias mv='mv -iv'
+
 # -I prompts once before removing more than three files
 alias rm='rm -Iv --one-file-system --preserve-root'
 alias rmd='rm -rfv'
@@ -49,17 +72,15 @@ alias rmd='rm -rfv'
 # ------------------------------------------
 
 # cd
+alias home='cd ~'
+alias ~='home'
+alias cd~='home'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 alias .4='cd ../../../..'
 alias .5='cd ../../../../..'
-alias ~='cd ~'
-# alias c="cd" # was too annoying
-alias home='cd ~'
-alias cd~='cd ~'
 
-## ls
 # ls variants (Colorized)
 if [[ "$(uname)" == "Darwin" ]]; then
     alias ls='ls -Gph'
@@ -68,18 +89,17 @@ else
 fi
 
 alias l='ls'
-alias ls='ls -Gl'
+alias ll='ls -lh'
+alias la="ls -aAlh"
 alias lla='ls -Alh'
-alias lsd="ls -d */" # List only directories
+alias lsd="ls -d */"
 alias ldir="lsd"
-alias ll="ls -Alh"  # show hidden files
-alias la='ls -aAlh'  # same as above, but no . or ..
 alias lsa="ls -la"
-# alias lsd="ls -a1F | grep /$"
-alias lt="la -lt"
-alias l.='ls -d .* -G'  # show only hidden files
-alias labc='ls -lap'  #alphabetical sort
-alias lf="ls -l | egrep -v '^d'"  # files only
+alias lsd='ls -d */'              # List only directories
+alias lt='ls -Alht'               # Sort by time (newest first)
+alias labc='ls -lap'              # Sort by alphabetical
+alias lf="ls -l | egrep -v '^d'"  # Show files only
+alias l.='ls -d .* -G'            # Show only hidden files
 
 alias mkcd='mkdir -p $1 && cd $1'
 
@@ -91,23 +111,55 @@ alias cls='clear && ls'
 alias clss='clear && lsa'
 alias h='history'
 alias x='exit'
+
+# vim
 alias v='vim'
-alias vi='vim'
+alias svi='sudo vi'
+alias vis='vim "+set si"'
 alias edit='vim'
 alias ebrc='vim ~/.bashrc'
 
-# Resource usage
+# installer
+alias p="sudo pacman"
+alias y="yaourt"
+
+# resource usage
+alias ps='[[ "$(uname)" == "Darwin" ]] && ps aux || ps auxf'
+alias j='jobs -l'
 alias df='df -H'
 alias du='du -ch'
-alias top='htop' # Assumes htop is installed
+alias top='htop'
+alias top10='[[ "$(uname)" == "Darwin" ]] && ps -arcwwwxo pid,comm,%cpu,%mem | head -n 11 || ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 11'
+alias uptime='uptime -p'
+alias nowtime='date +"%T"'
+alias nowdate='date +"%d-%m-%Y"'
 alias path='echo -e ${PATH//:/\\n}'
-alias j='jobs -l'
+alias dmesg10='sudo dmesg | tail -n 10'
+alias folder="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
+alias wc='wc -l -w -c'
+alias tree='tree -CAhF --dirsfirst'
+alias treed='tree -CAFd'
+alias mountedinfo='df -hT'
 
-# Networking
+# networking
 alias myip="curl -s icanhazip.com"
 alias ping='ping -c 5'
+alias p4="ping 4.2.2.2 -c 4"
 alias header='curl -I'
 alias ports='[[ "$(uname)" == "Darwin" ]] && netstat -tulanp || ss -tulanp'
+
+# chmod
+alias mx='chmod a+x'
+alias 000='chmod -R 000'
+alias 644='chmod -R 644'
+alias 666='chmod -R 666'
+alias 755='chmod -R 755'
+alias 777='chmod -R 777'
+
+# grep
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
 
 # ------------------------------------------
 # Archives (The "I always forget the flags" section)
@@ -141,64 +193,24 @@ alias gf='git fetch'
 alias gfetch='git fetch'
 
 # ------------------------------------------
-# Specialized
+# Other
 # ------------------------------------------
+
+# fnm / Node
 alias update-node='fnm install --lts && LTS_VER=$(fnm list | grep "lts-latest" | awk "{print \$2}") && fnm default "$LTS_VER" && date +%s > "$DOTFILES_CONFIG_DIR/.node_update_timestamp" && echo "Node LTS updated to $LTS_VER"'
 
-## TODO reorg
-if [[ "$(uname)" == "Darwin" ]]; then
-    alias ps='ps aux'
-else
-    alias ps='ps auxf'
-fi
+# Docker
+alias dk='docker'
+alias dkc='docker ps -a'
+alias dkps='docker ps'
+alias dki='docker images'
 
-alias top='htop'
-if [[ "$(uname)" == "Darwin" ]]; then
-    alias top10='ps -arcwwwxo pid,comm,%cpu,%mem | head -n 11'
-else
-    alias top10='ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 11'
-fi
-alias uptime='uptime -p'
+alias so0="cmatrix"
 # alias mv='timeout 8 mv -iv'
 # alias rm='timeout 3 rm -Iv --one-file-system --preserve-root'
 # alias rmd='rm  --recursive --force --verbose '
 # alias mkdir='mkdir -pv'
 
-# chmod
-alias mx='chmod a+x'
-alias 000='chmod -R 000'
-alias 644='chmod -R 644'
-alias 666='chmod -R 666'
-alias 755='chmod -R 755'
-alias 777='chmod -R 777'
-
-# grep
-alias grep='grep --color=auto'
-alias egrep='egrep --color=auto'
-alias fgrep='fgrep --color=auto'
-
-# vim
-alias vi=vim
-alias svi='sudo vi'
-alias vis='vim "+set si"'
-alias edit='vim'
-
-# installer
-alias p="sudo pacman"
-alias y="yaourt"
-
-# internet check
-alias myip="curl icanhazip.com"
-alias ping='ping -c 5'
-alias p4="ping 4.2.2.2 -c 4"
-# shortcut  for iptables and pass it via sudo#
-alias ipt='sudo /sbin/iptables'
-# display all rules #
-alias iptlist='sudo /sbin/iptables -L -n -v --line-numbers'
-alias iptlistin='sudo /sbin/iptables -L INPUT -n -v --line-numbers'
-alias iptlistout='sudo /sbin/iptables -L OUTPUT -n -v --line-numbers'
-alias iptlistfw='sudo /sbin/iptables -L FORWARD -n -v --line-numbers'
-alias firewall=iptlist
 # get web server headers #
 alias header='curl -I'
 # find out if remote server supports gzip / mod_deflate or not #
@@ -213,27 +225,11 @@ alias ethtool='ethtool eth1'
 # Only useful for laptop as all servers are without wireless interface
 alias iwconfig='iwconfig wlan0'
 
-if [[ "$(uname)" == "Darwin" ]]; then
-    alias diskspace="du | sort -n -r | more"
-    alias ports='netstat -tulanp'
+if command -v colordiff >/dev/null 2>&1; then
+    alias diff='colordiff'
+    # Side-by-side comparison
+    alias diffy='colordiff -y -W $(tput cols)'
 else
-    alias diskspace="du -S | sort -n -r | more"
-    alias ports='ss -tulanp'
+    # Fallback for systems without colordiff
+    alias diff='diff --color=auto'
 fi
-
-alias dmesg10='sudo dmesg | tail -n 10'
-alias folder="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
-alias path='echo -e ${PATH//:/\\n}'
-alias wc='wc -l -w -c'
-alias nowtime='date +"%T"'
-alias nowdate='date +"%d-%m-%Y"'
-alias ebrc='edit ~/.bashrc'
-alias tree='tree -CAhF --dirsfirst'
-alias treed='tree -CAFd'
-alias mountedinfo='df -hT'
-
-# other
-alias so0="cmatrix"
-
-# install  colordiff package
-# alias diff='colordiff'

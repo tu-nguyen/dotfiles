@@ -222,7 +222,7 @@ _install_gitstatus() {
     local original_dir=$(pwd)
     local installed_or_updated="installed"
     if [ -d "$GITSTATUS_DIR/.git" ]; then
-        t "Gitstatus directory '$GITSTATUS_DIR' already exists. Pulling latest changes.."
+        t OK "Gitstatus directory '$GITSTATUS_DIR' already exists. Pulling latest changes.."
         cd "$GITSTATUS_DIR"
         if ! git pull origin master; then
             t Warning "Failed to pull Gitstatus. Using existing version."
@@ -391,6 +391,7 @@ _install_packages() {
     elif [[ "$OS_TYPE" == "macos" ]]; then
         _install_package lesspipe
         _install_package htop
+        _install_package rsync
 
         # Check for python3, but do NOT install it
         if ! command -v python3 &>/dev/null; then

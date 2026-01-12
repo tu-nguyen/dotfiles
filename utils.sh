@@ -357,6 +357,8 @@ _convert_hex_to_ansi() {
         t "Replacing $hex with $ansi"
         sed -i '' "s|$hex|$ansi|g" "$output_file"
     done
+
+    t OK "Hex to ANSI 256 conversion for $(basename $input_file) completed!"
 }
 
 _install_packages() {

@@ -34,21 +34,36 @@ alias svi='sudo vi'
 # Automatic sudo for system commands if not root
 if (( EUID != 0 )); then
     alias reboot='sudo reboot'
-    alias ipt='sudo /sbin/iptables'
-    # Detect package manager
-    if command -v apt-get &>/dev/null; then
-        alias update='sudo apt-get update && sudo apt-get upgrade'
-    elif command -v pacman &>/dev/null; then
-        alias update='sudo pacman -Syu'
+
+    # Package Manager Detection
+    if [[ "$(uname)" == "Darwin" ]]; then
+        # macOS: Use Homebrew for 'update'
+        if command -v brew &>/dev/null; then
+            alias update='brew update && brew upgrade'
+        fi
+    else
+        if command -v apt-get &>/dev/null; then
+            alias update='sudo apt-get update && sudo apt-get upgrade'
+        elif command -v pacman &>/dev/null; then
+            alias update='sudo pacman -Syu'
+        fi
+    fi
+
+    # Firewall / iptables (Guard for macOS)
+    if [[ "$(uname)" == "Darwin" ]]; then
+        # macOS: Use pfctl equivalents
+        alias ipt='sudo pfctl'
+        alias iptlist='sudo pfctl -s rules'
+        alias firewall='sudo pfctl -s info'
+    else
+        alias ipt='sudo /sbin/iptables'
+        alias iptlist='sudo /sbin/iptables -L -n -v --line-numbers'
+        alias iptlistin='sudo /sbin/iptables -L INPUT -n -v --line-numbers'
+        alias iptlistout='sudo /sbin/iptables -L OUTPUT -n -v --line-numbers'
+        alias iptlistfw='sudo /sbin/iptables -L FORWARD -n -v --line-numbers'
+        alias firewall=iptlist
     fi
 fi
-
-# display all rules #
-alias iptlist='sudo /sbin/iptables -L -n -v --line-numbers'
-alias iptlistin='sudo /sbin/iptables -L INPUT -n -v --line-numbers'
-alias iptlistout='sudo /sbin/iptables -L OUTPUT -n -v --line-numbers'
-alias iptlistfw='sudo /sbin/iptables -L FORWARD -n -v --line-numbers'
-alias firewall=iptlist
 
 # macOS compatibility for timeout
 [[ "$(uname)" == "Darwin" ]] && alias timeout=gtimeout

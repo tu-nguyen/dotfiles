@@ -193,7 +193,7 @@ _install_starship() {
             t OK "Version: $(starship -V)"
         fi
     elif [[ "$OS_TYPE" == "macos" ]]; then
-        _install_mac_package install starship
+        _install_mac_package starship
     fi
 }
 

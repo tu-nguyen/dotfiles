@@ -45,10 +45,10 @@ post_r() {
       popd > /dev/null
     fi
 
-    DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
-    [[ -f "$DOTFILES_CONFIG_DIR/.bash_style" ]] && . "$DOTFILES_CONFIG_DIR/.bash_style"
+    # DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
+    # [[ -f "$DOTFILES_CONFIG_DIR/.bash_style" ]] && . "$DOTFILES_CONFIG_DIR/.bash_style"
 
-    t SUCCESS "${SUCCESS}Reset successful!!${NC}"
+    # t SUCCESS "${SUCCESS}All set!${NC}"
 }
 
 # Re-run Dotfile installation

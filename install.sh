@@ -154,7 +154,9 @@ if [[ $# -eq 0 ]]; then
                 reset_ps
                 break
                 ;;
-            x | X) break ;;
+            x | X)
+                clear
+                exit 0 ;;
             *) t WARN "${WARN}Invalid${NC} option, please try again." ;;
         esac
         read -p "Press ${HDR_F}Enter${NC} to continue.."

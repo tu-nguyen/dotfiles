@@ -39,16 +39,16 @@ _sudo_keep() {
 # TODO: Add support for arch yoart
 _install_linux_package() {
     if dpkg -s "$1" &>/dev/null; then
-        t SUCCESS "$1 is already installed via apt."
+        t SUCCESS "${HDR_F}$1${NC} is already installed via apt."
     else
-        t "Installing $1.."
+        t "Installing ${HDR_F}$1${NC}.."
         sudo apt install -y "$@"
     fi
 }
 
 _install_brew() {
     if ! command -v brew &> /dev/null; then
-        t INFO "Homebrew not found. Installing Homebrew.."
+        t INFO "${HDR_F}homebrew${NC} not found. Installing ${HDR_F}homebrew${NC}.."
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         # Add Homebrew to PATH for current session
         eval "$(/opt/homebrew/bin/brew shellenv)" || eval "$(brew shellenv)"
@@ -58,18 +58,18 @@ _install_brew() {
 _install_mac_package() {
     _install_brew
     if brew list "$1" &>/dev/null; then
-        t SUCCESS "$1 is already installed via brew."
+        t SUCCESS "${HDR_F}$1${NC} is already installed via brew."
     else
-        t "Installing $1.."
+        t "Installing ${HDR_F}$1${NC}.."
         brew install "$@"
     fi
 }
 
 _install_pip_package() {
     if ! pip3 show "$1" &>/dev/null; then
-        t SUCCESS "$1 is already installed via pip."
+        t SUCCESS "${HDR_F}$1${NC} is already installed via pip."
     else
-        t "Installing $1.."
+        t "Installing ${HDR_F}$1${NC}.."
         # tmp remove --user --break-system-packages
         pip3 install "$@"
     fi
@@ -103,11 +103,11 @@ _install_fira_font() {
     fi
 
     if [[ "$INSTALLED" -eq 1 ]]; then
-        t SUCCESS "${FONT_NAME} is already installed. Skipping.."
+        t SUCCESS "${HDR_F}${FONT_NAME}${NC} is already installed. Skipping.."
         return 0
     fi
 
-    t "Installing ${FONT_NAME}.."
+    t "Installing ${HDR_F}${FONT_NAME}${NC}.."
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         local font_dir="$HOME/.local/share/fonts"
         mkdir -p "$font_dir"
@@ -125,7 +125,7 @@ _install_fira_font() {
         brew tap homebrew/cask-fonts
         brew install --cask font-fira-code-nerd-font
     fi
-    t SUCCESS "Installation complete!"
+    t SUCCESS "${SUCCESS}Installation complete!${NC}"
 
     # TODO: fix windows font installation
     # if [[ "$OS_TYPE" == "wsl" ]]; then
@@ -161,10 +161,10 @@ _install_fira_font() {
 _install_starship() {
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         if ! command -v starship &> /dev/null; then
-            t "Installing Starship.."
+            t "Installing ${HDR_F}Starship${NC}.."
             curl -sS https://starship.rs/install.sh | sh
         else
-            t OK "$(starship -V) is already installed at $(command -v starship)"
+            t OK "${HDR_F}$(starship -V)${NC} is already installed at $(command -v starship)"
         fi
     elif [[ "$OS_TYPE" == "macos" ]]; then
         _install_mac_package starship
@@ -174,21 +174,20 @@ _install_starship() {
 # Function to install uv
 _install_uv() {
     if ! command -v uv &> /dev/null; then
-        t "Installing uv.."
+        t "Installing ${HDR_F}uv${NC}.."
         curl -LsSf https://astral.sh/uv/install.sh | sh
     else
-        t OK "$(uv --version) is already installed at $(command -v uv)"
+        t OK "${HDR_F}$(uv --version)${NC} is already installed at $(command -v uv)"
     fi
 }
 
 # Function to install Fast Node Manager
 _install_fnm() {
-
     if ! command -v fnm &> /dev/null; then
-        t "Installing fnm.."
+        t "Installing ${HDR_F}fnm${NC}.."
         curl -fsSL https://fnm.vercel.app/install | bash
     else
-        t OK "$(fnm --version) is already installed at $(command -v fnm)"
+        t OK "${HDR_F}$(fnm --version)${NC} is already installed at $(command -v fnm)"
     fi
 }
 
@@ -197,11 +196,12 @@ _install_gitstatus() {
     local original_dir=$(pwd)
     local installed_or_updated="installed"
     if [ -d "$GITSTATUS_DIR/.git" ]; then
-        t OK "Gitstatus directory '$GITSTATUS_DIR' already exists. Pulling latest changes.."
+        t OK "${SUB_F}gitstatus${NC} directory '$GITSTATUS_DIR' already exists. Pulling latest changes.."
         cd "$GITSTATUS_DIR"
-        if ! git pull origin master; then
+        if ! git pull origin master &> /dev/null; then
             t Warning "Failed to pull Gitstatus. Using existing version."
         fi
+        printf "\033[1A\r\033[K"
         local installed_or_updated="updated"
     else
         t "Cloning Gitstatus repository to '$GITSTATUS_DIR'.."
@@ -211,7 +211,8 @@ _install_gitstatus() {
         local installed_or_updated=installed
     fi
     cd "$original_dir"
-    t OK "Gitstatus $installed_or_updated successfully!"
+    printf "\033[1A\r\033[K"
+    t OK "${HDR_F}gitstatus${NC} $installed_or_updated successfully!"
 }
 
 cp_and_source() {
@@ -250,18 +251,18 @@ _prompt() {
 _clone_or_pull_dotfiles() {
     t "Managing dotfiles repository.."
     if [ -d "$DOTFILES_REPO_DIR/.git" ]; then
-        t "  Dotfiles directory '$DOTFILES_REPO_DIR' already exists."
+        t "${SUB_F}dotfiles${NC} directory '$DOTFILES_REPO_DIR' already exists."
         # Navigate to the dotfiles directory
         cd "$DOTFILES_REPO_DIR" || { t Error "Failed to change directory to $DOTFILES_REPO_DIR. Aborting."; exit 1; }
 
         local stashed_changes=false
         # Check if there are any uncommitted changes (staged or unstaged)
         if [[ $(git status --porcelain) ]]; then
-            t "  Uncommitted changes detected. Stashing them temporarily.."
+            t WARN "Uncommitted changes detected. Stashing them temporarily.."
             # Use 'git stash push' for modern git, 'save' is deprecated but works
             if git stash push -m "Temporary stash by dotfiles script before pull"; then
                 stashed_changes=true
-                t "  Changes stashed successfully."
+                t OK "Changes stashed successfully."
             else
                 t Error "Failed to stash uncommitted changes. Aborting pull."
                 # Return to home directory before exiting on error
@@ -270,14 +271,14 @@ _clone_or_pull_dotfiles() {
             fi
         fi
 
-        t "  Pulling latest changes from '$DOTFILES_REPO'.."
+        t "Pulling latest changes from '$DOTFILES_REPO'.."
         # Ensure we pull from the correct branch, or just 'git pull' if upstream is set
         local current_branch=$(git rev-parse --abbrev-ref HEAD)
-        if ! git pull origin "$current_branch"; then
+        if ! git pull origin "$current_branch" &> /dev/null; then
             t Error "Failed to pull dotfiles from '$DOTFILES_REPO'. Please check your network or repository access."
             # Attempt to reapply stash even if pull failed, so user can resolve
             if $stashed_changes; then
-                t "  Attempting to reapply stashed changes after pull failure.."
+                t WARN "Attempting to reapply stashed changes after pull failure.."
                 git stash pop || t Warning "Failed to pop stash. You may have conflicts to resolve manually."
             fi
             # Return to home directory before exiting on error
@@ -286,18 +287,18 @@ _clone_or_pull_dotfiles() {
         fi
 
         if $stashed_changes; then
-            t "  Applying stashed changes.."
+            t "Applying stashed changes.."
             # git stash pop will fail if there are conflicts, but the user requested it.
             # We'll report if it fails.
-            if git stash pop; then
-                t "  Stashed changes applied successfully."
+            if git stash pop &> /dev/null; then
+                t OK "Stashed changes applied successfully."
             else
                 t Warning "Failed to pop stash. You may have conflicts to resolve manually in '$DOTFILES_REPO_DIR'."
             fi
         fi
 
     else # Repository does not exist, clone it
-        t "  Cloning dotfiles repository '$DOTFILES_REPO' to '$DOTFILES_REPO_DIR'.."
+        t OK "Cloning ${SUB_F}dotfiles${NC} repository '$DOTFILES_REPO' to '$DOTFILES_REPO_DIR'.."
         mkdir -p "$DOTFILES_REPO_DIR" # Ensure parent directory exists
         if ! git clone "$DOTFILES_REPO" "$DOTFILES_REPO_DIR"; then
             t Error "Failed to clone dotfiles from '$DOTFILES_REPO'. Please check the URL and your network."
@@ -379,11 +380,11 @@ _install_packages() {
         fi
 
     else
-        t ERROR "Unsupported OS: $OS_TYPE. Please install the required packages manually."
+        t ERROR "Unsupported OS: ${ERROR}$OS_TYPE${NC}. Please install the required packages manually."
         return 1
     fi
 
-    t SUCCESS "All required packages installed successfully."
+    t SUCCESS "${SUCCESS}All required packages installed successfully.${NC}"
     return
 }
 
@@ -398,7 +399,7 @@ reset_pre() {
 
     _install_packages
 
-    t SUCCESS "reset_pre() completed!"
+    t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_pre()${SUCCESS} completed!!${NC}"
 }
 
 reset_bashrc() {
@@ -432,7 +433,7 @@ reset_bashrc() {
         cpp -q "$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml" "$HOME/.config/starship.toml"
     fi
 
-    t SUCCESS "reset_bashrc() completed!"
+    t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_bashrc()${SUCCESS} completed!!${NC}"
 }
 
 reset_vimrc() {
@@ -451,7 +452,7 @@ reset_vimrc() {
         t OK "Vim-Plug is already installed."
     fi
 
-    t SUCCESS "reset_vimrc() completed!"
+    t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_vimrc()${SUCCESS} completed!!${NC}"
 }
 
 reset_git_config() {
@@ -475,7 +476,7 @@ reset_vscode_config() {
     chmod +x $DOTFILES_REPO_DIR/setup/vscode/vscode_config_setup.sh
     $DOTFILES_REPO_DIR/setup/vscode/vscode_config_setup.sh || t WARNING "Some error occured during reset_vscode_config()"
 
-    t SUCCESS "reset_vscode_config() completed!"
+    t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_vscode_config()${SUCCESS} completed!!${NC}"
 }
 
 reset_wsl_config() {
@@ -492,7 +493,7 @@ reset_wsl_config() {
     chmod +x $DOTFILES_REPO_DIR/setup/wsl/wsl_config_setup.sh
     $DOTFILES_REPO_DIR/setup/wsl/wsl_config_setup.sh  || t WARNING "Some error occured during reset_wsl_config()"
 
-    t SUCCESS "reset_wsl_config() completed!"
+    t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_wsl_config()${SUCCESS} completed!!${NC}"
 }
 
 reset_registry() {
@@ -510,7 +511,7 @@ reset_registry() {
 
     powershell.exe -Command "Start-Process powershell.exe -Verb RunAs -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"$(wslpath -w $DOTFILES_REPO_DIR/setup/registry/registry_script.ps1)\"'"  || t WARNING "Some error occured during reset_registry()"
 
-    t SUCCESS "reset_registry() completed!"
+    t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_registry()${SUCCESS} completed!!${NC}"
 }
 
 reset_firefox() {
@@ -522,7 +523,7 @@ reset_firefox() {
     chmod +x $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh
     $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh || t WARNING "Some error occured during reset_firefox()"
 
-    t SUCCESS "reset_firefox() completed!"
+    t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_firefox()${SUCCESS} completed!!${NC}"
 }
 
 reset_ps() {
@@ -539,5 +540,5 @@ reset_ps() {
     chmod +x $DOTFILES_REPO_DIR/setup/powershell/ps1_setup.sh
     $DOTFILES_REPO_DIR/setup/powershell/ps1_setup.sh  || t WARNING "Some error occured during reset_ps()"
 
-    t SUCCESS "reset_ps() completed!"
+    t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_ps()${SUCCESS} completed!!${NC}"
 }

@@ -109,22 +109,23 @@ show_menu() {
     printf "${HDR_F}==========================================${NC}\n"
     printf "    ${HDR_F}Dotfiles Setup -- Choose an Option${NC}    \n"
     printf "${HDR_F}==========================================${NC}\n"
-    printf "${SEL_F}1.${NC} Reset Pre-configuration\n"
-    printf "${SEL_F}2.${NC} Reset .bashrc\n"
-    printf "${SEL_F}3.${NC} Reset .vimrc\n"
-    printf "${SEL_F}4.${NC} Reset Git Config\n"
-    printf "${SEL_F}5.${NC} Reset VS Code Config\n"
-    printf "${SEL_F}6.${NC} Reset Firefox\n"
-    printf "${SEL_F}7.${NC} Reset WSL Config ${SUB_F}(WSL only)${NC}\n"
-    printf "${SEL_F}8.${NC} Run Gaming Registry Tweaks ${SUB_F}(WSL only)${NC}\n"
-    printf "${SEL_F}9.${NC} Reset PowerShell profile ${SUB_F}(WSL only)${NC}\n"
-    printf "${SEL_F}0.${NC} Run All of the Above ${SUB_F}(Default)${NC}\n"
-    printf "${BOLD}${RED}x. Exit${NC}\n"
-    printf "${BOLD}${WHITE}==========================================${NC}\n"
+    printf "${SEL_F}[1]${NC} Reset Pre-configuration\n"
+    printf "${SEL_F}[2]${NC} Reset .bashrc\n"
+    printf "${SEL_F}[3]${NC} Reset .vimrc\n"
+    printf "${SEL_F}[4]${NC} Reset Git Config\n"
+    printf "${SEL_F}[5]${NC} Reset VS Code Config\n"
+    printf "${SEL_F}[6]${NC} Reset Firefox\n"
+    printf "${SEL_F}[7]${NC} Reset WSL Config ${SUB_F}(WSL only)${NC}\n"
+    printf "${SEL_F}[8]${NC} Run Gaming Registry Tweaks ${SUB_F}(WSL only)${NC}\n"
+    printf "${SEL_F}[9]${NC} Reset PowerShell profile ${SUB_F}(WSL only)${NC}\n"
+    printf "${SEL_F}[0]${NC} Run All of the Above ${SUB_F}(Default)${NC}\n"
+    printf "${BOLD}${RED}[x] Exit${NC}\n"
+    printf "${BOLD}${WHITE}==========================================x${NC}\n"
 }
 
 t "Setting up configuration files.."
 
+# if [[ -z "$target" ]]; then
 if [[ $# -eq 0 ]]; then
     # User input loop
     while true; do
@@ -154,7 +155,7 @@ if [[ $# -eq 0 ]]; then
                 break
                 ;;
             x | X) break ;;
-            *) echo "${BOLD}${RED}Invalid${NC} option, please try again." ;;
+            *) t WARN "${WARN}Invalid${NC} option, please try again." ;;
         esac
         read -p "Press ${HDR_F}Enter${NC} to continue.."
     done
@@ -162,12 +163,10 @@ if [[ $# -eq 0 ]]; then
     echo "${OK}Setup script finished.${NC}"
     # reset_post
 else
-    # currently any arg will trigger this
-    # TODO: decide if we want other shortcuts
+    # DIRECT COMMAND MODE (e.g., 'r bash' or 'r -f vim')
+    clear
+    t WARN "${WARN}Forcing bashrc reset..${NC}"
     reset_bashrc
-    . $HOME/.bashrc
 fi
 
-clear
-
-t OK "All done! You may need to exit and reopen!"
+t OK "${SUCCESS}All done! You may need to exit and reopen!${NC}"

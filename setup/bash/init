@@ -50,6 +50,7 @@ t() {
         WARN|WARNING)   color="${WARN}";  label="[ WARN ]" ;;
         ERR|ERROR)      color="${ERR}";   label="[ ERR  ]" ;;
         SUCCESS|OK)     color="${OK}";    label="[  OK  ]" ;;
+        ALERT)          color="${ALERT}"; label="[-ALERT]" ;;
         TODO)           color="${ALERT}"; label="[ TODO ]" ;;
         DEBUG)          color="${DEBUG}"; label="[-DEBUG]" ;;
         *)              color="${BOLD}";  label="[-$severity]" ;;

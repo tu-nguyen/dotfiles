@@ -60,10 +60,10 @@ check_addon_installed() {
         "$extensions_json" | head -n 1)
 
     if [ -n "$is_installed" ]; then
-        t "Add-on '$addon_id' (Tree Style Tab) is installed and enabled."
+        t OK "Add-on ${HDR_F}$addon_id (Tree Style Tab)${NC} is installed and enabled."
         return 0 # Add-on is installed and enabled
     else
-        t "Add-on '$addon_id' (Tree Style Tab) is NOT found or not enabled."
+        t ERR "Add-on ${ERR}$addon_id (Tree Style Tab)${NC} is NOT found or not enabled."
         # You might want to provide instructions to the user here.
         return 1 # Add-on not found or not enabled
     fi
@@ -189,13 +189,14 @@ setup_userchrome_css() {
     cpp -q "$source_css_path" "$dest_css_path"
     if [ $? -eq 0 ]; then
         t OK "Successfully copied userChrome.css from to '$(basename $dest_css_path)'"
-        t "IMPORTANT: For userChrome.css to work, you need to enable it in Firefox:"
-        echo "  1. Open Firefox."
-        echo "  2. Type 'about:config' in the address bar and press Enter."
-        echo "  3. Accept the risk warning."
-        echo "  4. Search for 'toolkit.legacyUserProfileCustomizations.stylesheets'."
-        echo "  5. Toggle its value to 'true'."
-        echo "  6. Restart Firefox completely."
+        t "${BOLD}Please follow the steps below.${NC}"
+        echo "${HDR_F}For userChrome.css to work, you need to enable it in Firefox${NC}:"
+        echo "${SEL_F}1${NC}. Open Firefox."
+        echo "${SEL_F}2${NC}. Type '${SUB_F}about:config${NC}' in the address bar and press ${HDR_F}Enter${NC}."
+        echo "${SEL_F}3${NC}. Accept the risk warning."
+        echo "${SEL_F}4${NC}. Search for '${SUB_F}toolkit.legacyUserProfileCustomizations.stylesheets${NC}'."
+        echo "${SEL_F}5${NC}. Toggle its value to '${SUB_F}true${NC}'."
+        echo "${SEL_F}6${NC}. Restart Firefox completely."
     else
         t ERROR "Error copying userChrome.css from '$source_css_path' to '$dest_css_path'" >&2
         return 1

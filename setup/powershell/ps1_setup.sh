@@ -32,5 +32,5 @@ else
     t "Copying profile.ps1 for PowerShell"
 fi
 
-cpp "$src" "$dest"
+cp "$src" "$dest"
 t OK "PS1 settings synced to: ${VAL_F}$dest${NC}"

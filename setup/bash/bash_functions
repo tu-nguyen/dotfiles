@@ -44,7 +44,11 @@ post_r() {
     if [ "$IS_PROJECT_ROOT" = false ]; then
       popd > /dev/null
     fi
-    t SUCCESS "Reset successful!"
+
+    DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
+    [[ -f "$DOTFILES_CONFIG_DIR/.bash_style" ]] && . "$DOTFILES_CONFIG_DIR/.bash_style"
+
+    t SUCCESS "${SUCCESS}Reset successful!!${NC}"
 }
 
 # Re-run Dotfile installation

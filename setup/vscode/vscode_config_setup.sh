@@ -20,7 +20,6 @@ DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
 [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 # --- End Load Configuration ---
 
-t "Copying settings.json for VSCode"
 src=$DOTFILES_REPO_DIR/setup/vscode/vscode-settings.json
 
 if [[ "$OS_TYPE" == "linux" ]]; then

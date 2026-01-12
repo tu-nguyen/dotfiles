@@ -24,7 +24,7 @@ DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
 # See: https://gist.github.com/cowboy/3118588
 _sudo_keep() {
     if ! command -v sudo &> /dev/null; then
-        t Error "sudo is not installed. Please install sudo or run as root."
+        t Error "${ERR}sudo${NC} is not installed. Please install sudo or run as root."
         exit 1
     fi
 
@@ -199,14 +199,14 @@ _install_gitstatus() {
         t OK "${SUB_F}gitstatus${NC} directory '$GITSTATUS_DIR' already exists. Pulling latest changes.."
         cd "$GITSTATUS_DIR"
         if ! git pull origin master &> /dev/null; then
-            t Warning "Failed to pull Gitstatus. Using existing version."
+            t Warning "Failed to pull ${SUB_F}gitstatus${NC}. Using existing version."
         fi
         printf "\033[1A\r\033[K"
         local installed_or_updated="updated"
     else
         t "Cloning Gitstatus repository to '$GITSTATUS_DIR'.."
         if ! git clone https://github.com/romkatv/gitstatus.git "$GITSTATUS_DIR"; then
-            t Error" Failed to clone Gitstatus repository."
+            t Error"Failed to clone ${ERR}gitstatus${NC} repository."
         fi
         local installed_or_updated=installed
     fi
@@ -276,7 +276,7 @@ _clone_or_pull_dotfiles() {
         # Ensure we pull from the correct branch, or just 'git pull' if upstream is set
         local current_branch=$(git rev-parse --abbrev-ref HEAD)
         if ! git pull origin "$current_branch" &> /dev/null; then
-            t Error "Failed to pull dotfiles from '$DOTFILES_REPO'. Please check your network or repository access."
+            t Error "Failed to pull ${ERR}dotfiles${NC} from '$DOTFILES_REPO'. Please check your network or repository access."
             # Attempt to reapply stash even if pull failed, so user can resolve
             if $stashed_changes; then
                 t WARN "Attempting to reapply stashed changes after pull failure.."
@@ -303,7 +303,7 @@ _clone_or_pull_dotfiles() {
         t OK "Cloning ${SUB_F}dotfiles${NC} repository '$DOTFILES_REPO' to '$DOTFILES_REPO_DIR'.."
         mkdir -p "$DOTFILES_REPO_DIR" # Ensure parent directory exists
         if ! git clone "$DOTFILES_REPO" "$DOTFILES_REPO_DIR"; then
-            t Error "Failed to clone dotfiles from '$DOTFILES_REPO'. Please check the URL and your network."
+            t Error "Failed to clone ${ERR}dotfiles from${NC} '$DOTFILES_REPO'. Please check the URL and your network."
             exit 1
         fi
     fi
@@ -376,14 +376,14 @@ _install_packages() {
 
         # Check for python3, but do NOT install it
         if ! command -v python3 &>/dev/null; then
-            t ERROR "python3 is required but not installed. Please install Python 3 manually."
+            t ERROR "${ERR}python3${NC} is required but not installed. Please install Python 3 manually."
             exit 1
         else
-            t SUCCESS "python3 is already installed."
+            t SUCCESS "${HDR_F}python3${NC} is already installed."
         fi
 
     else
-        t ERROR "Unsupported OS: ${ERROR}$OS_TYPE${NC}. Please install the required packages manually."
+        t ERROR "Unsupported OS: ${ERR}$OS_TYPE${NC}. Please install the required packages manually."
         return 1
     fi
 
@@ -448,11 +448,11 @@ reset_vimrc() {
     cpp -q "$DOTFILES_REPO_DIR/setup/vim/vimrc" "$HOME/.vimrc"
 
     if [ ! -f ~/.vim/autoload/plug.vim ]; then
-        t "Installing Vim-Plug.."
+        t "Installing ${HDR_F}Vim-Plug${NC}.."
         curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
             https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
     else
-        t OK "Vim-Plug is already installed."
+        t OK "${HDR_F}Vim-Plug${NC} is already installed."
     fi
 
     t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_vimrc()${SUCCESS} completed!!${NC}"
@@ -467,7 +467,7 @@ reset_git_config() {
     chmod +x $DOTFILES_REPO_DIR/setup/git/git_config_setup.sh
     $DOTFILES_REPO_DIR/setup/git/git_config_setup.sh
 
-    t SUCCESS "reset_git_config() completed!"
+    t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_git_config()${SUCCESS} completed!${NC}"
 }
 
 reset_vscode_config() {
@@ -489,7 +489,7 @@ reset_wsl_config() {
     fi
 
     if [[ "$OS_TYPE" != "wsl" ]]; then
-        t ERROR "This function is only for WSL. Skipping WSL configuration reset."
+        t ERROR "This function is only for ${ERR}WSL${NC}. Skipping WSL configuration reset."
         return
     fi
 
@@ -506,7 +506,7 @@ reset_registry() {
     fi
 
     if [[ "$OS_TYPE" != "wsl" ]]; then
-        t ERROR "This function is only for WSL. Skipping registry reset."
+        t ERROR "This function is only for ${ERR}WSL${NC}. Skipping registry reset."
         return
     fi
 
@@ -536,7 +536,7 @@ reset_ps() {
     fi
 
     if [[ "$OS_TYPE" != "wsl" ]]; then
-        t ERROR "This function is only for WSL. Skipping WSL configuration reset."
+        t ERROR "This function is only for ${ERR}WSL${NC}. Skipping WSL configuration reset."
         return
     fi
 

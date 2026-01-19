@@ -436,8 +436,8 @@ reset_bashrc() {
 
     # Copy direnv config
     DIRENV_TEMPLATE_FILE="$DOTFILES_REPO_DIR/setup/bash/direnv/direnv.toml"
-    DIRENV_DEST_FILE="$HOME/.config/direnv"
-    mkdir -p "$DIRENV_DEST_FILE"
+    DIRENV_DEST_FILE="$HOME/.config/direnv/direnv.toml"
+    mkdir -p "$(dirname "$DIRENV_DEST_FILE")"
     sed "s|/home/username|$HOME|g" "$DIRENV_TEMPLATE_FILE" > "$DIRENV_DEST_FILE"
 
     # Copy starship config

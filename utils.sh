@@ -403,6 +403,10 @@ reset_pre() {
         return
     fi
 
+    mkdir -p "$HOME/.config"
+    mkdir -p "$HOME/workplace"
+    mkdir -p "$HOME/workplace/repo"
+
     _install_packages
 
     t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_pre()${SUCCESS} completed!!${NC}"
@@ -432,8 +436,6 @@ reset_bashrc() {
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bashrc" "$HOME/.bashrc"
 
     . "$HOME/.bashrc"
-
-    mkdir -p "$HOME/.config"
 
     TEMP_CONFIG_DIR=$(mktemp -d)
 

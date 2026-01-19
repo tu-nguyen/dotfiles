@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #------------------------------------------
 # Display a message of the day (MOTD) when starting a new terminal session

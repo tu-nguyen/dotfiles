@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 pre_r() {
     unset DOTFILES_LOADED

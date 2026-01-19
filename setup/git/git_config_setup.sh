@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # # --- Start Load Configuration ---
 # if [ -z "$DOTFILES_CONFIG_DIR" ]; then

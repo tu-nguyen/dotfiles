@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ------------------------------------------
 # Path & Language Settings
@@ -46,6 +46,8 @@ if [[ "$(uname)" == "Darwin" ]]; then
     # Python & Tooling
     path_prepend "/opt/homebrew/opt/python@3.12/libexec/bin"
     path_prepend "$HOME/Library/Python/3.12/bin"
+
+    export HOMEBREW_NO_ENV_HINTS=1
 fi
 
 # ------------------------------------------

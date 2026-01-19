@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 alias dk="docker"
 alias dkps="docker ps --format '{{.ID}} - {{.Names}} - {{.Image}} - {{.Status}}'"

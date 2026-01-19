@@ -349,6 +349,7 @@ _install_packages() {
     _install_package jq
     _install_package colordiff
     _install_package wget
+    _install_package direnv
 
     _install_gitstatus
     _install_fira_font

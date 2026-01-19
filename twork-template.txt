@@ -18,8 +18,8 @@ function tworktt() {
     printf "%s\n" "$br"
     printf "${SUB_F}twork functions${NC}\n"
 
-    # printf "  azr                  → Clear the Azure CLI cache\n"
-    # printf "  print_azure_status      → Print current Azure DevOps iter..\n"
+    # printf "  ${KEY_F}azr${NC}                  ${H2}→${NC} Clear the Azure CLI cache\n"
+    # printf "  ${KEY_F}print_azure_status${NC}      ${H2}→${NC} Print current Azure DevOps iter..\n"
     printf "%s\n" "$br"
  }
 

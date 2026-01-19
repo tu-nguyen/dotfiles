@@ -1,0 +1,12 @@
+[global]
+# Automatically allow .envrc files in specific directories
+load_dotenv = true
+
+[whitelist]
+# Files in these paths are allowed to run without you typing `direnv allow`
+prefix = [ "/home/username/workplace/repo/" ]
+
+[strict]
+# If true, direnv will fail if there is an error in your .envrc
+# Catch syntax errors early
+strict_env = true

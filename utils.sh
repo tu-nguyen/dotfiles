@@ -432,10 +432,21 @@ reset_bashrc() {
 
     . "$HOME/.bashrc"
 
+    mkdir -p "$HOME/.config"
+
+    # Copy direnv config
+    DIRENV_TEMPLATE_FILE="$DOTFILES_REPO_DIR/setup/bash/direnv/direnv.toml"
+    DIRENV_DEST_FILE="$HOME/.config/direnv"
+    mkdir -p "$DIRENV_DEST_FILE"
+    sed "s|/home/username|$HOME|g" "$DIRENV_TEMPLATE_FILE" > "$DIRENV_DEST_FILE"
+
+    # Copy starship config
+    STARSHIP_TEMPLATE_FILE="$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml"
+    STARSHIP_DEST_FILE="$HOME/.config/starship.toml"
     if [[ "$OS_TYPE" == "macos" ]]; then
-        _convert_hex_to_ansi "$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml" "$HOME/.config/starship.toml"
+        _convert_hex_to_ansi "$STARSHIP_TEMPLATE_FILE" "$STARSHIP_DEST_FILE"
     else
-        cpp -q "$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml" "$HOME/.config/starship.toml"
+        cpp -q "$STARSHIP_TEMPLATE_FILE" "$STARSHIP_DEST_FILE"
     fi
 
     t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_bashrc()${SUCCESS} completed!!${NC}"

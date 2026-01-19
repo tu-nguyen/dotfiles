@@ -92,7 +92,7 @@ set-tworktt() {
 }
 
 # Extract a file
-extract () {
+ex() {
    if [ -f $1 ] ; then
        case $1 in
            *.tar.bz2)   tar xvjf $1    ;;
@@ -232,6 +232,65 @@ function status_colour() {
         "Blocked"|*"In Review"*|"Bug"|"IT") echo "$RED" ;;
         *) echo "$WHITE" ;;
     esac
+}
+
+# Internal helper to handle the browser opening logic
+function _browser_open() {
+    local url="$1"
+
+    if [[ -n "$WSL_DISTRO_NAME" ]]; then
+        # WSL: Open in Windows default browser
+        powershell.exe -NoProfile -Command "Start-Process '$url'"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS: Open in default Mac browser
+        open "$url"
+    else
+        # Standard Linux: Use xdg-open
+        xdg-open "$url" 2>/dev/null
+    fi
+}
+
+# DuckDuckGo Search
+ddg() {
+    if [[ -z "$1" ]]; then
+        t ERR "Usage: ddg <query>"
+        return 1
+    fi
+    local query=$(printf "%s+" "$@")
+    _browser_open "https://duckduckgo.com/?q=${query%?}"
+}
+
+# Dictionary Search (Merriam-Webster)
+dict() {
+    [[ -z "$1" ]] && { t ERR "Usage: dict <word>"; return 1; }
+    _browser_open "https://www.merriam-webster.com/dictionary/$1"
+}
+
+# Urban Dictionary (Slang)
+urban() {
+    [[ -z "$1" ]] && { t ERR "Usage: urban <query>"; return 1; }
+    local query=$(printf "%s+" "$@")
+    _browser_open "https://www.urbandictionary.com/define.php?term=${query%?}"
+}
+
+# YouTube Search
+yt() {
+    if [[ -z "$1" ]]; then
+        t ERR "Usage: yt <query>"
+        return 1
+    fi
+    local query=$(printf "%s+" "$@")
+    _browser_open "https://www.youtube.com/results?search_query=${query%?}"
+}
+
+# Google Search
+gg() {
+    if [[ -z "$1" ]]; then
+        t ERR "Usage: google <query>"
+        return 1
+    fi
+    local query=$(printf "%s+" "$@")
+    _browser_open "https://www.google.com/search?q=${query%?}"
 }
 
 # Python venv

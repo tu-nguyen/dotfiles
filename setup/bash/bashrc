@@ -14,22 +14,23 @@
 [[ $- != *i* ]] && return
 
 # Input/Output behavior
-set -o vi            # Use vi-style line editing
-set -o ignoreeof     # Prevent Ctrl-D from accidentally exiting the shell
+set -o vi                           # Use vi-style line editing
+set -o ignoreeof                    # Prevent Ctrl-D from accidentally exiting the shell
 
 # Shell Options (shopt)
-shopt -s dotglob                # Include filenames beginning with a '.' in glob patterns
-shopt -s nullglob               # If a pattern matches nothing, expand to nothing instead of the pattern itself
-shopt -s checkwinsize           # Update LINES and COLUMNS after each command if terminal size changed
-shopt -s cdspell                # Correct minor typos in directory names during 'cd'
-shopt -s cdable_vars            # If an argument to 'cd' isn't a dir, assume it's a variable name
-shopt -s checkhash              # Always check if a hashed command exists before executing
-shopt -s sourcepath             # Force 'source' to use the PATH to find files
-shopt -s no_empty_cmd_completion # Don't look for commands on PATH when trying to complete an empty line
-shopt -s cmdhist                # Save multi-line commands as a single history entry
-shopt -s histappend             # Append to history file instead of overwriting
-shopt -s histreedit             # Allow user to re-edit a failed history substitution
-shopt -s histverify             # Load history substitution into the editing buffer instead of executing immediately
+shopt -s autocd                     # If a directory name is typed alone, cd into it
+shopt -s dotglob                    # Include filenames beginning with a '.' in glob patterns
+shopt -s nullglob                   # If a pattern matches nothing, expand to nothing instead of the pattern itself
+shopt -s checkwinsize               # Update LINES and COLUMNS after each command if terminal size changed
+shopt -s cdspell                    # Correct minor typos in directory names during 'cd'
+shopt -s cdable_vars                # If an argument to 'cd' isn't a dir, assume it's a variable name
+shopt -s checkhash                  # Always check if a hashed command exists before executing
+shopt -s sourcepath                 # Force 'source' to use the PATH to find files
+shopt -s no_empty_cmd_completion    # Don't look for commands on PATH when trying to complete an empty line
+shopt -s cmdhist                    # Save multi-line commands as a single history entry
+shopt -s histappend                 # Append to history file instead of overwriting
+shopt -s histreedit                 # Allow user to re-edit a failed history substitution
+shopt -s histverify                 # Load history substitution into the editing buffer instead of executing immediately
 
 # Enable Programmable Completion
 if ! shopt -oq posix; then
@@ -40,26 +41,30 @@ if ! shopt -oq posix; then
     fi
 fi
 
-# Environment Variables (Locale & Color)
-export COLORTERM=truecolor
-export LANG=en_US.UTF-8
-export LC_CTYPE=en_US.UTF-8
-
 # ------------------------------------------
 # Load custom bash files
 # ------------------------------------------
 # Dynamically loads all .bash_* files from your custom dotfiles directory (~/.config/dotfiles).
-
 export DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
 
-[[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
+if [[ -d "$DOTFILES_CONFIG_DIR" ]]; then
 
-# Iterate through all bash modular files
-for file in "$DOTFILES_CONFIG_DIR"/.bash_*; do
-    [[ "$file" == *"/.bash_style" ]] && continue
-    [[ "$file" == *"/.init" ]] && continue
-    [[ -f "$file" && -r "$file" ]] && . "$file"
-done
+    [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
+
+    for file in "$DOTFILES_CONFIG_DIR"/.bash_*; do
+        [[ "$file" == *"/.bash_style" ]] && continue
+        [[ "$file" == *"/.init" ]] && continue
+        [[ -f "$file" && -r "$file" ]] && . "$file"
+    done
+
+else
+    # Use your custom 't' function if available, otherwise fallback to standard echo
+    if declare -f t > /dev/null; then
+        t ERR "Config directory not found: $DOTFILES_CONFIG_DIR"
+    else
+        echo -e "\033[0;31m[ERR]\033[0m Config directory not found: $DOTFILES_CONFIG_DIR"
+    fi
+fi
 
 # ------------------------------------------
 # Tools & Prompt
@@ -104,21 +109,6 @@ if [[ -d "$FNM_PATH" ]]; then
         fi
     fi
 fi
-
-# function _update_ps1() {
-#     PS1=$(powerline-shell $?)
-# }
-
-# if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
-#     # PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
-#     enable_powerline
-#     if is_powerline_enabled; then
-#         # t SUCCESS "Powerline is enabled"
-#         :
-#     else
-#         t WARNING "Powerline is not enabled"
-#     fi
-# fi
 
 # Window Title: Sets terminal tab title to "♥ CurrentDir"
 set_win_title() {

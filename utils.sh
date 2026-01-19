@@ -103,16 +103,16 @@ _install_fira_font() {
     fi
 
     if [[ "$INSTALLED" -eq 1 ]]; then
-        t SUCCESS "${HDR_F}${FONT_NAME}${NC} is already installed. Skipping.."
+        t SUCCESS "${HDR_F}${FONT_NAME,,}${NC} is already installed."
         return 0
     fi
 
-    t "Installing ${HDR_F}${FONT_NAME}${NC}.."
+    t "Installing ${HDR_F}${FONT_NAME,,}${NC}.."
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         local font_dir="$HOME/.local/share/fonts"
         mkdir -p "$font_dir"
 
-        t INFO "Downloading FiraCode Nerd Font zip..."
+        t INFO "Downloading ${FONT_NAME,,} zip.."
         curl -fLo "/tmp/FiraCode.zip" https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip
 
         unzip -o "/tmp/FiraCode.zip" -d "$font_dir"

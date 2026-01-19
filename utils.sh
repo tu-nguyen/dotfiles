@@ -244,6 +244,7 @@ _prompt() {
             RETURN=1
             return
         fi
+        t OK "${OK}Starting ${H}$config${OK} reset.${NC}"
     fi
 }
 
@@ -434,25 +435,28 @@ reset_bashrc() {
 
     mkdir -p "$HOME/.config"
 
+    TEMP_CONFIG_DIR=$(mktemp -d)
+
     # Copy direnv config
     DIRENV_TEMPLATE_FILE="$DOTFILES_REPO_DIR/setup/bash/direnv/direnv.toml"
     DIRENV_DEST_FILE="$HOME/.config/direnv/direnv.toml"
-    TEMP_DIRENV_TOML=$(mktemp)
+    TEMP_DIRENV_TOML="$TEMP_CONFIG_DIR/direnv.toml"
     mkdir -p "$(dirname "$DIRENV_DEST_FILE")"
     sed "s|/home/username|$HOME|g" "$DIRENV_TEMPLATE_FILE" > "$TEMP_DIRENV_TOML"
     cpp -q "$TEMP_DIRENV_TOML" "$DIRENV_DEST_FILE"
-    rm "$TEMP_DIRENV_TOML"
 
     # Copy starship config
     STARSHIP_TEMPLATE_FILE="$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml"
     STARSHIP_DEST_FILE="$HOME/.config/starship.toml"
-    TEMP_STARSHIP_TOML=$(mktemp)
+    TEMP_STARSHIP_TOML="$TEMP_CONFIG_DIR/starship.toml"
     if [[ "$OS_TYPE" == "macos" ]]; then
         _convert_hex_to_ansi "$STARSHIP_TEMPLATE_FILE" "$TEMP_STARSHIP_TOML"
     else
-        cpp -q "$TEMP_STARSHIP_TOML" "$STARSHIP_DEST_FILE"
+        cpp -q "$STARSHIP_TEMPLATE_FILE" "$TEMP_STARSHIP_TOML"
     fi
-    rm "$TEMP_STARSHIP_TOML"
+    cpp "$TEMP_STARSHIP_TOML" "$STARSHIP_DEST_FILE"
+
+    rm -fr "$TEMP_CONFIG_DIR"
 
     t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_bashrc()${SUCCESS} completed!!${NC}"
 }

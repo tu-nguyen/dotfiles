@@ -69,7 +69,7 @@ function tt() {
   printf "                       ${H2}→${NC} ${KEY_F}ping${NC} (ping -c 5)             ${H2}→${NC} ${KEY_F}nowdate${NC} (date)\n"
   printf "                       ${H2}→${NC} ${KEY_F}p4${NC} (ping 4.2.2.2 -c 4)       ${H2}→${NC} ${KEY_F}ipt${NC} (sudo /sbin/iptables)\n"
   printf "                       ${H2}→${NC} ${KEY_F}ports${NC} (netstat -tulanp)      ${H2}→${NC} ${KEY_F}diskspace${NC} (du)\n"
-  printf "                       ${H2}→${NC} ${KEY_F}folder${NC} ()                    ${H2}→${NC} ${KEY_F}path${NC} ()${H2}→${NC}\n"
+  printf "                       ${H2}→${NC} ${KEY_F}folder${NC} (dir and sizes)       ${H2}→${NC} ${KEY_F}path${NC} (readible \$PATH)\n"
   # other
   printf "%s\n" "$br"
   printf "${SUB_F}other functions${NC}      \n"

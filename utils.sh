@@ -330,11 +330,11 @@ _convert_hex_to_ansi() {
     # Create a copy to work on
     cpp "$input_file" "$output_file"
 
-    t "Converting Hex to ANSI 256 for: $input_file"
+    t OK "Converting Hex to ANSI 256 for: $(basename "$input_file")"
 
     grep -oE '#[0-9a-fA-F]{6}' "$input_file" | sort -u | while read -r hex; do
         ansi=$(_hex_to_256 "$hex")
-        t "Replacing $hex with $ansi"
+        t OK "Replacing $hex with $ansi"
         sed -i '' "s|$hex|$ansi|g" "$output_file"
     done
 

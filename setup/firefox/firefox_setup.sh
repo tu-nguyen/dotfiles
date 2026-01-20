@@ -117,36 +117,38 @@ check_base_path() {
         fi
     fi
 
-    # Fallback: If profiles.ini parsing fails, try to find a common default profile name
+    # Fallback: Check both base path and Profiles/ subdirectory
+    local search_paths=("$FF_PATH" "$FF_PATH/Profiles")
     local latest_profile=""
     local latest_mtime=0
-    for profile_dir in "$FF_PATH"/Profiles/*; do
-        # Check if it's a directory and matches the naming pattern
-        if [ -d "$profile_dir" ]; then
-            # Get the modification time of the directory
-            # For GNU systems (Linux, WSL), use stat -c %Y
-            # For macOS/BSD, use stat -f %m
+
+    for base in "${search_paths[@]}"; do
+        [[ ! -d "$base" ]] && continue
+
+        # Look for directories that contain common Firefox files like 'places.sqlite'
+        for profile_dir in "$base"/*; do
+            [[ ! -d "$profile_dir" ]] && continue
+
+            # Skip directories that are definitely not profiles (like 'Pending Pings')
+            [[ "$profile_dir" == *"Pending Pings"* ]] && continue
+
+            # Get modification time
             local mtime=""
-            if command -v stat >/dev/null 2>&1 && stat -c %Y "$profile_dir" >/dev/null 2>&1; then
-                # GNU stat (Linux, WSL)
+            if stat -c %Y "$profile_dir" >/dev/null 2>&1; then
                 mtime=$(stat -c %Y "$profile_dir")
-            elif command -v stat >/dev/null 2>&1 && stat -f %m "$profile_dir" >/dev/null 2>&1; then
-                # BSD stat (macOS)
+            elif stat -f %m "$profile_dir" >/dev/null 2>&1; then
                 mtime=$(stat -f %m "$profile_dir")
-            else
-                # Fallback if stat isn't robust or portable enough, or just skip mtime check
-                # You might need to adjust this if stat fails frequently.
-                # For this specific scenario, given we expect stat, it's fine.
-                t WARNING "'stat' command not behaving as expected for modification time check. Skipping time comparison for '$profile_dir'." >&2
-                continue # Skip to the next directory
             fi
 
-            # Check if this profile is newer than the current latest
             if [ -n "$mtime" ] && (( mtime > latest_mtime )); then
-                latest_mtime="$mtime"
-                latest_profile="$profile_dir"
+                # Check if it's actually a profile (must contain files)
+                local f_count=$(find "$profile_dir" -maxdepth 1 -type f | grep -c .)
+                if (( f_count >= MIN_FILES_REQUIRED )); then
+                    latest_mtime="$mtime"
+                    latest_profile="$profile_dir"
+                fi
             fi
-        fi
+        done
     done
 
     if [ -n "$latest_profile" ]; then
@@ -155,7 +157,7 @@ check_base_path() {
     fi
 
     # If no matching profile was found after checking all directories
-    t DEBUG "No matching default-release or .default profile found in '$current_base_path'." >&2 # Add debug
+    t DEBUG "No matching default-release or .default profile found in '$current_base_path'." >&2
     return 1
 }
 

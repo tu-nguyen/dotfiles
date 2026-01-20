@@ -80,7 +80,9 @@ function tt() {
     printf "${SUB_F}other tt${NC}      \n"
     printf "  ${KEY_F}btt${NC}                  ${H2}→${NC} to view bash cheatsheet\n"
     printf "  ${KEY_F}djtt${NC}                 ${H2}→${NC} to view django cheatsheet\n"
-    printf "  ${KEY_F}gtt${NC}                  ${H2}→${NC} to view git aliases\n"
+    printf "  ${KEY_F}gtt${NC}                  ${H2}→${NC} to view git cheatsheet\n"
+    printf "  ${KEY_F}gttt${NC}                 ${H2}→${NC} to view git aliases\n"
+    printf "  ${KEY_F}sshtt${NC}                ${H2}→${NC} to view ssh cheatsheet\n"
     printf "  ${KEY_F}makett${NC}               ${H2}→${NC} to view makefile cheatsheet\n"
     printf "  ${KEY_F}pytt${NC}                 ${H2}→${NC} to view python cheatsheet\n"
     printf "  ${KEY_F}dctt${NC}                 ${H2}→${NC} to view docker-compose cheatsheet\n"
@@ -251,7 +253,31 @@ function gtt() {
 function gttt() {
     printf "${HDR_F}Git Aliases (Active)${NC}\n"
     printf "%s\n" "$br"
-    alias | grep 'git' | sed "s/alias //g" | sed "s/='/\t${H2}→${NC} /g" | sed "s/'//g"
+    alias | grep 'git' | awk -F"[=']+" -v  key_f="${KEY_F}" -v h2="${H2}" -v nc="${NC}" '
+    {
+        sub(/alias /, "", $1);
+        printf "  %s%-20s%s %s%s%s %s\n", key_f, $1, nc, h2, "→", nc, $2
+    }'
+    printf "%s\n" "$br"
+}
+
+function sshtt() {
+    printf "${HDR_F}ssh cheatsheet${NC}\n"
+    printf "%s\n" "$br"
+    printf "${SUB_F}common commands:${NC}\n"
+    printf "  ${KEY_F}ssh${NC} ${DIM_F}user${NC}${KEY_F}@${NC}${DIM_F}remotehost${NC}                                 ${H2}→${NC} Connect to remote server\n"
+    printf "  ${KEY_F}scp${NC} ${DIM_F}file.txt user${NC}${KEY_F}@${NC}${DIM_F}remotehost${NC}${KEY_F}:~/${NC}                     ${H2}→${NC} Copy local file to remote server\n"
+    printf "  ${KEY_F}scp${NC} ${DIM_F}user${NC}${KEY_F}@${NC}${DIM_F}remotehost:${DIM_F}~/file.txt .${NC}                    ${H2}→${NC} Copy file from a remote server to local\n"
+    printf "  ${KEY_F}scp -r${NC} ${DIM_F}user${NC}${KEY_F}@${NC}${DIM_F}remotehost${NC}${KEY_F}:${NC}${DIM_F}/home /home${NC}                  ${H2}→${NC} Recursively copy /home from remote host to local serve\n"
+    printf "  ${KEY_F}ssh${NC} ${DIM_F}user${NC}${KEY_F}@${NC}${DIM_F}remotehost${NC}${KEY_F} \"cat ${NC}${DIM_F}/tmp/remotefile${NC}${KEY_F}\" | diff – ${NC}${DIM_F}/tmp/localfile${NC}\n"
+    printf "                                                      ${H2}→${NC} Compare a file on remote server with local host \n"
+    printf "%s\n" "$br"
+    printf "${SUB_F}other:${NC}\n"
+    printf "  ${KEY_F}cat ~/.ssh/id_rsa.pub | ssh${NC} ${DIM_F}user${NC}${KEY_F}@${NC}${DIM_F}remotehost${NC} ${KEY_F}\"cat – \>\> ~/.ssh/authorized_keys\"${NC}\n"
+    printf "                                                      ${H2}→${NC} Setup passwordless SSH access to another server\n"
+    printf "  ${KEY_F}ssh-copy-id -i ~/.ssh/id_rsa.pub${NC} ${DIM_F}user${NC}${KEY_F}@${NC}${DIM_F}remotehost${NC}    ${H2}→${NC} Transfer your public key to the remote server \n"
+    printf "  ${KEY_F}ssh -D 9999${NC} ${DIM_F}user${NC}${KEY_F}@${NC}${DIM_F}remotehost${NC}                         ${H2}→${NC} Tunnel all your browser traffic through your SSH server \n"
+    printf "  ${KEY_F}ssh -X${NC} ${DIM_F}user${NC}${KEY_F}@${NC}${DIM_F}remote_server${NC} ${KEY_F}\"${NC}${DIM_F}some_command${NC}${KEY_F}\"${NC}            ${H2}→${NC} Execute one single command  \n"
     printf "%s\n" "$br"
 }
 

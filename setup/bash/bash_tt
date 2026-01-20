@@ -14,8 +14,8 @@ function print_tt() {
         return 1
     fi
 
-    # Pass S, H, and NC into awk variables
-    awk -v h="$H" -v s="$S" -v h2="$H2" -v nc="$NC" '
+    # Pass KEY_F, S, and NC into awk variables
+    awk -v key_f="$KEY_F" -v s="$S" -v h2="$H2" -v nc="$NC" '
     BEGIN { comment="" }
 
     /^#/ { comment = $0; next }
@@ -36,7 +36,7 @@ function print_tt() {
 
         # Print using the passed variables
         # %-20s ensures the function name column stays aligned
-        printf "  %s%-20s%s %s→%s %s\n", h, func_name, nc, h2, nc, comment
+        printf "  %s%-20s%s %s→%s %s\n", key_f, func_name, nc, h2, nc, comment
         comment=""
     }' "$file"
 }
@@ -51,7 +51,7 @@ function tt() {
     printf "%s\n" "$br"
     # TODO: add chmod aliases
     printf "${SUB_F}primary functions${NC}      ${H2}→${NC} ${KEY_F}ttt${NC} (show all tt)            ${H2}→${NC} ${KEY_F}j${NC} (jobs -l)\n"
-    printf "                       ${S}${H2}→${NC}${NC} ${KEY_F}cls${NC} (clear and ls)           ${H2}→${NC} ${KEY_F}df${NC} (df -H)\n"
+    printf "                       ${H2}→${NC} ${KEY_F}cls${NC} (clear and ls)           ${H2}→${NC} ${KEY_F}df${NC} (df -H)\n"
     printf "                       ${H2}→${NC} ${KEY_F}mkcd${NC} (mkdir then cd)         ${H2}→${NC} ${KEY_F}du${NC} (du -ch)\n"
     printf "                       ${H2}→${NC} ${KEY_F}h${NC} (history)                  ${H2}→${NC} ${KEY_F}dmesg10${NC} (10 recent logs)\n"
     printf "                       ${H2}→${NC} ${KEY_F}x${NC} (exit)                     ${H2}→${NC} ${KEY_F}top${NC} (htop)\n"
@@ -90,14 +90,15 @@ function tt() {
     printf "  ${KEY_F}vtt${NC}                  ${H2}→${NC} to view vim cheatsheet\n"
 
     if [[ ! -f "$DOTFILES_CONFIG_DIR/.bash_personal" ]]; then
-        printf "  ${KEY_F}ptt${NC}                  ${H2}→${NC} .bash_personal ${RED}does not exist${NC} inside $DOTFILES_CONFIG_DIR\n"
+        printf "  ${KEY_F}ptt${NC}                  ${H2}→${NC} config ${VAL_F}.bash_personal${NC} ${RED}does not exist${NC} inside ${VAL_F}$DOTFILES_CONFIG_DIR${NC}\n"
+        printf "                             run ${KEY_F}set-ptt${NC} to copy ${VAL_F}.bash_personal${NC} template ${RED}TODO: create${NC}\n"
     else
         printf "  ${KEY_F}ptt${NC}                  ${H2}→${NC} to view personal stuff\n"
     fi
 
     if [[ ! -f "$DOTFILES_CONFIG_DIR/.bash_twork" ]]; then
-        printf "  ${KEY_F}tworktt${NC}              ${H2}→${NC} .bash_twork ${RED}does not exist${NC} inside $DOTFILES_CONFIG_DIR\n"
-        printf "                             run ${KEY_F}set-tworktt${NC} to copy .bash_twork template\n"
+        printf "  ${KEY_F}tworktt${NC}              ${H2}→${NC} config .bash_twork ${RED}does not exist${NC} inside ${VAL_F}$DOTFILES_CONFIG_DIR${NC}\n"
+        printf "                             run ${KEY_F}set-tworktt${NC} to copy ${VAL_F}.bash_twork template${NC}\n"
     else
         printf "  ${KEY_F}tworktt${NC}              ${H2}→${NC} to view twork stuff\n"
     fi
@@ -148,16 +149,17 @@ function btt() {
     printf "  ${KEY_F}Ctrl+d${NC}               ${H2}→${NC} Logout/EOF\n"
     printf "%s\n" "$br"
     printf "${SUB_F}scripting:${NC}\n"
-    printf "  ${KEY_F}echo${NC} ${DIM_F}\"text\"${NC}          ${H2}→${NC} Print text\n"
+    printf "  ${KEY_F}echo \"${NC}${DIM_F}text${NC}${KEY_F}\"${NC}          ${H2}→${NC} Print text\n"
     printf "  ${DIM_F}VAR${NC}${KEY_F}=${NC}${DIM_F}value${NC}            ${H2}→${NC} Set variable\n"
-    printf "  ${DIM_F}\$VAR${NC}                 ${H2}→${NC} Use variable\n"
+    printf "  ${KEY_F}\$${NC}${DIM_F}VAR${NC}                 ${H2}→${NC} Use variable\n"
     printf "  ${KEY_F}for i in *; do ... done${NC}\n"
     printf "  ${KEY_F}if ...; then ...; fi${NC}\n"
-    printf "  ${KEY_F}function fname() { ... }${NC}\n"
+    printf "  ${KEY_F}function${NC} ${DIM_F}fname${NC}${KEY_F}() { ... }${NC}\n"
     printf "%s\n" "$br"
     printf "${SUB_F}other:${NC}\n"
-    printf "  ${KEY_F}curl${NC}                 ${H2}→${NC} Check connectivity (ping 8.8.8.8) Network troubleshooting 101\n"
-    printf "  ${KEY_F}ping${NC}                 ${H2}→${NC} Grab data(curl -O http://example.com/file.txt) Downloads without a browser\n"
+    printf "  ${KEY_F}ping${NC} ${DIM_F}8.8.8.8${NC}         ${H2}→${NC} Check connectivity/Network troubleshooting 101\n"
+    printf "  ${KEY_F}curl -O${NC} ${DIM_F}http://example.com/file.txt${NC}\n"
+    printf "                       ${H2}→${NC} Grab data/ Downloads without a browser\n"
     printf "%s\n" "$br"
 }
 
@@ -290,7 +292,7 @@ function makett() {
     printf "  ${KEY_F}make${NC} ${DIM_F}target${NC}         ${H2}→${NC} Run specific target\n"
     printf "%s\n" "$br"
     printf "${SUB_F}variables:${NC}\n"
-    printf "  ${DIM_F}VAR${NC} ${KEY_F}=${NC} ${DIM_F}value${NC}         ${H2}→${NC} Set variable\n"
+    printf "  ${DIM_F}VAR${NC} ${KEY_F}=${NC} ${DIM_F}value${NC}         ${H2}→${NC} Set variable ${RED}TODO: add entry for ?= and := ${NC}\n"
     printf "  ${DIM_F}\$(VAR)${NC}              ${H2}→${NC} Use variable\n"
     printf "%s\n" "$br"
     printf "${SUB_F}phony targets:${NC}\n"

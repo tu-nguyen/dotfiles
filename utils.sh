@@ -351,6 +351,7 @@ _install_packages() {
     _install_package colordiff
     _install_package wget
     _install_package direnv
+    _install_package tree
 
     _install_gitstatus
     _install_fira_font
@@ -368,7 +369,6 @@ _install_packages() {
 
         _install_package coreutils
         _install_package less
-        _install_package tree
         _install_package iptables
 
     # macOS only

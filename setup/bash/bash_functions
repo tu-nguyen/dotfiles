@@ -363,37 +363,57 @@ function venv () {
 
 # github related functions
 function gbr() {
+    printf "${HDR_F}==========================================${NC}\n"
+    printf "    ${HDR_F}git checkout b -- Choose an Option${NC}    \n"
+    printf "${HDR_F}==========================================${NC}\n"
+    local width=$(tput cols)
+    # local width=$(($(tput cols) - 5))
+    local target_width=$((width + 6))
+
+    # Get raw and colored branch lists
+    mapfile -t branches < <(git --no-pager branch --format="%(refname:short)")
+
     # Use --color=always to keep your pink/green hex colors
     # 'git -p' or 'git --no-pager' BEFORE 'branch'
-    mapfile -t branches < <(git --no-pager branch --format="%(refname:short)")
-    mapfile -t colored_branches < <(git --no-pager branch -vv --color=always)
+    # truncate the line based on terminal width with 'cut'
+    # Note: the subtraction (-3) accounts for the "[1]" prefix space
+    # mapfile -t colored_branches < <(git --no-pager branch -vv --color=always | sed 's/^[ *]*//' | cut -c 1-$((width - 2)))
+    mapfile -t colored_branches < <(git --no-pager branch -vv --color=always | sed 's/^[ *]*//')
 
-    # 3. Display the menu using your custom git colors
-    echo -e "\033[1;35mSelect a branch to copy:\033[0m"
+    # Display the menu
+    # echo -e "${H}Select a branch to checkout (or type 'x' to exit):${NC}"
     for i in "${!colored_branches[@]}"; do
-        printf "%2d) %s\n" "$((i+1))" "${colored_branches[$i]}"
+        # printf "${SEL_F}[%s] ${NC}%s\n" "$((i+1))" "${colored_branches[$i]}"
+        printf "${SEL_F}[%s] ${NC}%.${target_width}s\n" "$((i+1))" "${colored_branches[$i]}"
     done
+    echo "${BOLD}${RED}[x] Exit${NC}"
+    printf "${BOLD}${WHITE}==========================================x${NC}\n"
 
     # Prompt for selection
-    read -p "Enter number: " choice
+    read -p "Checkout branch #: " choice
 
-    # Handle the selection and copy to clipboard
-    if [[ "$choice" -gt 0 && "$choice" -le "${#branches[@]}" ]]; then
-        # Use the uncolored branch name for the actual clipboard
+    # Handle 'x' for Exit
+    if [[ "$choice" == "x" ]]; then
+        return 0
+    fi
+
+    # Handle numerical selection
+    if [[ "$choice" =~ ^[0-9]+$ ]] && [[ "$choice" -gt 0 && "$choice" -le "${#branches[@]}" ]]; then
         selected="${branches[$((choice-1))]}"
 
-        # Detect OS and use the appropriate clipboard tool
-        if command -v pbcopy >/dev/null; then
-            echo -n "$selected" | pbcopy # Mac
-        elif command -v clip.exe >/dev/null; then
-            echo -n "$selected" | clip.exe # WSL
-        elif command -v xclip >/dev/null; then
-            echo -n "$selected" | xclip -sel clip # Linux
-        fi
+        # if command -v pbcopy >/dev/null; then
+        #     echo -n "$selected" | pbcopy
+        # elif command -v clip.exe >/dev/null; then
+        #     echo -n "$selected" | clip.exe
+        # elif command -v xclip >/dev/null; then
+        #     echo -n "$selected" | xclip -sel clip
+        # fi
 
-        echo -e "\033[1;32m✓ Copied '$selected' to clipboard!\033[0m"
+        # echo -e "${OK}✓ Copied '$selected' to clipboard!${NC}"
+         t OK "Switching to '$selected'.."
+        git checkout "$selected"
     else
-        echo -e "\033[1;31mInvalid selection.\033[0m"
+        t ERR "Invalid selection."
     fi
 }
 

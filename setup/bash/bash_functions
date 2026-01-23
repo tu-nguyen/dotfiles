@@ -362,7 +362,9 @@ function venv () {
 }
 
 # github related functions
-function gbr() {
+
+# Checkout via selecting from a menu
+function gco() {
     printf "${HDR_F}==========================================${NC}\n"
     printf "    ${HDR_F}git checkout b -- Choose an Option${NC}    \n"
     printf "${HDR_F}==========================================${NC}\n"
@@ -386,11 +388,25 @@ function gbr() {
         # printf "${SEL_F}[%s] ${NC}%s\n" "$((i+1))" "${colored_branches[$i]}"
         printf "${SEL_F}[%s] ${NC}%.${target_width}s\n" "$((i+1))" "${colored_branches[$i]}"
     done
+    echo "${SEL_F}[n] Create new branch${NC}"
     echo "${BOLD}${RED}[x] Exit${NC}"
-    printf "${BOLD}${WHITE}==========================================x${NC}\n"
+    printf "${BOLD}${WHITE}==========================================${NC}\n"
 
     # Prompt for selection
     read -p "Checkout branch #: " choice
+
+    # Handle 'n' for New Branch
+    if [[ "$choice" == "n" ]]; then
+        read -p "Enter new branch name: " new_branch
+        if [[ -n "$new_branch" ]]; then
+            git checkout -b "$new_branch"
+            t OK "'$new_branch' created.."
+        else
+            echo -e "${ERR}Branch name cannot be empty.${NC}"
+        fi
+        t OK "Switching to '$new_branch'.."
+        return 0
+    fi
 
     # Handle 'x' for Exit
     if [[ "$choice" == "x" ]]; then
@@ -417,33 +433,21 @@ function gbr() {
     fi
 }
 
-function gpull() {
-    local branch=$(git rev-parse --abbrev-ref HEAD)
-    t INFO "Pulling ${H2}${branch}${NC}.."
-    git pull origin "$branch" --prune
-}
+# removing in favogiven branch with confirmation
+# function gco() {
+#     local branch=$1
+#     if [ -z "$branch" ]; then
+#         t "Usage: gco <branch_name>"
+#         return 1
+#     fi
+#     if git checkout "$branch"; then
+#         t SUCCESS "Switched to branch ${H2}$branch${NC}"
+#     else
+#         t ERROR "Could not find branch ${H2}$branch${NC}"
+#     fi
+# }
 
-function gpush() {
-    local branch=$(git rev-parse --abbrev-ref HEAD)
-    t INFO "Pushing ${H2}${branch}${NC} to origin.."
-    git push -u origin "$branch"
-}
-
-# Switch to a specified Git branch with confirmation
-function gco() {
-    local branch=$1
-    if [ -z "$branch" ]; then
-        t "Usage: gco <branch_name>"
-        return 1
-    fi
-    if git checkout "$branch"; then
-        t SUCCESS "Switched to branch ${H2}$branch${NC}"
-    else
-        t ERROR "Could not find branch ${H2}$branch${NC}"
-    fi
-}
-
-# Same as above but with fallback to create a branch
+# Checkout to a branch, create if it doesn't exist
 function gcob() {
     local branch=$1
     if [ -z "$branch" ]; then
@@ -460,6 +464,18 @@ function gcob() {
             t ERROR "Failed to create branch ${H2}$branch${NC}"
         fi
     fi
+}
+
+function gpull() {
+    local branch=$(git rev-parse --abbrev-ref HEAD)
+    t INFO "Pulling ${H2}${branch}${NC}.."
+    git pull origin "$branch" --prune
+}
+
+function gpush() {
+    local branch=$(git rev-parse --abbrev-ref HEAD)
+    t INFO "Pushing ${H2}${branch}${NC} to origin.."
+    git push -u origin "$branch"
 }
 
 # Rename git branch

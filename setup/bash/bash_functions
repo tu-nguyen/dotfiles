@@ -362,6 +362,41 @@ function venv () {
 }
 
 # github related functions
+function gbr() {
+    # Use --color=always to keep your pink/green hex colors
+    # 'git -p' or 'git --no-pager' BEFORE 'branch'
+    mapfile -t branches < <(git --no-pager branch --format="%(refname:short)")
+    mapfile -t colored_branches < <(git --no-pager branch -vv --color=always)
+
+    # 3. Display the menu using your custom git colors
+    echo -e "\033[1;35mSelect a branch to copy:\033[0m"
+    for i in "${!colored_branches[@]}"; do
+        printf "%2d) %s\n" "$((i+1))" "${colored_branches[$i]}"
+    done
+
+    # Prompt for selection
+    read -p "Enter number: " choice
+
+    # Handle the selection and copy to clipboard
+    if [[ "$choice" -gt 0 && "$choice" -le "${#branches[@]}" ]]; then
+        # Use the uncolored branch name for the actual clipboard
+        selected="${branches[$((choice-1))]}"
+
+        # Detect OS and use the appropriate clipboard tool
+        if command -v pbcopy >/dev/null; then
+            echo -n "$selected" | pbcopy # Mac
+        elif command -v clip.exe >/dev/null; then
+            echo -n "$selected" | clip.exe # WSL
+        elif command -v xclip >/dev/null; then
+            echo -n "$selected" | xclip -sel clip # Linux
+        fi
+
+        echo -e "\033[1;32m✓ Copied '$selected' to clipboard!\033[0m"
+    else
+        echo -e "\033[1;31mInvalid selection.\033[0m"
+    fi
+}
+
 function gpull() {
     local branch=$(git rev-parse --abbrev-ref HEAD)
     t INFO "Pulling ${H2}${branch}${NC}.."
@@ -450,19 +485,19 @@ function grn() {
 # Print current Azure DevOps iteration details and tasks assigned to the user
 function print_azure_status() {
     if [[ $# -lt 4 ]]; then
-        echo "Usage: print_current_iteration <ORG> <PROJECT> <TEAM> <AZDO_PAT>"
+        echo "Usage: print_current_iteration <AZURE_ORG> <AZURE_PROJECT> <AZURE_TEAM> <AZURE_DEVOPS_PAT>"
         return 1
     fi
 
-    local ORG="$1"
-    local PROJECT="$2"
-    local TEAM="$3"
-    local AZDO_PAT="$4"
+    local AZURE_ORG="$1"
+    local AZURE_PROJECT="$2"
+    local AZURE_TEAM="$3"
+    local AZURE_DEVOPS_PAT="$4"
 
     # Get current iteration path
-    local ITERATION_API="https://dev.azure.com/$ORG/$PROJECT/$TEAM/_apis/work/teamsettings/iterations?\$timeframe=current&api-version=7.0"
+    local ITERATION_API="https://dev.azure.com/$AZURE_ORG/$AZURE_PROJECT/$AZURE_TEAM/_apis/work/teamsettings/iterations?\$timeframe=current&api-version=7.0"
     local ITERATION_PATH
-    ITERATION_PATH=$(curl -s -u ":$AZDO_PAT" "$ITERATION_API" | jq -r '.value[0].path')
+    ITERATION_PATH=$(curl -s -u ":$AZURE_DEVOPS_PAT" "$ITERATION_API" | jq -r '.value[0].path')
     if [[ -z "$ITERATION_PATH" || "$ITERATION_PATH" == "null" ]]; then
         echo "Could not determine current sprint/iteration."
         return 1
@@ -470,7 +505,7 @@ function print_azure_status() {
 
     # Get current iteration info
     local ITERATION_INFO
-    ITERATION_INFO=$(curl -s -u ":$AZDO_PAT" "$ITERATION_API" | jq '.value[0]')
+    ITERATION_INFO=$(curl -s -u ":$AZURE_DEVOPS_PAT" "$ITERATION_API" | jq '.value[0]')
     local ITERATION_NAME
     ITERATION_NAME=$(echo "$ITERATION_INFO" | jq -r '.name')
     local ITERATION_START
@@ -512,9 +547,9 @@ function print_azure_status() {
     local WIQL="SELECT [System.Id], [System.Title], [System.WorkItemType], [System.Parent], [System.State] FROM WorkItems WHERE [System.IterationPath] = '$ITERATION_PATH' AND [System.AssignedTo] = @Me AND [System.WorkItemType] IN ('Task', 'Chore')"
     local WIQL_JSON
     WIQL_JSON=$(jq -n --arg q "$WIQL" '{query: $q}')
-    local WIQL_API="https://dev.azure.com/$ORG/$PROJECT/_apis/wit/wiql?api-version=7.0"
+    local WIQL_API="https://dev.azure.com/$AZURE_ORG/$AZURE_PROJECT/_apis/wit/wiql?api-version=7.0"
     local WIQL_RESPONSE
-    WIQL_RESPONSE=$(curl -s -u ":$AZDO_PAT" -H "Content-Type: application/json" -d "$WIQL_JSON" "$WIQL_API")
+    WIQL_RESPONSE=$(curl -s -u ":$AZURE_DEVOPS_PAT" -H "Content-Type: application/json" -d "$WIQL_JSON" "$WIQL_API")
 
     local TASK_IDS
     TASK_IDS=$(echo "$WIQL_RESPONSE" | jq -r '.workItems[]?.id' | paste -sd, -)
@@ -525,9 +560,9 @@ function print_azure_status() {
     fi
 
     # Get details for all tasks/chores
-    local DETAILS_API="https://dev.azure.com/$ORG/$PROJECT/_apis/wit/workitems?ids=$TASK_IDS&fields=System.Id,System.Title,System.WorkItemType,System.Parent,System.State&api-version=7.0"
+    local DETAILS_API="https://dev.azure.com/$AZURE_ORG/$AZURE_PROJECT/_apis/wit/workitems?ids=$TASK_IDS&fields=System.Id,System.Title,System.WorkItemType,System.Parent,System.State&api-version=7.0"
     local TASKS_JSON
-    TASKS_JSON=$(curl -s -u ":$AZDO_PAT" "$DETAILS_API")
+    TASKS_JSON=$(curl -s -u ":$AZURE_DEVOPS_PAT" "$DETAILS_API")
 
     # Collect unique parent IDs
     local PARENT_IDS
@@ -537,9 +572,9 @@ function print_azure_status() {
 
     # Build associative array: id -> "type|state|title"
     if [[ -n "$PARENT_IDS" ]]; then
-        local PARENT_API="https://dev.azure.com/$ORG/$PROJECT/_apis/wit/workitems?ids=$PARENT_IDS&fields=System.Id,System.Title,System.WorkItemType,System.State&api-version=7.0"
+        local PARENT_API="https://dev.azure.com/$AZURE_ORG/$AZURE_PROJECT/_apis/wit/workitems?ids=$PARENT_IDS&fields=System.Id,System.Title,System.WorkItemType,System.State&api-version=7.0"
         local PARENTS_JSON
-        PARENTS_JSON=$(curl -s -u ":$AZDO_PAT" "$PARENT_API")
+        PARENTS_JSON=$(curl -s -u ":$AZURE_DEVOPS_PAT" "$PARENT_API")
         while IFS='|' read -r id type state title; do
             PARENTS["$id"]="$type|$state|$title"
         done < <(echo "$PARENTS_JSON" | jq -r '.value[] | "\(.fields."System.Id")|\(.fields."System.WorkItemType")|\(.fields."System.State")|\(.fields."System.Title" | gsub("[\n\r]"; " "))"')
@@ -576,16 +611,16 @@ function print_azure_status() {
  # Print current Asana project details and tasks assigned to the user
 function print_asana_status() {
     if [[ $# -lt 2 ]]; then
-        echo "Usage: print_asana_status <PROJECT_GID> <ASANA_PAT>"
+        echo "Usage: print_asana_status <ASANA_PROJECT_GID> <ASANA_PAT>"
         return 1
     fi
 
-    local PROJECT_GID="$1"
+    local ASANA_PROJECT_GID="$1"
     local ASANA_PAT="$2"
     local AUTH_HDR="Authorization: Bearer $ASANA_PAT"
 
     # Get Project/Iteration Details
-    local PROJECT_API="https://app.asana.com/api/1.0/projects/$PROJECT_GID"
+    local PROJECT_API="https://app.asana.com/api/1.0/projects/$ASANA_PROJECT_GID"
     local PROJECT_JSON=$(curl -s -H "$AUTH_HDR" "$PROJECT_API")
     local PROJECT_NAME=$(echo "$PROJECT_JSON" | jq -r '.data.name // "Unknown Project"')
     local DUE_ON=$(echo "$PROJECT_JSON" | jq -r '.data.due_on')
@@ -613,13 +648,13 @@ function print_asana_status() {
 
     # Filter tasks assigned to you (pls)
     # local MY_TASKS=$(echo "$TASKS_JSON" | jq -c --arg me "$ME_GID" '.data[] | select(.assignee.gid == $me)')
-    # local MY_TASKS_DATA=$(echo "$TASKS_JSON" | jq -r --arg me "$ME_GID" --arg pgid "$PROJECT_GID" '
-    local TASKS_API="https://app.asana.com/api/1.0/tasks?project=$PROJECT_GID&opt_fields=name,completed,assignee.gid,custom_fields.name,custom_fields.display_value,custom_fields.number_value,memberships.project.name,memberships.section.name"
+    # local MY_TASKS_DATA=$(echo "$TASKS_JSON" | jq -r --arg me "$ME_GID" --arg pgid "$ASANA_PROJECT_GID" '
+    local TASKS_API="https://app.asana.com/api/1.0/tasks?project=$ASANA_PROJECT_GID&opt_fields=name,completed,assignee.gid,custom_fields.name,custom_fields.display_value,custom_fields.number_value,memberships.project.name,memberships.section.name"
     # local TASKS_JSON=$(curl -s -H "$AUTH_HDR" "$TASKS_API")
 
     # # DEBUG check
     # if [[ $(echo "$TASKS_JSON" | jq '.data | length') -eq 0 ]]; then
-    #     t ERROR "Asana returned 0 tasks for GID $PROJECT_GID. Check if tasks are subtasks."
+    #     t ERROR "Asana returned 0 tasks for GID $ASANA_PROJECT_GID. Check if tasks are subtasks."
     #     return 1
     # fi
 

@@ -5,3 +5,13 @@ DOTFILES_CONFIG_FILE=/path/to/.dotfile_config.env
 
 # wsl, linux, macos
 OS_TYPE=some_os
+
+## Asana Project Board
+# ASANA_PROJECT_GID=
+# ASANA_PAT=
+
+## Azure DevOps Board
+# AZURE_ORG
+# AZURE_PROJECT=
+# AZURE_TEAM=
+# AZURE_DEVOPS_PAT=

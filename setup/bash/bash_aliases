@@ -196,7 +196,8 @@ alias ungz='tar -xvzf'
 # push, pull, checkout, check -b, rename in .bash_functions
 alias ga='git a'
 alias gb='git b'
-alias gbr='git br'
+# alias gbr='git br'  # replace with copy
+# alias gbr='git branch -vv --color=always | fzf --ansi | awk "{print \$1}" | sed "s/* //" | tr -d "\n" | (pbcopy 2>/dev/null || clip.exe 2>/dev/null || xclip -sel clip 2>/dev/null)'
 alias gbd='git branch -D'
 alias gc='git cam'
 alias gcl='git cl'

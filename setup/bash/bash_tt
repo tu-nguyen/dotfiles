@@ -71,41 +71,35 @@ function tt() {
     printf "                       ${H2}→${NC} ${KEY_F}ports${NC} (netstat -tulanp)      ${H2}→${NC} ${KEY_F}diskspace${NC} (du)\n"
     printf "                       ${H2}→${NC} ${KEY_F}folder${NC} (dir and sizes)       ${H2}→${NC} ${KEY_F}path${NC} (readible \$PATH)\n"
     printf "                       ${H2}→${NC} ${KEY_F}tree${NC} (blazeit)               ${H2}→${NC} ${KEY_F}treed${NC} (tree dir only)\n"
-    # other
-    printf "%s\n" "$br"
-    printf "${SUB_F}other functions${NC}      \n"
-    print_tt "$DOTFILES_CONFIG_DIR/.bash_functions"
     # other other
     printf "%s\n" "$br"
-    printf "${SUB_F}other tt${NC}      \n"
-    printf "  ${KEY_F}btt${NC}                  ${H2}→${NC} to view bash cheatsheet\n"
-    printf "  ${KEY_F}djtt${NC}                 ${H2}→${NC} to view django cheatsheet\n"
-    printf "  ${KEY_F}gtt${NC}                  ${H2}→${NC} to view git cheatsheet\n"
-    printf "  ${KEY_F}gttt${NC}                 ${H2}→${NC} to view git aliases\n"
-    printf "  ${KEY_F}sshtt${NC}                ${H2}→${NC} to view ssh cheatsheet\n"
-    printf "  ${KEY_F}makett${NC}               ${H2}→${NC} to view makefile cheatsheet\n"
-    printf "  ${KEY_F}pytt${NC}                 ${H2}→${NC} to view python cheatsheet\n"
-    printf "  ${KEY_F}dctt${NC}                 ${H2}→${NC} to view docker-compose cheatsheet\n"
-    printf "  ${KEY_F}dktt${NC}                 ${H2}→${NC} to view docker stuff\n"
-    printf "  ${KEY_F}vtt${NC}                  ${H2}→${NC} to view vim cheatsheet\n"
+    printf "${SUB_F}other tt${NC}               ${H2}→${NC} ${KEY_F}btt${NC} (bash)                     ${H2}→${NC} ${KEY_F}djtt${NC} (django)\n"
+    printf "                       ${H2}→${NC} ${KEY_F}gtt${NC} (git)                      ${H2}→${NC} ${KEY_F}gttt${NC} (git aliases)\n"
+    printf "                       ${H2}→${NC} ${KEY_F}sshtt${NC} (ssh)                    ${H2}→${NC} ${KEY_F}makett${NC} (makefile)\n"
+    printf "                       ${H2}→${NC} ${KEY_F}pytt${NC} (python)                  ${H2}→${NC} ${KEY_F}vtt${NC} (vim)\n"
+    printf "                       ${H2}→${NC} ${KEY_F}dctt${NC} (docker-compose)          ${H2}→${NC} ${KEY_F}dktt${NC} (docker)\n"
 
     if [[ ! -f "$DOTFILES_CONFIG_DIR/.bash_personal" ]]; then
-        printf "  ${KEY_F}ptt${NC}                  ${H2}→${NC} config ${VAL_F}.bash_personal${NC} ${RED}does not exist${NC} inside ${VAL_F}$DOTFILES_CONFIG_DIR${NC}\n"
-        printf "                             run ${KEY_F}set-ptt${NC} to copy ${VAL_F}.bash_personal${NC} template ${RED}TODO: create${NC}\n"
+        printf "  ${KEY_F}ptt${NC}                  ${H2}→${NC} config ${VAL_F}.bash_personal${NC} ${RED}does not exist${NC} inside ${VAL_F}$DOTFILES_CONFIG_DIR${NC}; run ${KEY_F}set-ptt${NC}\n"
     else
         printf "  ${KEY_F}ptt${NC}                  ${H2}→${NC} to view personal stuff\n"
     fi
 
     if [[ ! -f "$DOTFILES_CONFIG_DIR/.bash_twork" ]]; then
-        printf "  ${KEY_F}tworktt${NC}              ${H2}→${NC} config .bash_twork ${RED}does not exist${NC} inside ${VAL_F}$DOTFILES_CONFIG_DIR${NC}\n"
-        printf "                             run ${KEY_F}set-tworktt${NC} to copy ${VAL_F}.bash_twork template${NC}\n"
+        printf "  ${KEY_F}tworktt${NC}              ${H2}→${NC} config .bash_twork ${RED}does not exist${NC} inside ${VAL_F}$DOTFILES_CONFIG_DIR${NC}; run ${KEY_F}set-tworktt${NC}\n"
     else
         printf "  ${KEY_F}tworktt${NC}              ${H2}→${NC} to view twork stuff\n"
     fi
+    printf "  ${KEY_F}ftt${NC}                  ${H2}→${NC} to view list of functions\n"
 
     printf "%s\n" "$br"
     printf "${SUB_F}reminder${NC}      \n"
     printf "  ${KEY_F}cd-dot${NC}               ${H2}→${NC} to acd to original dotfiles dir\n"
+}
+
+function ftt() {
+    printf "${SUB_F}functions${NC}      \n"
+    print_tt "$DOTFILES_CONFIG_DIR/.bash_functions"
 }
 
 function btt() {

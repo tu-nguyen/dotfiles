@@ -326,7 +326,6 @@ as() {
                 fi
                 shift
                 ;;
-            ;;
             --user)
                 # Convert input to uppercase (e.g., someguy -> SOMEGUY)
                 local user_name="${2^^}"

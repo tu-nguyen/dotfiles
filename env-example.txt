@@ -11,6 +11,10 @@ OS_TYPE=some_os
 # ASANA_PROJECT_GID=
 # ASANA_PAT=
 # ASANA_ME_ID=
+## Other team member's asana id ASANA_<name>_ID
+# ASANA_OTHER_ID=
+# ASANA_OTHER_ID=
+# ASANA_OTHER_ID=
 
 ## Azure DevOps Board
 # AZURE_ORG

@@ -298,7 +298,7 @@ as() {
     local status_flag=""
     local args=()
 
-    local env_file="$HOME/.config/dotfiles/.dotfile_config/.dotfile_config.env"
+    local env_file="$DOTFILES_CONFIG_DIR/.dotfile_config.env"
 
     # Parse arguments
     while [[ $# -gt 0 ]]; do

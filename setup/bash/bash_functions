@@ -222,7 +222,7 @@ function truncate_text() {
 }
 
 # Helper to get color for a status
-status_colour() {
+function status_colour() {
     local status="$1"
     case "$status" in
         "To Do"|"New"|*"On Deck"*|"Story"|"Task") echo "$PINK" ;;
@@ -262,6 +262,49 @@ function get_config() {
         fi
     fi
     return 1
+}
+
+# Starship Theme Switcher
+sss() {
+    local config_dir="$HOME/.config"
+    local target="$config_dir/starship.toml"
+
+    # Find all .toml files in ~/.config, excluding the active starship.toml
+    # Strip the path to just show the filenames in the menu
+    local themes=($(find "$config_dir" -maxdepth 1 -name "starship.*.toml" -printf "%f\n" | sort))
+
+    printf "${HDR_F}==========================================${NC}\n"
+    printf "          ${HDR_F}Select Starship theme${NC}           \n"
+    printf "${HDR_F}==========================================${NC}\n"
+
+    local i=1
+    for theme in "${themes[@]}"; do
+        # Clean up the name for the display (e.g., starship.gruvbox.toml -> gruvbox)
+        local display_name=$(echo "$theme" | sed 's/starship.\(.*\).toml/\1/')
+        printf "${SEL_F}[$i]${NC} Load ${display_name^} Theme ${SUB_F}($theme)${NC}\n"
+        ((i++))
+    done
+    printf "${BOLD}${RED}[x]${NC} Cancel\n"
+    printf "${BOLD}${WHITE}==========================================${NC}\n"
+
+    echo -ne "\n${SEL_F}Select an option:${NC} "
+    read -r opt
+
+    if [[ "$opt" == "x" || "$opt" == "q" ]]; then
+        t "No changes made."
+        return 0
+    elif [[ "$opt" -gt 0 && "$opt" -le ${#themes[@]} ]]; then
+        local selected_theme="${themes[$((opt-1))]}"
+
+        # Backup and Swap // Just swap no backup currently
+        # [[ -f "$target" ]] && cp "$target" "$target.bak"
+        cp "$config_dir/$selected_theme" "$target"
+
+        t OK "${SEL_F}[✓]${NC} Switched to ${selected_theme}"
+    else
+        t ERR "${SEL_F}[!]${NC} Invalid selection."
+        return 1
+    fi
 }
 
 # DuckDuckGo Search
@@ -490,7 +533,7 @@ function gco() {
         fi
 
         # Handle 'x' for Exit
-        if [[ "$choice" == "x" ]]; then
+        if [[ "$choice" == "x" || "$choice" == "q" ]]; then
             return 0
         fi
 

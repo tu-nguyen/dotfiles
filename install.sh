@@ -160,7 +160,7 @@ if [[ $# -eq 0 ]]; then
                 reset_ps
                 break
                 ;;
-            x | X)
+            x | X | q | Q)
                 clear
                 exit 0 ;;
             *) t WARN "${WARN}Invalid${NC} option, please try again." ;;

@@ -210,7 +210,7 @@ function now() {
     echo "$(date +"%d-%m-%Y") $(date +"%T")"
 }
 
-# Truncate text to a maximum length
+# Helper to truncate text to a maximum length
 function truncate_text() {
     local text="$1"
     local maxlen="${2:-30}"
@@ -221,8 +221,8 @@ function truncate_text() {
     fi
 }
 
-# Helper: get color for a status
-function status_colour() {
+# Helper to get color for a status
+status_colour() {
     local status="$1"
     case "$status" in
         "To Do"|"New"|*"On Deck"*|"Story"|"Task") echo "$PINK" ;;
@@ -233,7 +233,7 @@ function status_colour() {
     esac
 }
 
-# Internal helper to handle the browser opening logic
+# Helper to handle the browser opening logic
 function _browser_open() {
     local url="$1"
 
@@ -246,6 +246,20 @@ function _browser_open() {
     else
         # Standard Linux: Use xdg-open
         xdg-open "$url" 2>/dev/null
+    fi
+}
+
+# Helper to fetch values from your specific dotfile config
+function get_config() {
+    local var_name="$1"
+    local env_file="$DOTFILES_CONFIG_DIR/.dotfile_config.env"
+
+    if [[ -f "$env_file" ]]; then
+        # Search for the variable, get the value, and strip Windows line endings
+        local value=$(grep "^${var_name}=" "$env_file" | cut -d'=' -f2- | tr -d '\r')
+        echo "$value"
+    else
+        return 1
     fi
 }
 
@@ -298,25 +312,15 @@ as() {
     local status_flag=""
     local args=()
 
-    local env_file="$DOTFILES_CONFIG_DIR/.dotfile_config.env"
-
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --me)
-                if [[ -f "$env_file" ]]; then
-                    # Extract ASANA USER ID
-                    local my_id=$(grep "^ASANA_ME_ID=" "$env_file" | cut -d'=' -f2 | tr -d '\r')
-
-                    if [[ -n "$my_id" ]]; then
-                        me_flag="&assignees.ids=${my_id}"
-                    else
-                        # This does nothing tbh
-                        t ERR "ASANA_ME_ID not found in $env_file. Falling back to 'me'."
-                        me_flag="&assignees.ids=me"
-                    fi
+                local my_id=$(get_config "ASANA_ME_ID")
+                if [[ -n "$my_id" ]]; then
+                    me_flag="&assignees.ids=${my_id}"
                 else
-                    t ERR "Config file not found: $env_file"
+                    # Fallback if variable is missing from the file
                     me_flag="&assignees.ids=me"
                 fi
                 shift
@@ -340,7 +344,7 @@ as() {
 
     # Check if we have a query
     if [[ ${#args[@]} -eq 0 ]]; then
-        t ERR "Usage: as [--me] [--status <type>] <query>"
+        t ERR "Usage: as [--me] [--status <incomplete|completed|deleted>] <query>"
         return 1
     fi
 

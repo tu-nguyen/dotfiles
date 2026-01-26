@@ -348,7 +348,7 @@ as() {
     local query=$(printf "%s+" "${args[@]}")
 
     # Open browser
-    _browser_open "https://app.asana.com/0/search?q=${query%?}&sort=creation_time&searched_type=task${me_flag}${status_flag}"
+    _browser_open "https://app.asana.com/0/search?q=${query%?}&sort=last_modified&searched_type=task${me_flag}${status_flag}"
 }
 
 # Python venv

@@ -1,3 +1,4 @@
+# dotfile
 DOTFILES_REPO=https://github.com/YOUR_USERNAME/YOUR_DOTFILES_REPO.git
 DOTFILES_REPO_DIR=/path/to/dotfiles
 DOTFILES_CONFIG_DIR=/path/to/.config/dotfiles
@@ -9,6 +10,7 @@ OS_TYPE=some_os
 ## Asana Project Board
 # ASANA_PROJECT_GID=
 # ASANA_PAT=
+# ASANA_ME_ID=
 
 ## Azure DevOps Board
 # AZURE_ORG

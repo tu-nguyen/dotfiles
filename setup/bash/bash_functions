@@ -292,6 +292,65 @@ gg() {
     _browser_open "https://www.google.com/search?q=${query%?}"
 }
 
+# Asana Search
+as() {
+    local me_flag=""
+    local status_flag=""
+    local args=()
+
+    local env_file="$HOME/.config/dotfiles/.dotfile_config/.dotfile_config.env"
+
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --me)
+                if [[ -f "$env_file" ]]; then
+                    # Extract ASANA USER ID
+                    local my_id=$(grep "^ASANA_ME_ID=" "$env_file" | cut -d'=' -f2 | tr -d '\r')
+
+                    if [[ -n "$my_id" ]]; then
+                        me_flag="&assignees.ids=${my_id}"
+                    else
+                        # This does nothing tbh
+                        t ERR "ASANA_ME_ID not found in $env_file. Falling back to 'me'."
+                        me_flag="&assignees.ids=me"
+                    fi
+                else
+                    t ERR "Config file not found: $env_file"
+                    me_flag="&assignees.ids=me"
+                fi
+                shift
+                ;;
+            --status)
+                # Map the user input to Asana's URL parameters
+                case "$2" in
+                    completed) status_flag="&completion=complete" ;;
+                    incomplete) status_flag="&completion=incomplete" ;;
+                    deleted)   status_flag="&deleted=true" ;;
+                    *) t ERR "Status must be: incomplete, completed, or deleted" && return 1 ;;
+                esac
+                shift 2
+                ;;
+            *)
+                args+=("$1")
+                shift
+                ;;
+        esac
+    done
+
+    # Check if we have a query
+    if [[ ${#args[@]} -eq 0 ]]; then
+        t ERR "Usage: as [--me] [--status <type>] <query>"
+        return 1
+    fi
+
+    # Format query
+    local query=$(printf "%s+" "${args[@]}")
+
+    # Open browser
+    _browser_open "https://app.asana.com/0/search?q=${query%?}&sort=creation_time&searched_type=task${me_flag}${status_flag}"
+}
+
 # Python venv
 # TODO: add args for other txt?
 function venv () {

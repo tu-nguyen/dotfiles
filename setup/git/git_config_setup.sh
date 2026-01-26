@@ -76,6 +76,9 @@ git config --global alias.conflicts "diff --name-only --diff-filter=U" # List fi
 
 # --- Logging & Visualization ---
 git config --global alias.l "log -1"                     # Show only the very last commit
+git config --global alias.g "log --oneline --graph --decorate --all --color"
+git config --global alias.graph "log --oneline --graph --decorate --all --color"
+
 # The ultimate "Pretty Log" graph
 git config --global alias.ll "log --graph --pretty=format:'%C(#ffd1dc)%h%Creset -%C(#689d6a)%d%Creset %s %C(#928374)(%cr) %C(#689d6a)[%an]%Creset' --abbrev-commit"
 # List all your aliases

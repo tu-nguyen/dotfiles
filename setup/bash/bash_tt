@@ -73,11 +73,11 @@ function tt() {
     printf "                       ${H2}→${NC} ${KEY_F}tree${NC} (blazeit)               ${H2}→${NC} ${KEY_F}treed${NC} (tree dir only)\n"
     # other other
     printf "%s\n" "$br"
-    printf "${SUB_F}other tt${NC}               ${H2}→${NC} ${KEY_F}btt${NC} (bash)                     ${H2}→${NC} ${KEY_F}djtt${NC} (django)\n"
-    printf "                       ${H2}→${NC} ${KEY_F}gtt${NC} (git)                      ${H2}→${NC} ${KEY_F}gttt${NC} (git aliases)\n"
-    printf "                       ${H2}→${NC} ${KEY_F}sshtt${NC} (ssh)                    ${H2}→${NC} ${KEY_F}makett${NC} (makefile)\n"
-    printf "                       ${H2}→${NC} ${KEY_F}pytt${NC} (python)                  ${H2}→${NC} ${KEY_F}vtt${NC} (vim)\n"
-    printf "                       ${H2}→${NC} ${KEY_F}dctt${NC} (docker-compose)          ${H2}→${NC} ${KEY_F}dktt${NC} (docker)\n"
+    printf "${SUB_F}other tt${NC}               ${H2}→${NC} ${KEY_F}btt${NC} (bash)                   ${H2}→${NC} ${KEY_F}djtt${NC} (django)\n"
+    printf "                       ${H2}→${NC} ${KEY_F}gtt${NC} (git)                    ${H2}→${NC} ${KEY_F}gttt${NC} (git aliases)\n"
+    printf "                       ${H2}→${NC} ${KEY_F}sshtt${NC} (ssh)                  ${H2}→${NC} ${KEY_F}makett${NC} (makefile)\n"
+    printf "                       ${H2}→${NC} ${KEY_F}pytt${NC} (python)                ${H2}→${NC} ${KEY_F}vtt${NC} (vim)\n"
+    printf "                       ${H2}→${NC} ${KEY_F}dctt${NC} (docker-compose)        ${H2}→${NC} ${KEY_F}dktt${NC} (docker)\n"
 
     if [[ ! -f "$DOTFILES_CONFIG_DIR/.bash_personal" ]]; then
         printf "  ${KEY_F}ptt${NC}                  ${H2}→${NC} config ${VAL_F}.bash_personal${NC} ${RED}does not exist${NC} inside ${VAL_F}$DOTFILES_CONFIG_DIR${NC}; run ${KEY_F}set-ptt${NC}\n"

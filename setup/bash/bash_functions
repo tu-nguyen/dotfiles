@@ -255,12 +255,13 @@ function get_config() {
     local env_file="$DOTFILES_CONFIG_DIR/.dotfile_config.env"
 
     if [[ -f "$env_file" ]]; then
-        # Search for the variable, get the value, and strip Windows line endings
         local value=$(grep "^${var_name}=" "$env_file" | cut -d'=' -f2- | tr -d '\r')
-        echo "$value"
-    else
-        return 1
+        if [[ -n "$value" ]]; then
+            echo "$value"
+            return 0
+        fi
     fi
+    return 1
 }
 
 # DuckDuckGo Search
@@ -324,6 +325,20 @@ as() {
                     me_flag="&assignees.ids=me"
                 fi
                 shift
+                ;;
+            ;;
+            --user)
+                # Convert input to uppercase (e.g., someguy -> SOMEGUY)
+                local user_name="${2^^}"
+                local user_id=$(get_config "ASANA_${user_name}_ID")
+
+                if [[ -n "$user_id" ]]; then
+                    me_flag="&assignees.ids=${user_id}"
+                else
+                    t ERR "No ID found for ASANA_${user_name}_ID in config."
+                    return 1
+                fi
+                shift 2
                 ;;
             --status)
                 # Map the user input to Asana's URL parameters

@@ -467,6 +467,7 @@ reset_bashrc() {
 
         # Final move/copy to destination
         if [[ ! -f "$dest_output" ]]; then
+            t "dest_output: $dest_output"
             cpp "$temp_output" "$dest_output"
         fi
     done

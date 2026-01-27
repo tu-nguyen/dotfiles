@@ -7,7 +7,7 @@
 
 # --- Start Load Configuration ---
 : "${DOTFILES_CONFIG_DIR:=$HOME/.config/dotfiles}"
-: "${DOTFILES_CONFIG_FILE:=$DOTFILES_CONFIG_DIR/.dotfile_config.env}"
+: "${DOTFILES_CONFIG_FILE:=$DOTFILES_CONFIG_DIR/.dotfile_config}"
 
 if [[ -f "$DOTFILES_CONFIG_FILE" ]]; then
     source "$DOTFILES_CONFIG_FILE"

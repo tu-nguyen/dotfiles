@@ -11,7 +11,7 @@ if [ -z "$DOTFILES_CONFIG_DIR" ]; then
 fi
 
 if [ -z "$DOTFILES_CONFIG_FILE" ]; then
-    DOTFILES_CONFIG_FILE="$DOTFILES_CONFIG_DIR/.dotfile_config.env"
+    DOTFILES_CONFIG_FILE="$DOTFILES_CONFIG_DIR/.dotfile_config"
 fi
 
 if [ -f "$DOTFILES_CONFIG_FILE" ]; then

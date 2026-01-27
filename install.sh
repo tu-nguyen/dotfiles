@@ -3,6 +3,11 @@ set -e
 
 unset DOTFILES_LOADED
 unset BASH_STYLE_LOADED
+unset DOTFILES_REPO
+unset DOTFILES_REPO_DIR
+unset DOTFILES_CONFIG_FILE
+unset DOTFILES_CONFIG_DIR
+unset OS_TYPE
 
 _get_os_type() {
     if [ -z "$OS_TYPE" ]; then
@@ -24,17 +29,32 @@ _get_os_type() {
     echo "$OS_TYPE"
 }
 
+# Load bash_function to use set_config
+. ./setup/bash/bash_functions || {
+    echo "Error: Could not source bash_functions"
+    exit 1
+}
+
 ENV_LOADED=false
 if [ -f .env ]; then
     echo "[INFO] Configuration loaded from .env"
     . .env
     ENV_LOADED=true
 else
-    DOTFILES_CONFIG_FILE="$HOME/.config/dotfiles/.dotfile_config.env"
-    if [[ -f "$DOTFILES_CONFIG_FILE" ]]; then
-        echo "[INFO] Configuration loaded from $DOTFILES_CONFIG_FILE"
-        . "$DOTFILES_CONFIG_FILE"
+    LOADED_DOTFILES_CONFIG_FILE="$HOME/.config/dotfiles/.dotfile_config"
+    if [[ -f "$LOADED_DOTFILES_CONFIG_FILE" ]]; then
+        echo "[INFO] Configuration loaded from $LOADED_DOTFILES_CONFIG_FILE"
+        . "$LOADED_DOTFILES_CONFIG_FILE"
         ENV_LOADED=true
+    fi
+fi
+
+# Temp patch
+if [[ "$ENV_LOADED" == "false" ]]; then
+    OLD_DOTFILES_CONFIG_FILE="$HOME/.config/dotfiles/.dotfile_config.env"
+    if [[ -f "$OLD_DOTFILES_CONFIG_FILE" ]]; then
+        echo "[INFO] Configuration loaded from $OLD_DOTFILES_CONFIG_FILE"
+        . "$OLD_DOTFILES_CONFIG_FILE"
     fi
 fi
 
@@ -42,12 +62,12 @@ DEFAULT_DOTFILES_REPO="https://github.com/tu-nguyen/dotfiles.git"
 DEFAULT_DOTFILES_REPO_DIR="$(pwd)"
 DEFAULT_GITSTATUS_DIR="$HOME/.gitstatus"
 DEFAULT_DOTFILES_CONFIG_DIR=$HOME/.config/dotfiles
-DEFAULT_DOTFILES_CONFIG_FILE="$DEFAULT_DOTFILES_CONFIG_DIR/.dotfile_config.env"
+DEFAULT_DOTFILES_CONFIG_FILE="$DEFAULT_DOTFILES_CONFIG_DIR/.dotfile_config"
 DEFAULT_OS_TYPE=$(_get_os_type)
 GITSTATUS_DIR="$HOME/.gitstatus"
 
 if [[ "$ENV_LOADED" == "false" ]]; then
-    echo "[WARNING] .env and .dotfile_config.env files not found. Script will rely on defaults."
+    echo "[WARNING] .env and .dotfile_config files not found. Script will rely on defaults."
     : "${DOTFILES_REPO:="$DEFAULT_DOTFILES_REPO"}"
     : "${DOTFILES_REPO_DIR:="$DEFAULT_DOTFILES_REPO_DIR"}"
     : "${DOTFILES_CONFIG_DIR:="$DEFAULT_DOTFILES_CONFIG_DIR"}"
@@ -55,42 +75,42 @@ if [[ "$ENV_LOADED" == "false" ]]; then
     : "${OS_TYPE:=$DEFAULT_OS_TYPE}"
 
     mkdir -p "$DOTFILES_CONFIG_DIR"
-    echo "DOTFILES_REPO=$DOTFILES_REPO" > "$DOTFILES_CONFIG_FILE"
+    echo "DOTFILES_REPO=$DOTFILES_REPO" >> "$DOTFILES_CONFIG_FILE"
 fi
 
 if [ -z "$DOTFILES_REPO_DIR" ] || [ "$DOTFILES_REPO_DIR" == "/path/to/dotfiles" ]; then
     echo "[WARNING] 'DOTFILES_REPO_DIR' was not set, falling to default $DEFAULT_DOTFILES_REPO_DIR."
     : "${DOTFILES_REPO_DIR:="$DEFAULT_DOTFILES_REPO_DIR"}"
 
-    sed -i "s|^DOTFILES_REPO_DIR=.*|DOTFILES_REPO_DIR=$DOTFILES_REPO_DIR|" "$DOTFILES_CONFIG_FILE"
+    set_config "DOTFILES_REPO_DIR" "$DEFAULT_DOTFILES_REPO_DIR"
 fi
 
 if [ -z "$DOTFILES_REPO" ] || [ "$DOTFILES_REPO" == "https://github.com/YOUR_USERNAME/YOUR_DOTFILES_REPO.git" ]; then
     echo "[WARNING] 'DOTFILES_REPO' was not set, falling to default $DEFAULT_DOTFILES_REPO."
     : "${DOTFILES_REPO:="$DEFAULT_DOTFILES_REPO"}"
 
-    sed -i "s|^DOTFILES_REPO=.*|DOTFILES_REPO=$DOTFILES_REPO|" "$DOTFILES_CONFIG_FILE"
+    set_config "DOTFILES_REPO" "$DEFAULT_DOTFILES_REPO"
 fi
 
 if [ -z "$DOTFILES_CONFIG_DIR" ] || [ "$DOTFILES_CONFIG_DIR" == "/path/to/.config/dotfiles" ]; then
     echo "[WARNING] 'DOTFILES_CONFIG_DIR' was not set, falling to default $DEFAULT_DOTFILES_CONFIG_DIR."
     : "${DOTFILES_CONFIG_DIR:="$DEFAULT_DOTFILES_CONFIG_DIR"}"
 
-    sed -i "s|^DOTFILES_CONFIG_DIR=.*|DOTFILES_CONFIG_DIR=$DOTFILES_CONFIG_DIR|" "$DOTFILES_CONFIG_FILE"
+    set_config "DOTFILES_CONFIG_DIR" "$DEFAULT_DOTFILES_CONFIG_DIR"
 fi
 
-if [ -z "$DOTFILES_CONFIG_FILE" ] || [ "$DOTFILES_CONFIG_FILE" == "/path/to/.dotfile_config.env" ]; then
+if [ -z "$DOTFILES_CONFIG_FILE" ] || [ "$DOTFILES_CONFIG_FILE" == "/path/to/.dotfile_config" ]; then
     echo "[WARNING] 'DOTFILES_CONFIG_FILE' was not set, falling to default $DEFAULT_DOTFILES_CONFIG_FILE."
     : "${DOTFILES_CONFIG_FILE:="$DEFAULT_DOTFILES_CONFIG_FILE"}"
 
-    sed -i "s|^DOTFILES_CONFIG_FILE=.*|DOTFILES_CONFIG_FILE=$DOTFILES_CONFIG_FILE|" "$DOTFILES_CONFIG_FILE"
+    set_config "DOTFILES_CONFIG_FILE" "$DEFAULT_DOTFILES_CONFIG_FILE"
 fi
 
 if [ -z "$OS_TYPE" ] || [ "$OS_TYPE" == "some_os" ]; then
     echo "[WARNING] 'OS_TYPE' was not set, falling to default $DEFAULT_OS_TYPE."
     : "${OS_TYPE:="$DEFAULT_OS_TYPE"}"
 
-    sed -i "s|^OS_TYPE=.*|OS_TYPE=$OS_TYPE|" "$DOTFILES_CONFIG_FILE"
+    set_config "OS_TYPE" "$DEFAULT_OS_TYPE"
 fi
 
 unset BASH_STYLE_LOADED

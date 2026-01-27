@@ -4,6 +4,7 @@
 # ========================================== #
 # This file sets up the core environment variables and helper functions
 # used by the rest of the shell configuration.
+# Sourced from bash_style and bash_functions.
 
 # --- Start Load Configuration ---
 : "${DOTFILES_CONFIG_DIR:=$HOME/.config/dotfiles}"

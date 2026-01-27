@@ -85,6 +85,28 @@ function _browser_open() {
     fi
 }
 
+# Helper to load config
+function load_config() {
+    if [ -z "$DOTFILES_CONFIG_DIR" ]; then
+        DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
+    fi
+
+    if [[ ! -d "$DOTFILES_CONFIG_DIR" && ! -d "$DOTFILES_REPO_DIR" ]]; then
+        echo -e "\e[31m[ ERR  ]\e[0m Configuration file not found at $DOTFILES_CONFIG_FILE" or "$DOTFILES_REPO_DIR" >&2
+        return 1 2>/dev/null || exit 1
+    fi
+
+    if [[ -f "$DOTFILES_CONFIG_DIR/.init" ]]; then
+        . "$DOTFILES_CONFIG_DIR/.init"
+    elif [[ -f "$DOTFILES_REPO_DIR/setup/bash/init" ]]; then
+        . "$DOTFILES_REPO_DIR/setup/bash/init"
+    else
+        echo "\e[31m[ WARN ]\e[0m Failed to load core config"
+    fi
+
+    [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
+}
+
 # Helper to update or add a variable in your .dotfile_config
 function set_config() {
     local key="$1"
@@ -498,8 +520,8 @@ ghs() {
                 if [[ -n "$twork_gh_ins" ]]; then
                     gh_ins="$twork_gh_ins"
                 else
-                    # Fallback if variable is missing from the file
-                    gh_ins="https://github.com"
+                    t ERR "--twork flag given but TWORK_GH_INSTACE is not set"
+                    return 1
                 fi
                 shift
                 ;;
@@ -534,7 +556,7 @@ ghs() {
 
     # Check if we have a query
     if [[ ${#args[@]} -eq 0 ]]; then
-        t ERR "Usage: ghs [--me] [--type <code|repositories|issues|pullrequests|users>] <query>"
+        t ERR "Usage: ghs [--twork] [--type <code|repositories|issues|pullrequests|users>] <query>"
         return 1
     fi
 
@@ -559,6 +581,7 @@ asa() {
                     me_flag="&assignees.ids=${my_id}"
                 else
                     # Fallback if variable is missing from the file
+                    t WARN "--me flag given but ASANA_ME_ID is not set, defaulting to 'me'"
                     me_flag="&assignees.ids=me"
                 fi
                 shift

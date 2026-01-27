@@ -87,32 +87,32 @@ _install_package() {
 
 # Function to install (patch) Fira Code (Nerd Font icons)
 _install_fira_font() {
-    local FONT_NAME="FiraCode Nerd Font"
-    local INSTALLED=0
+    local font_name="FiraCode Nerd Font"
+    local fira_font_installed=0
 
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         if command -v fc-list >/dev/null; then
-            if fc-list : family | grep -iq "$FONT_NAME"; then
-                INSTALLED=1
+            if fc-list : family | grep -iq "$font_name"; then
+                fira_font_installed=1
             fi
         fi
     elif [[ "$OS_TYPE" == "macos" ]]; then
-        if system_profiler SPFontsDataType | grep -iq "$FONT_NAME"; then
-            INSTALLED=1
+        if system_profiler SPFontsDataType | grep -iq "$font_name"; then
+            fira_font_installed=1
         fi
     fi
 
-    if [[ "$INSTALLED" -eq 1 ]]; then
-        t SUCCESS "${HDR_F}${FONT_NAME,,}${NC} is already installed."
+    if [[ "$fira_font_installed" -eq 1 ]]; then
+        t SUCCESS "${HDR_F}${font_name,,}${NC} is already installed."
         return 0
     fi
 
-    t "Installing ${HDR_F}${FONT_NAME,,}${NC}.."
+    t "Installing ${HDR_F}${font_name,,}${NC}.."
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         local font_dir="$HOME/.local/share/fonts"
         mkdir -p "$font_dir"
 
-        t INFO "Downloading ${FONT_NAME,,} zip.."
+        t INFO "Downloading ${font_name,,} zip.."
         curl -fLo "/tmp/FiraCode.zip" https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip
 
         unzip -o "/tmp/FiraCode.zip" -d "$font_dir"
@@ -121,40 +121,43 @@ _install_fira_font() {
         if command -v fc-cache >/dev/null; then
             fc-cache -f
         fi
+
+        if [[ "$OS_TYPE" == "wsl" ]]; then
+            # If this didn't work, manually move Fira Font
+            # explorer.exe .
+            # explorer.exe shell:fonts
+            win_font_dir_raw=$(cmd.exe /c "echo %SystemRoot%\Fonts" 2>/dev/null | tr -d '\r')
+            win_font_dir=$(wslpath "$win_font_dir_raw")
+
+            cpp "$font_dir"/*.ttf "$win_font_dir/"
+
+            if [ $? -ne 0 ]; then
+                t WARNING  "Warning: Could not copy fonts to C:\Windows\Fonts."
+                t WARNING  "Try running your Terminal as Administrator."
+            else
+                t "Registering Fira Code in Windows Registry via PowerShell.."
+                powershell.exe -Command "
+                    \$src = '$(wslpath -w "$font_dir")';
+                    \$fonts = Get-ChildItem -Path \$src -Include *.ttf, *.otf -Recurse;
+                    foreach (\$font in \$fonts) {
+                        \$targetPath = 'C:\\Windows\\Fonts\\' + \$font.Name;
+                        if (!(Test-Path \$targetPath)) {
+                            Copy-Item \$font.FullName -Destination \$targetPath;
+                            # Registering the font in the Registry so Windows 'sees' it
+                            New-ItemProperty -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts' \
+                            -Name \$font.Name -PropertyType String -Value \$font.Name -Force | Out-Null;
+                        }
+                    }
+                "
+                t SUCCESS "Windows registration complete."
+            fi
+        fi
+
     elif [[ "$OS_TYPE" == "macos" ]]; then
         brew tap homebrew/cask-fonts
         brew install --cask font-fira-code-nerd-font
     fi
     t SUCCESS "${SUCCESS}Installation complete!${NC}"
-
-    # TODO: fix windows font installation
-    # if [[ "$OS_TYPE" == "wsl" ]]; then
-    #     # If this didn't work, manually move Fira Font
-    #     # explorer.exe .
-    #     # explorer.exe shell:fonts
-    #     WIN_FONT_DIR_RAW=$(cmd.exe /c "echo %SystemRoot%\Fonts" 2>/dev/null | tr -d '\r')
-    #     WIN_FONT_DIR=$(wslpath "$WIN_FONT_DIR_RAW")
-
-    #     cp -n ~/.local/share/fonts/*FiraCode*Nerd*.ttf "$WIN_FONT_DIR" 2>/dev/null
-
-    #     if [ $? -ne 0 ]; then
-    #         t WARNING  "Warning: Could not copy fonts to C:\Windows\Fonts."
-    #         t WARNING  "Try running your Terminal as Administrator."
-    #     else
-    #         t "Registering fonts in Windows Registry via PowerShell.."
-    #         powershell.exe -ExecutionPolicy Bypass -Command "
-    #             \$FontsFolder = 'C:\\Windows\\Fonts'
-    #             Get-ChildItem -Path \$FontsFolder -Filter '*FiraCode*Nerd*.ttf' | ForEach-Object {
-    #                 \$RegistryPath = 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts'
-    #                 \$Name = \$_.Name.Replace('.ttf', ' (TrueType)')
-    #                 if (-not (Get-ItemProperty -Path \$RegistryPath -Name \$Name -ErrorAction SilentlyContinue)) {
-    #                     New-ItemProperty -Path \$RegistryPath -Name \$Name -Value \$_.Name -PropertyType String
-    #                 }
-    #             }
-    #         "
-    #         t SUCCESS "Windows registration complete."
-    #     fi
-    # fi
 }
 
 # Function to install Starship
@@ -236,7 +239,6 @@ cp_and_source() {
 
     if [[ "$quiet" == false ]]; then
         cpp "$src" "$dest"
-
     else
         cpp -q "$src" "$dest"
     fi
@@ -376,6 +378,10 @@ reset_bashrc() {
     echo "alias cd-dot='cd $DOTFILES_REPO_DIR'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
     echo "alias cd-dotfile='cd-dot'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
     echo "alias cd-dotfiles='cd-dot'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
+    if ! command -v graphviz &> /dev/null; then
+        echo "alias dot='cd-dot'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
+    if
+
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_docker_functions" "$DOTFILES_CONFIG_DIR/.bash_docker_functions"
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_functions" "$DOTFILES_CONFIG_DIR/.bash_functions"
     cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_exports" "$DOTFILES_CONFIG_DIR/.bash_exports"

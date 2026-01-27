@@ -274,7 +274,7 @@ sss() {
     local themes=($(find "$config_dir" -maxdepth 1 -name "starship.*.toml" -printf "%f\n" | sort))
 
     printf "${HDR_F}==========================================${NC}\n"
-    printf "          ${HDR_F}Select Starship theme${NC}           \n"
+    printf "    ${HDR_F}Starship theme -- Choose an Option${NC}    \n"
     printf "${HDR_F}==========================================${NC}\n"
 
     local i=1
@@ -284,10 +284,10 @@ sss() {
         printf "${SEL_F}[$i]${NC} Load ${display_name^} Theme ${SUB_F}($theme)${NC}\n"
         ((i++))
     done
-    printf "${BOLD}${RED}[x]${NC} Cancel\n"
+    printf "${BOLD}${RED}[x]${NC} Exit\n"
     printf "${BOLD}${WHITE}==========================================${NC}\n"
 
-    echo -ne "\n${SEL_F}Select an option:${NC} "
+    echo -ne "\n${SEL_F}Switch Starship theme:${NC} "
     read -r opt
 
     if [[ "$opt" == "x" || "$opt" == "q" ]]; then

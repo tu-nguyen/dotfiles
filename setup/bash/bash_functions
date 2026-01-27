@@ -167,7 +167,7 @@ ftext() {
 
 # Copy file with a progress bar
 cpp() {
-    local quiet=""
+    local quiet="false"
     local src=""
     local dest=""
 
@@ -188,7 +188,7 @@ cpp() {
     rsync -ah --info=progress2 "$src" "$dest"
     printf "\033[1A\r\033[K"
 
-    if [[ "$quiet" ]]; then
+    if [[ "$quiet" == false ]]; then
         t OK "Transfer of $(basename "$dest") complete."
     fi
 

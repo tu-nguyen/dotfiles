@@ -72,18 +72,25 @@ function set_config() {
 function get_config() {
     local var_name="$1"
     local config_file="$DOTFILES_CONFIG_DIR/.dotfile_config"
+    local value=""
 
+    # Try to get from the config file first
     if [[ -f "$config_file" ]]; then
-        local value=$(grep "^${var_name}=" "$config_file" | cut -d'=' -f2- | tr -d '\r')
+        value=$(grep "^${var_name}=" "$config_file" | cut -d'=' -f2- | tr -d '\r')
+    fi
+
+    # Fallback to shell environment if config file search was empty
+    if [[ -z "$value" ]]; then
+        # ${!var_name} is Bash indirect expansion (gets the value of the name stored in var_name)
+        value="${!var_name}"
+    fi
+
+    if [[ -n "$value" ]]; then
         echo "$value"
+        return 0
+    else
+        return 1
     fi
-
-    # Fallback to env
-    if [[ -z "$($$var_name)" ]]; then
-        echo "$($$var_name)"
-    fi
-
-    return 1
 }
 
 

@@ -82,9 +82,9 @@ function get_config() {
     # Fallback to shell environment if config file search was empty
     if [[ -z "$value" ]]; then
         # ${!var_name} is Bash indirect expansion (gets the value of the name stored in var_name)
-        # value="${!var_name}"
+        value="${!var_name}"
         # The above didn't work, trying printenv
-        value=$(printenv "$var_name")
+        # value=$(printenv "$var_name")
     fi
 
     if [[ -n "$value" ]]; then

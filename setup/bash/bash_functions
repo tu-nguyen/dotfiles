@@ -77,6 +77,12 @@ function get_config() {
         local value=$(grep "^${var_name}=" "$config_file" | cut -d'=' -f2- | tr -d '\r')
         echo "$value"
     fi
+
+    # Fallback to env
+    if [[ -z "$($$var_name)" ]]; then
+        echo "$($$var_name)"
+    fi
+
     return 1
 }
 

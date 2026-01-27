@@ -470,6 +470,7 @@ reset_bashrc() {
             cpp "$temp_output" "$dest_output"
         fi
     done
+    t OK "Transfer of starship tomls complete."
 
     rm -fr "$TEMP_CONFIG_DIR"
 

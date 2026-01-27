@@ -466,7 +466,9 @@ reset_bashrc() {
         fi
 
         # Final move/copy to destination
-        cpp "$temp_output" "$dest_output"
+        if [[ ! -f "$dest_output" ]]; then
+            cpp "$temp_output" "$dest_output"
+        fi
     done
 
     rm -fr "$TEMP_CONFIG_DIR"

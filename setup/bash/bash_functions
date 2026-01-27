@@ -1,6 +1,90 @@
 #!/usr/bin/env bash
 
-pre_r() {
+
+## General Helper functions
+
+# Display date and time
+function now() {
+    echo "$(date +"%d-%m-%Y") $(date +"%T")"
+}
+
+# Helper to truncate text to a maximum length
+function truncate_text() {
+    local text="$1"
+    local maxlen="${2:-30}"
+    if [ ${#text} -gt "$maxlen" ]; then
+        echo "${text:0:$((maxlen-3))}.."
+    else
+        echo "$text"
+    fi
+}
+
+# Helper to get color for a status
+function status_colour() {
+    local status="$1"
+    case "$status" in
+        "To Do"|"New"|*"On Deck"*|"Story"|"Task") echo "$PINK" ;;
+        "In Progress"|"Active"|*"In Progress"*|"Epic") echo "$CYAN" ;;
+        "Done"|"Closed"|"Completed"|"Resolved"|*"Done"*) echo "$GREEN" ;;
+        "Blocked"|*"In Review"*|"Bug"|"IT") echo "$RED" ;;
+        *) echo "$WHITE" ;;
+    esac
+}
+
+# Helper to handle the browser opening logic
+function _browser_open() {
+    local url="$1"
+
+    if [[ -n "$WSL_DISTRO_NAME" ]]; then
+        # WSL: Open in Windows default browser
+        powershell.exe -NoProfile -Command "Start-Process '$url'"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS: Open in default Mac browser
+        open "$url"
+    else
+        # Standard Linux: Use xdg-open
+        xdg-open "$url" 2>/dev/null
+    fi
+}
+
+# Helper to update or add a variable in your .dotfile_config
+function set_config() {
+    local key="$1"
+    local value="$2"
+    local config_file="$DOTFILES_CONFIG_DIR/.dotfile_config"
+
+    if [[ -z "$key" || -z "$value" ]]; then
+        t ERR "Usage: set_config <KEY> <VALUE>"
+        return 1
+    fi
+
+    if grep -q "^$key=" "$config_file"; then
+        # Line exists: Replace it
+        # Using '|' as a delimiter to safely handle paths/slashes in values
+        sed -i "s|^$key=.*|$key=$value|" "$config_file"
+    else
+        # Line missing: Append it
+        echo "$key=$value" >> "$config_file"
+    fi
+}
+
+# Helper to fetch values from your specific dotfile config
+function get_config() {
+    local var_name="$1"
+    local config_file="$DOTFILES_CONFIG_DIR/.dotfile_config"
+
+    if [[ -f "$config_file" ]]; then
+        local value=$(grep "^${var_name}=" "$config_file" | cut -d'=' -f2- | tr -d '\r')
+        echo "$value"
+    fi
+    return 1
+}
+
+
+## Reset flow: r & rr
+
+# Setup processes for r running dotfile install
+function pre_r() {
     unset DOTFILES_LOADED
     unset BASH_STYLE_LOADED
 
@@ -40,7 +124,8 @@ pre_r() {
     unset BASH_STYLE_LOADED
 }
 
-post_r() {
+# Post processes after dotfile install
+function post_r() {
     if [ "$IS_PROJECT_ROOT" = false ]; then
       popd > /dev/null
     fi
@@ -60,7 +145,7 @@ r() {
     post_r
 }
 
-# Re-run just bashrc installation
+# Re-run just bashrc installation (forced y)
 rr() {
     pre_r
 
@@ -80,12 +165,34 @@ set-tworktt() {
         fi
 
 		t "Generating basic tworktt file"
-        TWORKTT_FILE="$DOTFILES_REPO_DIR/twork-template.txt"
+        TWORKTT_FILE="$DOTFILES_REPO_DIR/setup/_templates/twork-template.txt"
         if [ -f "$TWORKTT_FILE" ]; then
             cpp -q "$TWORKTT_FILE" "$DOTFILES_CONFIG_DIR/.bash_twork"
             t SUCCESS "All set! Remember to edit .bash_twork"
         else
-            t Error "twork-template.txt file not found at $DOTFILES_REPO_DIR" >&2
+            t Error "twork-template.txt file not found at $DOTFILES_REPO_DIR/setup/_templates" >&2
+            exit 1
+        fi
+	fi
+}
+
+# Copy generic .bash_personal starter file
+set-ptt() {
+    if [ -z "$DOTFILES_REPO_DIR" ]; then
+		t ERROR "DOTFILES_REPO_DIR not set, check $HOME/.config/dotfiles/.dotfile_config"
+        exit 1
+	else
+        if [ -z "$DOTFILES_CONFIG_DIR" ]; then
+            DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
+        fi
+
+		t "Generating basic personal file"
+        TWORKTT_FILE="$DOTFILES_REPO_DIR/setup/_templates/personal-template.txt"
+        if [ -f "$TWORKTT_FILE" ]; then
+            cpp -q "$TWORKTT_FILE" "$DOTFILES_CONFIG_DIR/.bash_personal"
+            t SUCCESS "All set! Remember to edit .bash_personal"
+        else
+            t Error "personal-template.txt file not found at $DOTFILES_REPO_DIR/setup/_templates" >&2
             exit 1
         fi
 	fi
@@ -202,86 +309,6 @@ ff() {
     find . -type f -iname '*'"$*"'*' -ls ;
 }
 
-# Helper functions
-
-# general
-# Display date and time
-function now() {
-    echo "$(date +"%d-%m-%Y") $(date +"%T")"
-}
-
-# Helper to truncate text to a maximum length
-function truncate_text() {
-    local text="$1"
-    local maxlen="${2:-30}"
-    if [ ${#text} -gt "$maxlen" ]; then
-        echo "${text:0:$((maxlen-3))}.."
-    else
-        echo "$text"
-    fi
-}
-
-# Helper to get color for a status
-function status_colour() {
-    local status="$1"
-    case "$status" in
-        "To Do"|"New"|*"On Deck"*|"Story"|"Task") echo "$PINK" ;;
-        "In Progress"|"Active"|*"In Progress"*|"Epic") echo "$CYAN" ;;
-        "Done"|"Closed"|"Completed"|"Resolved"|*"Done"*) echo "$GREEN" ;;
-        "Blocked"|*"In Review"*|"Bug"|"IT") echo "$RED" ;;
-        *) echo "$WHITE" ;;
-    esac
-}
-
-# Helper to handle the browser opening logic
-function _browser_open() {
-    local url="$1"
-
-    if [[ -n "$WSL_DISTRO_NAME" ]]; then
-        # WSL: Open in Windows default browser
-        powershell.exe -NoProfile -Command "Start-Process '$url'"
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS: Open in default Mac browser
-        open "$url"
-    else
-        # Standard Linux: Use xdg-open
-        xdg-open "$url" 2>/dev/null
-    fi
-}
-
-# Helper to update or add a variable in your .dotfile_config
-set_config() {
-    local key="$1"
-    local value="$2"
-    local config_file="$DOTFILES_CONFIG_DIR/.dotfile_config"
-
-    if [[ -z "$key" || -z "$value" ]]; then
-        t ERR "Usage: set_config <KEY> <VALUE>"
-        return 1
-    fi
-
-    if grep -q "^$key=" "$config_file"; then
-        # Line exists: Replace it
-        # Using '|' as a delimiter to safely handle paths/slashes in values
-        sed -i "s|^$key=.*|$key=$value|" "$config_file"
-    else
-        # Line missing: Append it
-        echo "$key=$value" >> "$config_file"
-    fi
-}
-
-# Helper to fetch values from your specific dotfile config
-function get_config() {
-    local var_name="$1"
-    local config_file="$DOTFILES_CONFIG_DIR/.dotfile_config"
-
-    if [[ -f "$config_file" ]]; then
-        local value=$(grep "^${var_name}=" "$config_file" | cut -d'=' -f2- | tr -d '\r')
-        echo "$value"
-    fi
-    return 1
-}
-
 # Starship Theme Switcher
 sss() {
     local config_dir="$HOME/.config"
@@ -325,6 +352,9 @@ sss() {
     fi
 }
 
+
+# Searches/open link functions
+
 # DuckDuckGo Search
 ddg() {
     if [[ -z "$1" ]]; then
@@ -361,11 +391,95 @@ yt() {
 # Google Search
 gg() {
     if [[ -z "$1" ]]; then
-        t ERR "Usage: google <query>"
+        t ERR "Usage: gg <query>"
         return 1
     fi
     local query=$(printf "%s+" "$@")
     _browser_open "https://www.google.com/search?q=${query%?}"
+}
+
+# GitHub Search
+ghs() {
+    local gh_ins="https://github.com"
+    local type_flag="&type=repositories"
+    local args=()
+
+    # TODO
+    # --lang)  # TODO
+    #     # Map the user input to GitHub's language param
+    #     case "$2" in
+    #         c) status_flag="&type=code" ;;
+    #         code) status_flag="&type=code" ;;
+    #         r) status_flag="&type=repositories" ;;
+    #         repo) status_flag="&type=repositories" ;;
+    #         repos) status_flag="&type=repositories" ;;
+    #         repositories) status_flag="&type=repositories" ;;
+    #         i)   status_flag="&type=issues" ;;
+    #         issue)   status_flag="&type=issues" ;;
+    #         issues)   status_flag="&type=issues" ;;
+    #         pr)   status_flag="&type=pullrequests" ;;
+    #         prs)   status_flag="&type=pullrequests" ;;
+    #         pullrequests)   status_flag="&type=pullrequests" ;;
+    #         u)   status_flag="&type=users" ;;
+    #         user)   status_flag="&type=users" ;;
+    #         users)   status_flag="&type=users" ;;
+    #         *) t ERR "Type must be: code, repositories, issues, pullrequests, or users" && return 1 ;;
+    #     esac
+    #     shift 2
+    #     ;;
+
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --twork)
+                local twork_gh_ins=$(get_config "TWORK_GH_INSTACE")
+                if [[ -n "$twork_gh_ins" ]]; then
+                    gh_ins="$twork_gh_ins"
+                else
+                    # Fallback if variable is missing from the file
+                    gh_ins="https://github.com"
+                fi
+                shift
+                ;;
+            --type)
+                # Map the user input to GitHub's type param
+                case "$2" in
+                    c) type_flag="&type=code" ;;
+                    code) type_flag="&type=code" ;;
+                    r) type_flag="&type=repositories" ;;
+                    repo) type_flag="&type=repositories" ;;
+                    repos) type_flag="&type=repositories" ;;
+                    repositories) type_flag="&type=repositories" ;;
+                    i)   type_flag="&type=issues" ;;
+                    issue)   type_flag="&type=issues" ;;
+                    issues)   type_flag="&type=issues" ;;
+                    pr)   type_flag="&type=pullrequests" ;;
+                    prs)   type_flag="&type=pullrequests" ;;
+                    pullrequests)   type_flag="&type=pullrequests" ;;
+                    u)   type_flag="&type=users" ;;
+                    user)   type_flag="&type=users" ;;
+                    users)   type_flag="&type=users" ;;
+                    *) t ERR "Type must be: code, repositories, issues, pullrequests, or users" && return 1 ;;
+                esac
+                shift 2
+                ;;
+            *)
+                args+=("$1")
+                shift
+                ;;
+        esac
+    done
+
+    # Check if we have a query
+    if [[ ${#args[@]} -eq 0 ]]; then
+        t ERR "Usage: ghs [--me] [--type <code|repositories|issues|pullrequests|users>] <query>"
+        return 1
+    fi
+
+    # Format query
+    local query=$(printf "%s+" "${args[@]}")
+
+    _browser_open "${gh_ins}/search?q=${query%?}${type_flag}"
 }
 
 # Asana Search
@@ -429,6 +543,9 @@ asa() {
     # Open browser
     _browser_open "https://app.asana.com/0/search?q=${query%?}&sort=last_modified&searched_type=task${me_flag}${status_flag}"
 }
+
+
+## Other functions (not listed via ftt)
 
 # Python venv
 # TODO: add args for other txt?
@@ -499,7 +616,7 @@ function venv () {
     t SUCCESS "Setup complete. Environment is active."
 }
 
-# github related functions
+## github related functions
 
 # Checkout via selecting from a menu
 function gco() {
@@ -586,7 +703,7 @@ function gco() {
     fi
 }
 
-# removing in favogiven branch with confirmation
+# removing in favour of new flow above
 # function gco() {
 #     local branch=$1
 #     if [ -z "$branch" ]; then
@@ -619,12 +736,14 @@ function gcob() {
     fi
 }
 
+# git pull
 function gpull() {
     local branch=$(git rev-parse --abbrev-ref HEAD)
     t INFO "Pulling ${H2}${branch}${NC}.."
     git pull origin "$branch" --prune
 }
 
+# git push
 function gpush() {
     local branch=$(git rev-parse --abbrev-ref HEAD)
     t INFO "Pushing ${H2}${branch}${NC} to origin.."
@@ -659,7 +778,9 @@ function grn() {
     fi
 }
 
-# azure related functions
+
+## azure related functions
+
 # Clear the Azure CLI cache
  function azr() {
     AZ_HTTP_CACHE_BIN="$HOME/.azure/msal_http_cache.bin"
@@ -796,6 +917,8 @@ function print_azure_status() {
     done
 }
 
+
+##asana related functions
 
 # Helper to generate the Asana Authorization header
 function get_asa_header() {

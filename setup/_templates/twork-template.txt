@@ -70,3 +70,6 @@ alias ssh-example4='ssh example4@example4.com'
 # The original version is saved in .bash_profile.pysave
 # PATH="/Library/Frameworks/Python.framework/Versions/3.10/bin:${PATH}"
 # export PATH=/opt/homebrew/bin:$PATH
+
+# twork gh instance
+# export TWORK_GH_INSTACE=

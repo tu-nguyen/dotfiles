@@ -25,67 +25,10 @@ else
     echo "\e[31m[WARNING]\e[0m Failed to load shell colors/styles"
 fi
 
-t() {
-    # t "System started"                  # [INFO] System started
-    # t WARNING "Disk space low"          # [WARNING] Disk space low
-    # t ERROR "Failed to connect to DB"   # [ERROR] Failed to connect to DB
-    # t                                   # Hello world
-    local severity message color label
-    local timestamp=$(date +"%H:%M:%S")
-
-    if [[ $# -eq 0 ]]; then
-        echo -e "${GREEN}Hello world${NC}"
-        return
-    elif [[ $# -eq 1 ]]; then
-        severity="INFO"
-        message="$1"
-    else
-        severity=$(echo "$1" | tr '[:lower:]' '[:upper:]')
-        message="$2"
-    fi
-
-    # Define color and label mapping
-    case "$severity" in
-        INFO)           color="${INFO}";  label="[ INFO ]" ;;
-        IMPORTANT)      color="${INFO}";  label="[ INFO ]" ;;
-        WARN|WARNING)   color="${WARN}";  label="[ WARN ]" ;;
-        ERR|ERROR)      color="${ERR}";   label="[ ERR  ]" ;;
-        SUCCESS|OK)     color="${OK}";    label="[  OK  ]" ;;
-        ALERT)          color="${ALERT}"; label="[-ALERT]" ;;
-        TODO)           color="${ALERT}"; label="[ TODO ]" ;;
-        DEBUG)          color="${DEBUG}"; label="[-DEBUG]" ;;
-        *)              color="${BOLD}";  label="[-$severity]" ;;
-    esac
-
-    # Output formatted message
-    # Format: [HH:MM:SS] [LABEL] Message
-    echo -e "${DEBUG}${timestamp}${NC} ${color}${label}${NC} ${message}${NC}"
-}
-
-# Copy file with a progress bar, also exists in .bash_functions
-cpp() {
-    local quiet=""
-    local src=""
-    local dest=""
-
-    if [[ "$1" == "-q" ]]; then
-        quiet=true
-        src="$2"
-        dest="$3"
-    else
-        src="$1"
-        dest="$2"
-    fi
-
-    if [[ -z "$src" ]] || [[ -z "$dest" ]]; then
-        t ERR "Usage: cpp [-q] <source> <destination>"
-        return 1
-    fi
-
-    rsync -ah --info=progress2 "$src" "$dest"
-    printf "\033[1A\r\033[K"
-
-    if [[ -n "$quiet" ]]; then
-        t OK "Transfer of $(basename "$dest") complete."
-    fi
-}
+if [[ -f "$DOTFILES_CONFIG_DIR/.bash_functions" ]]; then
+    . "$DOTFILES_CONFIG_DIR/.bash_functions"
+elif [[ -f "$DOTFILES_REPO_DIR/setup/bash/bash_functions" ]]; then
+    . "$DOTFILES_REPO_DIR/setup/bash/bash_functions"
+else
+    echo "\e[31m[WARNING]\e[0m Failed to load core shell bash_functions"
+fi

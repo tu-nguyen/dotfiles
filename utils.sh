@@ -248,71 +248,6 @@ _prompt() {
     fi
 }
 
-# Function to clone or pull dotfiles repository
-_clone_or_pull_dotfiles() {
-    t "Managing dotfiles repository.."
-    if [ -d "$DOTFILES_REPO_DIR/.git" ]; then
-        t "${SUB_F}dotfiles${NC} directory '$DOTFILES_REPO_DIR' already exists."
-        # Navigate to the dotfiles directory
-        cd "$DOTFILES_REPO_DIR" || { t Error "Failed to change directory to $DOTFILES_REPO_DIR. Aborting."; exit 1; }
-        printf "\033[1A\r\033[K"
-
-        local stashed_changes=false
-        # Check if there are any uncommitted changes (staged or unstaged)
-        if [[ $(git status --porcelain) ]]; then
-            t WARN "Uncommitted changes detected. Stashing them temporarily.."
-            # Use 'git stash push' for modern git, 'save' is deprecated but works
-            if git stash push -m "Temporary stash by dotfiles script before pull"; then
-                stashed_changes=true
-                t OK "Changes stashed successfully."
-            else
-                t Error "Failed to stash uncommitted changes. Aborting pull."
-                # Return to home directory before exiting on error
-                cd "$HOME" || { t Error "Failed to return to home directory after stash error."; }
-                exit 1
-            fi
-        fi
-
-        t "Pulling latest changes from '$DOTFILES_REPO'.."
-        # Ensure we pull from the correct branch, or just 'git pull' if upstream is set
-        local current_branch=$(git rev-parse --abbrev-ref HEAD)
-        if ! git pull origin "$current_branch" &> /dev/null; then
-            t Error "Failed to pull ${ERR}dotfiles${NC} from '$DOTFILES_REPO'. Please check your network or repository access."
-            # Attempt to reapply stash even if pull failed, so user can resolve
-            if $stashed_changes; then
-                t WARN "Attempting to reapply stashed changes after pull failure.."
-                git stash pop || t Warning "Failed to pop stash. You may have conflicts to resolve manually."
-            fi
-            # Return to home directory before exiting on error
-            cd "$HOME" || { t Error "Failed to return to home directory after pull error."; }
-            printf "\033[1A\r\033[K"
-            exit 1
-        fi
-
-        if $stashed_changes; then
-            t "Applying stashed changes.."
-            # git stash pop will fail if there are conflicts, but the user requested it.
-            # We'll report if it fails.
-            if git stash pop &> /dev/null; then
-                t OK "Stashed changes applied successfully."
-            else
-                t Warning "Failed to pop stash. You may have conflicts to resolve manually in '$DOTFILES_REPO_DIR'."
-            fi
-        fi
-
-    else # Repository does not exist, clone it
-        t OK "Cloning ${SUB_F}dotfiles${NC} repository '$DOTFILES_REPO' to '$DOTFILES_REPO_DIR'.."
-        mkdir -p "$DOTFILES_REPO_DIR" # Ensure parent directory exists
-        if ! git clone "$DOTFILES_REPO" "$DOTFILES_REPO_DIR"; then
-            t Error "Failed to clone ${ERR}dotfiles from${NC} '$DOTFILES_REPO'. Please check the URL and your network."
-            exit 1
-        fi
-    fi
-    # Always return to home directory at the end of the function
-    cd "$HOME" || { t Error "Failed to return to home directory."; exit 1; }
-    printf "\033[1A\r\033[K"
-}
-
 # Function to convert hex to 0-5 scale for ANSI cube
 _hex_to_256() {
     local hex=$(echo "$1" | sed 's/#//')
@@ -394,7 +329,7 @@ _install_packages() {
     return
 }
 
-_clone_or_pull_dotfiles
+clone_or_pull_dotfiles
 
 reset_pre() {
     t IMPORTANT "This should be ran at least once!"

@@ -50,11 +50,15 @@ else
 fi
 
 # Temp patch
-if [[ "$ENV_LOADED" == "false" ]]; then
+if [[ "$ENV_LOADED" == "false" && -z "$LOADED_DOTFILES_CONFIG_FILE" ]]; then
     OLD_DOTFILES_CONFIG_FILE="$HOME/.config/dotfiles/.dotfile_config.env"
     if [[ -f "$OLD_DOTFILES_CONFIG_FILE" ]]; then
         echo "[INFO] Configuration loaded from $OLD_DOTFILES_CONFIG_FILE"
         . "$OLD_DOTFILES_CONFIG_FILE"
+
+        mv "$OLD_DOTFILES_CONFIG_FILE" "$HOME/.config/dotfiles/.dotfile_config"
+
+        set_config "DOTFILES_CONFIG_FILE" "$HOME/.config/dotfiles/.dotfile_config"
     fi
 fi
 

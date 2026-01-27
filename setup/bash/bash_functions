@@ -211,7 +211,7 @@ rr() {
 rrr() {
     pre_r
 
-    _clone_or_pull_dotfiles -rb
+    clone_or_pull_dotfiles -rb
 
     post_r
 }

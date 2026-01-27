@@ -448,17 +448,33 @@ reset_bashrc() {
     cpp -q "$TEMP_DIRENV_TOML" "$DIRENV_DEST_FILE"
 
     # Copy starship config
-    STARSHIP_TEMPLATE_FILE="$DOTFILES_REPO_DIR/setup/bash/starship/starship.toml"
-    STARSHIP_DEST_FILE="$HOME/.config/starship.toml"
-    TEMP_STARSHIP_TOML="$TEMP_CONFIG_DIR/starship.toml"
-    if [[ "$OS_TYPE" == "macos" ]]; then
-        _convert_hex_to_ansi "$STARSHIP_TEMPLATE_FILE" "$TEMP_STARSHIP_TOML"
-    else
-        cpp -q "$STARSHIP_TEMPLATE_FILE" "$TEMP_STARSHIP_TOML"
-    fi
-    cpp "$TEMP_STARSHIP_TOML" "$STARSHIP_DEST_FILE"
+    STARSHIP_SRC_DIR="$DOTFILES_REPO_DIR/setup/bash/starship"
+    STARSHIP_DEST_DIR="$HOME/.config"
+
+    # Loop through all starship .toml files in the source directory
+    for template in "$STARSHIP_SRC_DIR"/starship*.toml; do
+        # Get just the filename (e.g., starship.gruvbox.toml)
+        filename=$(basename "$template")
+        temp_output="$TEMP_CONFIG_DIR/$filename"
+        dest_output="$STARSHIP_DEST_DIR/$filename"
+
+        if [[ "$OS_TYPE" == "macos" ]]; then
+            _convert_hex_to_ansi "$template" "$temp_output"
+        else
+            # Using -q for quiet preprocessing
+            cpp -q "$template" "$temp_output"
+        fi
+
+        # Final move/copy to destination
+        cpp "$temp_output" "$dest_output"
+    done
 
     rm -fr "$TEMP_CONFIG_DIR"
+
+    if [[ ! -f "$STARSHIP_DEST_DIR/starship.toml" ]]; then
+        t "starship.toml not found. Initializing with default theme.."
+        cpp -q "$STARSHIP_DEST_DIR/starship.tu.toml" "$STARSHIP_DEST_DIR/starship.toml"
+    fi
 
     t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_bashrc()${SUCCESS} completed!!${NC}"
 }

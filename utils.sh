@@ -216,20 +216,35 @@ _install_gitstatus() {
 }
 
 cp_and_source() {
-    local file="$1"
-    local target="$2"
+    local quiet=false
+    local src=""
+    local dest=""
 
-    if [[ -z "$file" || -z "$target" ]]; then
-        t ERROR "Usage: cp_and_source <file> <target>"
+    if [[ "$1" == "-q" ]]; then
+        quiet=true
+        src="$2"
+        dest="$3"
+    else
+        src="$1"
+        dest="$2"
+    fi
+
+    if [[ -z "$src" || -z "$dest" ]]; then
+        t ERROR "Usage: cp_and_source [-q] <source> <destination>"
         return 1
     fi
 
-    cpp -q "$file" "$target"
+    if [[ "$quiet" == false ]]; then
+        cpp "$src" "$dest"
 
-    if [[ -f "$target" ]]; then
-        . "$target"
     else
-        t ERROR "Failed to copy $file to $target."
+        cpp -q "$src" "$dest"
+    fi
+
+    if [[ -f "$dest" ]]; then
+        . "$dest"
+    else
+        t ERROR "Failed to copy $src to $dest."
     fi
 }
 

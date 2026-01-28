@@ -144,7 +144,7 @@ motd() {
         COOLDOWN_TIME=1169
 
         if [ -f "$COOLDOWN_FILE" ]; then
-            LAST_RUN=$(cat "$COOLDOWN_FILE")
+            LAST_RUN=$(qat "$COOLDOWN_FILE")
             ELAPSED=$((CURRENT_TIME - LAST_RUN))
 
             if [ "$ELAPSED" -lt "$COOLDOWN_TIME" ]; then

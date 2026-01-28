@@ -110,7 +110,7 @@ if [[ -d "$FNM_PATH" ]]; then
     CURRENT_TIME=$(date +%s)
     UPDATE_INTERVAL=86400
 
-    if [[ ! -f "$TIMESTAMP_FILE" ]] || (( CURRENT_TIME - $(cat "$TIMESTAMP_FILE") > UPDATE_INTERVAL )); then
+    if [[ ! -f "$TIMESTAMP_FILE" ]] || (( CURRENT_TIME - $(qat "$TIMESTAMP_FILE") > UPDATE_INTERVAL )); then
         # Determine latest LTS and set as default
         LTS_VER=$(fnm list | grep 'lts-latest' | awk '{print $2}')
         if [[ -n "$LTS_VER" ]]; then

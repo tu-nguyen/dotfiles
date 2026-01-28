@@ -140,9 +140,9 @@ _install_fira_font() {
             local ps1_path="$win_temp/install_choco_fira.ps1"
             local win_ps1_path="C:\\Users\\Public\\install_choco_fira.ps1"
 
-            # Write the PS1 file using a 'quoted' heredoc (cat << 'EOF')
+            # Write the PS1 file using a 'quoted' heredoc (qat << 'EOF')
             # This ensures Bash does NOT touch any backslashes or variables inside.
-            cat << 'EOF' > "$ps1_path"
+            qat << 'EOF' > "$ps1_path"
 Set-Location C:\
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 

@@ -511,30 +511,6 @@ ghs() {
     local repos=""
     local gh_username=""
 
-    # TODO
-    # --lang)  # TODO
-    #     # Map the user input to GitHub's language param
-    #     case "$2" in
-    #         c) status_flag="&type=code" ;;
-    #         code) status_flag="&type=code" ;;
-    #         r) status_flag="&type=repositories" ;;
-    #         repo) status_flag="&type=repositories" ;;
-    #         repos) status_flag="&type=repositories" ;;
-    #         repositories) status_flag="&type=repositories" ;;
-    #         i)   status_flag="&type=issues" ;;
-    #         issue)   status_flag="&type=issues" ;;
-    #         issues)   status_flag="&type=issues" ;;
-    #         pr)   status_flag="&type=pullrequests" ;;
-    #         prs)   status_flag="&type=pullrequests" ;;
-    #         pullrequests)   status_flag="&type=pullrequests" ;;
-    #         u)   status_flag="&type=users" ;;
-    #         user)   status_flag="&type=users" ;;
-    #         users)   status_flag="&type=users" ;;
-    #         *) t ERR "Type must be: code, repositories, issues, pullrequests, or users" && return 1 ;;
-    #     esac
-    #     shift 2
-    #     ;;
-
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -591,7 +567,7 @@ ghs() {
             --pr|--prs)
                 # Map the user input to GitHub's type param
                 case "$2" in
-                    nr) prs="pulls?q=label%3A%22needs+review" && shift ;;
+                    nr) prs='pulls?q=label%3A%22needs+review"' && shift ;;
                     *) prs="pulls?" ;;
                 esac
                 shift

@@ -29,7 +29,10 @@ extensions=(
     "tamasfe.even-better-toml"
     "esbenp.prettier-vscode"
     "ms-vscode-remote.remote-wsl"
+    "christian-kohler.path-intellisense"
     "ms-python.black-formatter"
+    "irongeek.vscode-env"
+    "mechatroner.rainbow-csv"
 )
 
 t INFO "Installing VS Code Extensions.."

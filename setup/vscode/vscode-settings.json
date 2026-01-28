@@ -29,9 +29,11 @@
     "editor.smoothScrolling": true, // Smooth scroll animation
     "editor.cursorBlinking": "smooth", // Smooth cursor blinking
     "editor.multiCursorModifier": "ctrlCmd", // Use Ctrl/Cmd for multiple cursors
+    "editor.suggestSelection": "first",
+    "vsintelligence.tt.enabled": true,
 
     // --- Files & Folders ---
-    // "files.eol": "\n", // Use LF (Unix/Linux) as the default end of line character
+    "files.eol": "\n", // Use LF (Unix/Linux) as the default end of line character
     // "files.autoSave": "afterDelay", // Auto save after a delay
     // "files.autoSaveDelay": 1000, // 1 second delay
     "files.trimTrailingWhitespace": true, // Remove trailing whitespace on save
@@ -67,6 +69,7 @@
     "workbench.enableExperiments": false, // Disable experimental features
     "workbench.settings.editor": "json", // Always open settings in JSON editor (or "ui" for UI editor)
     "workbench.startupEditor": "none", // Open VS Code to an empty window
+    "workbench.list.smoothScrolling": true,
     // "workbench.view.releaseNotes": false, // Don't show release notes on update
 
     // --- Terminal Settings ---
@@ -75,6 +78,8 @@
     "terminal.integrated.fontWeight": "normal",
     "terminal.integrated.letterSpacing": 0,
     "terminal.integrated.cursorBlinking": true,
+    "terminal.integrated.altClickMovesCursor": true,
+    "terminal.integrated.rightClickBehavior": "paste",
     "terminal.integrated.shellIntegration.enabled": true, // Enable shell integration for better terminal features
     "terminal.integrated.enableMultiLinePasteWarning": "auto", // Disable warning for multi-line paste
     "terminal.integrated.gpuAcceleration": "on",
@@ -105,6 +110,15 @@
             "path": "C:\\Windows\\System32\\wsl.exe",
             "icon": "terminal-linux"
         }
+    },
+
+    // --- Search & Exclusions ---
+    // This stops VS Code from wasting CPU indexing your node_modules or huge log files
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+        "**/dist": true
     },
 
     "python.terminal.activateEnvironment": true, // **Automatically activate Python environment in new terminals**

@@ -90,17 +90,28 @@ _install_fira_font() {
     local font_name="FiraCode Nerd Font"
     local fira_font_installed=0
 
-    # if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
-    #     if command -v fc-list >/dev/null; then
-    #         if fc-list : family | grep -iq "$font_name"; then
-    #             fira_font_installed=1
-    #         fi
-    #     fi
-    # elif [[ "$OS_TYPE" == "macos" ]]; then
-    #     if system_profiler SPFontsDataType | grep -iq "$font_name"; then
-    #         fira_font_installed=1
-    #     fi
-    # fi
+    if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
+        if command -v fc-list >/dev/null; then
+            if fc-list : family | grep -iq "$font_name"; then
+                fira_font_installed=1
+            fi
+        fi
+    elif [[ "$OS_TYPE" == "macos" ]]; then
+        if system_profiler SPFontsDataType | grep -iq "$font_name"; then
+            fira_font_installed=1
+        fi
+    fi
+
+    if [[ "$OS_TYPE" == "wsl" ]]; then
+        # Check Registry for Font registration (more reliable than 'dir' in Fonts folder)
+        if powershell.exe -NoProfile -Command "Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts' | Get-Member | Where-Object Name -like '*FiraCode*'" &>/dev/null; then
+            t SUCCESS "Found FiraCode in Windows Registry."
+            font_installed=1
+        else
+            t WARN "FiraCode not detected on Windows side."
+            font_installed=0 # Force reinstall/install if Windows side is missing
+        fi
+    fi
 
     if [[ "$fira_font_installed" -eq 1 ]]; then
         t SUCCESS "${HDR_F}${font_name,,}${NC} is already installed."
@@ -115,25 +126,20 @@ _install_fira_font() {
         t INFO "Downloading ${font_name,,} zip.."
         curl -fLo "./FiraCode.zip" https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip
 
-        unzip -o "./FiraCode.zip" -d "$font_dir"
-        rm "./FiraCode.zip"
+        unzip -o "./FiraCode.zip" -d "$font_dir" && rm "./FiraCode.zip"
+        [ -x "$(command -v fc-cache)" ] && fc-cache -f
 
-        # Refresh Linux font cache (for WSL apps)
-        if command -v fc-cache >/dev/null; then
-            fc-cache -f
-        fi
-
+        # If WSL, also trigger the Windows Side (Chocolatey)
         if [[ "$OS_TYPE" == "wsl" ]]; then
-            t INFO "Installing Chocolatey and Fira Code..."
+            t INFO "Installing Chocolatey and Fira Code.."
 
-            # 1. Detect the mount point to find where to write the temp file
+            # Detect the mount point to find where to write the temp file
             local win_temp="/c/Users/Public"
             [ -d "/mnt/c/Windows" ] && win_temp="/mnt/c/Users/Public"
-
             local ps1_path="$win_temp/install_choco_fira.ps1"
             local win_ps1_path="C:\\Users\\Public\\install_choco_fira.ps1"
 
-            # 2. Write the PS1 file using a 'quoted' heredoc (cat << 'EOF')
+            # Write the PS1 file using a 'quoted' heredoc (cat << 'EOF')
             # This ensures Bash does NOT touch any backslashes or variables inside.
             cat << 'EOF' > "$ps1_path"
 Set-Location C:\
@@ -154,23 +160,16 @@ Write-Host "Installing Fira Code Nerd Font..." -ForegroundColor Cyan
 & choco install firacodenf -y
 EOF
 
-            # 3. Trigger Elevation pointing to the physical file
+            # Elevate and Run
             # Set-Location C:\ is added to the initial call to kill the UNC/WSL path warning
             powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
                 Set-Location C:\\;
                 Start-Process powershell -ArgumentList '-NoProfile', '-ExecutionPolicy Bypass', '-File', '$win_ps1_path' -Verb RunAs -Wait
             "
 
-            # 4. Cleanup and Verification
+            # Cleanup and Verification
             rm "$ps1_path"
-
-            if cmd.exe /c "dir C:\\Windows\\Fonts\\Fira*" 2>/dev/null | grep -iq "Fira"; then
-                t SUCCESS "Fira Code Nerd Font installed via Chocolatey!"
-            else
-                t ERR "Installation failed. Please check the Admin window for error messages."
-            fi
         fi
-
 
     elif [[ "$OS_TYPE" == "macos" ]]; then
         brew tap homebrew/cask-fonts

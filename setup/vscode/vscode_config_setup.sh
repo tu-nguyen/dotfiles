@@ -20,7 +20,14 @@ DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
 [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 # --- End Load Configuration ---
 
-# extension installation
+# Check twork
+if [[ -f "$DOTFILES_CONFIG_DIR/.bash_twork" ]]; then
+    t WARN "Work environment detected (.twork exists). Bypassing SSL checks..."
+    export NODE_TLS_REJECT_UNAUTHORIZED=0
+    ssl_flag="--ignore-certificate-errors"
+fi
+
+# VS Code Extension installation
 extensions=(
     "zhuangtongfa.Material-theme"
     "PKief.material-icon-theme"
@@ -40,9 +47,15 @@ for ext in "${extensions[@]}"; do
         t OK "${HDR_F}$ext${NC} is already installed."
     else
         t "Installing ${HDR_F}$ext${NC}.."
-        code --install-extension "$ext" --force
+        code --install-extension "$ext" --force $ssl_flag
     fi
 done
+
+# Cleanup
+if [[ -n "$ssl_flag" ]]; then
+    unset NODE_TLS_REJECT_UNAUTHORIZED
+    t SUCCESS "SSL Bypass disabled. Extensions synced."
+fi
 
 t SUCCESS "VS Code extensions synced!"
 

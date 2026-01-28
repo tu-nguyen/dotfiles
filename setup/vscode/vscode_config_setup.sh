@@ -23,8 +23,8 @@ DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
 # Check twork
 if [[ -f "$DOTFILES_CONFIG_DIR/.bash_twork" ]]; then
     t WARN "Work environment detected (.twork exists). Bypassing SSL checks..."
+    extra_args="--ignore-certificate-errors --proxy-bypass-list=* --disable-proxy-server"
     export NODE_TLS_REJECT_UNAUTHORIZED=0
-    ssl_flag="--ignore-certificate-errors"
 fi
 
 # VS Code Extension installation
@@ -47,7 +47,7 @@ for ext in "${extensions[@]}"; do
         t OK "${HDR_F}$ext${NC} is already installed."
     else
         t "Installing ${HDR_F}$ext${NC}.."
-        code --install-extension "$ext" --force $ssl_flag
+        code $extra_args --install-extension "$ext" --force
     fi
 done
 

@@ -687,8 +687,8 @@ asa() {
     done
 
     # Check if we have a query
-    if [[ ${#args[@]} -eq 0 ]]; then
-        t ERR "Usage: asa [--me] [--user <USER>] [--collab <USER>] [--status <incomplete|completed|deleted>] <query>"
+    if [[ ${#args[@]} -eq 0 && -z "$status_param" && -z "$gh_username" ]]; then
+        t ERR "Usage: asa [--me] [--user <USER>] [--collab <USER>] [--status <incomplete|completed|deleted>] [query]"
         return 1
     fi
 

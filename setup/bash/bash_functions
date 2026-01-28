@@ -155,6 +155,26 @@ function get_config() {
     fi
 }
 
+# Helper to fetch value from .gitconfig
+function get_git_config() {
+    if [ -z "$1" ]; then
+        t ERR "Error: No configuration key provided." >&2
+        t ERR "Usage: get_git_config <section.key>" >&2
+        return 1
+    fi
+
+    # Use git's internal engine to find the value
+    # --get returns the value, or nothing (and an exit code of 1) if not found
+    local value
+    value=$(git config --get "$1")
+
+    if [ $? -eq 0 ]; then
+        echo "$value"
+    else
+        return 1
+    fi
+}
+
 
 ## Reset flow: r & rr
 
@@ -487,6 +507,9 @@ ghs() {
     local gh_ins="https://github.com"
     local type_flag="&type=repositories"
     local args=()
+    local prs=""
+    local repos=""
+    local gh_username=""
 
     # TODO
     # --lang)  # TODO
@@ -515,6 +538,21 @@ ghs() {
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case "$1" in
+            --me)
+                local config_gh_username=$(get_config "GITHUB_USERNAME")
+                if [[ -n "$config_gh_username" ]]; then
+                    gh_username="$config_gh_username"
+                else
+                    local gitconfig_gh_username=$(get_git_config user.name)
+                    if [[ -n "$gitconfig_gh_username" ]]; then
+                        gh_username="$gitconfig_gh_username"
+                    else
+                        t WARN "--me flag given but GITHUB_USERNAME is not set in env or in .gitconfig"
+                        return 1
+                    fi
+                fi
+                shift
+                ;;
             --twork)
                 local twork_gh_ins=$(get_config "TWORK_GH_INSTACE")
                 if [[ -n "$twork_gh_ins" ]]; then
@@ -528,24 +566,26 @@ ghs() {
             --type)
                 # Map the user input to GitHub's type param
                 case "$2" in
-                    c) type_flag="&type=code" ;;
-                    code) type_flag="&type=code" ;;
-                    r) type_flag="&type=repositories" ;;
-                    repo) type_flag="&type=repositories" ;;
-                    repos) type_flag="&type=repositories" ;;
-                    repositories) type_flag="&type=repositories" ;;
-                    i)   type_flag="&type=issues" ;;
-                    issue)   type_flag="&type=issues" ;;
-                    issues)   type_flag="&type=issues" ;;
-                    pr)   type_flag="&type=pullrequests" ;;
-                    prs)   type_flag="&type=pullrequests" ;;
-                    pullrequests)   type_flag="&type=pullrequests" ;;
-                    u)   type_flag="&type=users" ;;
-                    user)   type_flag="&type=users" ;;
-                    users)   type_flag="&type=users" ;;
+                    c|code) type_flag="&type=code" ;;
+                    r|repo|repos|repositories) type_flag="&type=repositories" ;;
+                    i|issue|issues)   type_flag="&type=issues" ;;
+                    pr|prs|pullrequests)   type_flag="&type=pullrequests" ;;
+                    u|user|users)   type_flag="&type=users" ;;
                     *) t ERR "Type must be: code, repositories, issues, pullrequests, or users" && return 1 ;;
                 esac
                 shift 2
+                ;;
+            --prs|--pr)
+                # Map the user input to GitHub's type param
+                case "$2" in
+                    nr) prs="pulls?q=label%3A%22needs+review" && shift ;;
+                    *) prs="pulls" ;;
+                esac
+                shift
+                ;;
+            --repos|--pr)
+                repos=repos
+                shift
                 ;;
             *)
                 args+=("$1")
@@ -554,16 +594,30 @@ ghs() {
         esac
     done
 
-    # Check if we have a query
-    if [[ ${#args[@]} -eq 0 ]]; then
-        t ERR "Usage: ghs [--twork] [--type <code|repositories|issues|pullrequests|users>] <query>"
-        return 1
+    if [[ -z "$prs" && -z "$repos" ]]; then
+        # Check if we have a query
+        if [[ ${#args[@]} -eq 0 ]]; then
+            t ERR "Usage: ghs [--twork] [--type <code|repositories|issues|pullrequests|users>] <query>"
+            return 1
+        fi
+
+        # Format query
+        local query=$(printf "%s+" "${args[@]}")
+
+        _browser_open "${gh_ins}/search?q=${query%?}${type_flag}"
     fi
 
-    # Format query
-    local query=$(printf "%s+" "${args[@]}")
+    if [[ "$prs" ]]; then
+        local by_author=""
+        if [[ "$gh_username" ]];
+            by_author="%22+is%3Aopen+author%3A${gh_username}+"
+        fi
+        _browser_open "${gh_ins}/${prs}${by_author}"
+    fi
 
-    _browser_open "${gh_ins}/search?q=${query%?}${type_flag}"
+    if [[ "$repos" ]]; then
+        _browser_open "${gh_ins}/${repos}"
+    fi
 }
 
 # Asana Search

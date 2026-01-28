@@ -20,7 +20,7 @@ DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
 [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 # --- End Load Configuration ---
 
-# VS Code Extension installation
+# extension installation
 extensions=(
     "zhuangtongfa.Material-theme"
     "PKief.material-icon-theme"
@@ -35,51 +35,35 @@ extensions=(
     "mechatroner.rainbow-csv"
 )
 
-if [[ -f "$DOTFILES_CONFIG_DIR/.bash_twork" ]]; then
-    t WARN "Work environment detected (.twork exists). Sideloading.."
-    DOWNLOAD_DIR="$./vscode_extensions_tmp"
-    mkdir -p "$DOWNLOAD_DIR"
-    t INFO "Starting Offline Extension Sync..."
-fi
+failed_exts=()
 
 for ext in "${extensions[@]}"; do
     if code --list-extensions | grep -qi "$ext"; then
         t OK "${HDR_F}$ext${NC} is already installed."
     else
-        t "Installing ${HDR_F}$ext${NC}.."
-        if [[ -f "$DOTFILES_CONFIG_DIR/.bash_twork" ]]; then
-            local pub=$(echo $ext | cut -d. -f1)
-            local name=$(echo $ext | cut -d. -f2)
-
-            local url="https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${pub}/vsextensions/${name}/latest/vspackage"
-            local target="$dl_dir/${ext}.vsix"
-
-            curl -fkLs -H "User-Agent: Mozilla/5.0" "$url" -o "$target"
-
-            # Check if the file is actually a ZIP (VSIX) and not a text/html error page
-            if file "$target" | grep -q "Zip archive data"; then
-                t SUCCESS "${HDR_F}$ext${NC} download valid. Installing..."
-                code --install-extension "$target" --force
-            else
-                t ERR "Download failed for ${HDR_F}$ext${NC}. The firewall likely blocked the file."
-                # Debug: show the first few lines of what we actually downloaded
-                head -n 5 "$target"
-            fi
-        else
-            code --install-extension "$ext" --force
+        t "Attempting to install ${HDR_F}$ext${NC}.."
+        # Attempt install; if it fails, add to the failed list
+        if ! code --install-extension "$ext" --force; then
+            t ERR "Network blocked install for ${HDR_F}$ext${NC}."
+            failed_exts+=("$ext")
         fi
     fi
 done
 
-# Cleanup
-if [[ -d "$$DOWNLOAD_DIR" ]]; then
-    rmdir "$DOWNLOAD_DIR"
+# Final Summary
+if [ ${#failed_exts[@]} -ne 0 ]; then
+    echo -e "\n${WARN} --- ${WARN} MANUAL ACTION REQUIRED  --- ${NC}"
+    t WARN "The following extensions could not be installed automatically due to network/SSL restrictions:"
+    for f in "${failed_exts[@]}"; do
+        echo -e "  - $f"
+    done
+    echo -e "\nTo fix this, please search for them in the VS Code Marketplace UI (Ctrl+Shift+X) and click 'Install'."
+    echo -e "${HDR_F}---------------------------------------------------------------------${NC}"
+else
+    t SUCCESS "All extensions synced successfully!"
 fi
 
-t SUCCESS "VS Code extensions synced!"
-
 # settings.json copy
-
 src=$DOTFILES_REPO_DIR/setup/vscode/vscode-settings.json
 
 if [[ "$OS_TYPE" == "linux" ]]; then

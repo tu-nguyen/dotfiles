@@ -41,9 +41,11 @@ for ext in "${extensions[@]}"; do
     else
         t "Installing ${HDR_F}$ext${NC}.."
         if [[ -f "$DOTFILES_CONFIG_DIR/.bash_twork" ]]; then
-            t WARN "Work environment detected (.twork exists). Bypassing SSL checks..."
-            extra_args="--ignore-certificate-errors --use-system-certificates"
-            cmd.exe /c "set NODE_TLS_REJECT_UNAUTHORIZED=0 && code --install-extension $ext --force"
+            t WARN "Work environment detected (.twork exists). PowerShell Bypass.."
+            powershell.exe -NoProfile -Command "
+                \$env:NODE_TLS_REJECT_UNAUTHORIZED = '0';
+                code --install-extension $ext --force --ignore-certificate-errors
+            "
         else
             code --install-extension "$ext" --force
         fi

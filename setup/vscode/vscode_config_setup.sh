@@ -35,13 +35,11 @@ extensions=(
     "mechatroner.rainbow-csv"
 )
 
-t INFO "Installing VS Code Extensions.."
-
 for ext in "${extensions[@]}"; do
     if code --list-extensions | grep -qi "$ext"; then
-        t OK "$ext is already installed."
+        t OK "${HDR_F}$ext${NC} is already installed."
     else
-        t "Installing $ext..."
+        t "Installing ${HDR_F}$ext${NC}.."
         code --install-extension "$ext" --force
     fi
 done

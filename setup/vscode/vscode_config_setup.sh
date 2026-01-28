@@ -23,16 +23,8 @@ DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
 # Check twork
 if [[ -f "$DOTFILES_CONFIG_DIR/.bash_twork" ]]; then
     t WARN "Work environment detected (.twork exists). Bypassing SSL checks..."
-
-    # Use jq to temporarily set SSL bypass in the actual config file
-    if command -v jq >/dev/null; then
-        jq '.["http.proxyStrictSSL"] = false | .["http.systemCertificates"] = true' "$settings_wsl" > "${settings_wsl}.tmp" && mv "${settings_wsl}.tmp" "$settings_wsl"
-    else
-        # Fallback if jq isn't installed yet: overwrite with a minimal bypass config
-        echo '{"http.proxyStrictSSL": false, "http.systemCertificates": true}' > "$settings_wsl"
-    fi
-
-    export NODE_TLS_REJECT_UNAUTHORIZED=0
+    extra_args="--ignore-certificate-errors --use-system-certificates"
+    code $extra_args --install-extension "$ext" --force
 fi
 
 # VS Code Extension installation

@@ -606,7 +606,7 @@ asa() {
                 local user_id_collab=$(get_config "ASANA_${user_name_collab}_ID")
 
                 if [[ -n "$user_id_collab" ]]; then
-                    collab_flag="&assignees.ids=${user_id_collab}"
+                    collab_flag="&collaborators.ids=${user_id_collab}"
                 else
                     t ERR "No ID found for ASANA_${user_name_collab}_ID in config."
                     return 1

@@ -579,7 +579,7 @@ ghs() {
                 # Map the user input to GitHub's type param
                 case "$2" in
                     nr) prs="pulls?q=label%3A%22needs+review" && shift ;;
-                    *) prs="pulls" ;;
+                    *) prs="pulls?" ;;
                 esac
                 shift
                 ;;

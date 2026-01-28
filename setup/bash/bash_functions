@@ -1112,6 +1112,12 @@ function print_asana_status() {
     local project_api="https://app.asana.com/api/1.0/projects/$asana_project_gid"
     local project_json=$(curl -s -H "$auth_header" "$project_api")
     local project_name=$(echo "$project_json" | jq -r '.data.name // "Unknown Project"')
+    if [[ "$TERM_PROGRAM" == "vscode" ]]; then
+        # If we are in VS Code, replace complex emojis with stable Nerd Font icons
+        local smh_star=$'\uf005 '
+        project_name=$(echo "$project_name" | sed "s/🏃‍♀️/$smh_star/g")
+    fi
+
     local due_on=$(echo "$project_json" | jq -r '.data.due_on')
 
     # Calculate Time Remaining (Handling empty due dates)

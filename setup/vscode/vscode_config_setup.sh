@@ -20,6 +20,33 @@ DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
 [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 # --- End Load Configuration ---
 
+# extension installation
+extensions=(
+    "zhuangtongfa.Material-theme"
+    "PKief.material-icon-theme"
+    "usernamehw.errorlens"
+    "eamodio.gitlens"
+    "tamasfe.even-better-toml"
+    "esbenp.prettier-vscode"
+    "ms-vscode-remote.remote-wsl"
+    "ms-python.black-formatter"
+)
+
+t INFO "Installing VS Code Extensions.."
+
+for ext in "${extensions[@]}"; do
+    if code --list-extensions | grep -qi "$ext"; then
+        t OK "$ext is already installed."
+    else
+        t "Installing $ext..."
+        code --install-extension "$ext" --force
+    fi
+done
+
+t SUCCESS "VS Code extensions synced!"
+
+# settings.json copy
+
 src=$DOTFILES_REPO_DIR/setup/vscode/vscode-settings.json
 
 if [[ "$OS_TYPE" == "linux" ]]; then

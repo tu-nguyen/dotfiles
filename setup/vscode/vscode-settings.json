@@ -2,7 +2,7 @@
     // --- Editor Settings ---
     "editor.fontSize": 14, // Adjust to your preference
     // "editor.lineHeight": 20, // Adjust for better readability
-    "editor.fontFamily": "Fira Code, Consolas, 'Courier New', monospace", // Recommended: Fira Code with ligatures
+    "editor.fontFamily": "'FiraCode NF', 'Fira Code', Consolas, 'Courier New', monospace", // Recommended: Fira Code with ligatures
     "editor.fontLigatures": true, // Enable font ligatures for better code aesthetics (if using Fira Code, etc.)
     "editor.renderLineHighlight": "gutter", // Highlight only the line number in the gutter
     "editor.tabSize": 4, // **Python standard is 4 spaces**
@@ -58,11 +58,11 @@
 
     // --- Workbench & UI ---
     "workbench.colorTheme": "Default Dark Modern",
-    "workbench.iconTheme": "vscode-icons", // Recommended: VSCode Icons (install extension)
+    "workbench.iconTheme": "material-icon-theme", // Recommended: VSCode Icons (install extension)
     "workbench.statusBar.visible": true,
     "workbench.editor.limit.enabled": true, // Limit the number of open editors
     "workbench.editor.limit.value": 9, // Max 9 open editors
-    "workbench.editor.untitled.labelFormat": "simple", // Simple label for untitled files
+    "workbench.editor.untitled.labelFormat": "content", // Simple label for untitled files
     "workbench.tree.indent": 12, // Indent in file explorer tree
     "workbench.enableExperiments": false, // Disable experimental features
     "workbench.settings.editor": "json", // Always open settings in JSON editor (or "ui" for UI editor)
@@ -71,7 +71,17 @@
 
     // --- Terminal Settings ---
     "terminal.integrated.fontSize": 14, // Terminal font size
+    "terminal.integrated.fontFamily": "'FiraCode NF', 'Fira Code'",
+    "terminal.integrated.fontWeight": "normal",
+    "terminal.integrated.letterSpacing": 0,
     "terminal.integrated.cursorBlinking": true,
+    "terminal.integrated.shellIntegration.enabled": true, // Enable shell integration for better terminal features
+    "terminal.integrated.enableMultiLinePasteWarning": "auto", // Disable warning for multi-line paste
+    "terminal.integrated.gpuAcceleration": "on",
+    "terminal.integrated.customGlyphs": true,
+    "terminal.integrated.unicodeVersion": "11",
+    "terminal.integrated.drawBoldTextInBrightColors": true,
+    "terminal.integrated.minimumContrastRatio": 1,
     "terminal.integrated.defaultProfile.linux": "bash", // Or "zsh", "fish", etc.
     "terminal.integrated.defaultProfile.windows": "Git Bash", // Or "Git Bash", "CMD", "WSL"
     "terminal.integrated.profiles.windows": { // Define profiles for Windows
@@ -93,11 +103,10 @@
         },
         "WSL": {
             "path": "C:\\Windows\\System32\\wsl.exe",
-            "icon": "terminal-wsl"
+            "icon": "terminal-linux"
         }
     },
-    "terminal.integrated.shellIntegration.enabled": true, // Enable shell integration for better terminal features
-    "terminal.integrated.enableMultiLinePasteWarning": false, // Disable warning for multi-line paste
+
     "python.terminal.activateEnvironment": true, // **Automatically activate Python environment in new terminals**
 
     // --- Source Control ---
@@ -164,12 +173,12 @@
     "window.zoomLevel": 0, // Adjust zoom level if needed
     "security.workspace.trust.enabled": true, // Enable Workspace Trust for security
     "extensions.ignoreRecommendations": false, // Show extension recommendations
-    "telemetry.telemetryLevel": "off" // Opt-out of sending telemetry data
+    "telemetry.telemetryLevel": "off", // Opt-out of sending telemetry data
 
 
     // TODO
     "security.allowedUNCHosts": [
-        "dumpster"
+        "dumpster",
     ],
     "security.workspace.trust.untrustedFiles": "open",
     "http.proxyAuthorization": null,

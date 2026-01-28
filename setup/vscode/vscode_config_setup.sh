@@ -43,8 +43,9 @@ for ext in "${extensions[@]}"; do
         if [[ -f "$DOTFILES_CONFIG_DIR/.bash_twork" ]]; then
             t WARN "Work environment detected (.twork exists). PowerShell Bypass.."
             powershell.exe -NoProfile -Command "
+                cd C:\;
                 \$env:NODE_TLS_REJECT_UNAUTHORIZED = '0';
-                code --install-extension $ext --force --ignore-certificate-errors
+                code --install-extension $ext --force --use-system-certificates --ignore-certificate-errors
             "
         else
             code --install-extension "$ext" --force

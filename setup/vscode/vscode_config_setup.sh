@@ -23,7 +23,15 @@ DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
 # Check twork
 if [[ -f "$DOTFILES_CONFIG_DIR/.bash_twork" ]]; then
     t WARN "Work environment detected (.twork exists). Bypassing SSL checks..."
-    extra_args="--ignore-certificate-errors --proxy-bypass-list=* --disable-proxy-server"
+
+    # Use jq to temporarily set SSL bypass in the actual config file
+    if command -v jq >/dev/null; then
+        jq '.["http.proxyStrictSSL"] = false | .["http.systemCertificates"] = true' "$settings_wsl" > "${settings_wsl}.tmp" && mv "${settings_wsl}.tmp" "$settings_wsl"
+    else
+        # Fallback if jq isn't installed yet: overwrite with a minimal bypass config
+        echo '{"http.proxyStrictSSL": false, "http.systemCertificates": true}' > "$settings_wsl"
+    fi
+
     export NODE_TLS_REJECT_UNAUTHORIZED=0
 fi
 
@@ -47,7 +55,7 @@ for ext in "${extensions[@]}"; do
         t OK "${HDR_F}$ext${NC} is already installed."
     else
         t "Installing ${HDR_F}$ext${NC}.."
-        code $extra_args --install-extension "$ext" --force
+        code --install-extension "$ext" --force --ignore-certificate-errors
     fi
 done
 

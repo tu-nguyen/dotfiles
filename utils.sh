@@ -370,7 +370,7 @@ _install_packages() {
     return
 }
 
-# clone_or_pull_dotfiles
+clone_or_pull_dotfiles
 
 reset_pre() {
     t IMPORTANT "This should be ran at least once!"

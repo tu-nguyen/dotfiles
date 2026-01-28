@@ -48,22 +48,22 @@ for ext in "${extensions[@]}"; do
     else
         t "Installing ${HDR_F}$ext${NC}.."
         if [[ -f "$DOTFILES_CONFIG_DIR/.bash_twork" ]]; then
-            publisher=$(echo $ext | cut -d. -f1)
-            name=$(echo $ext | cut -d. -f2)
+            local pub=$(echo $ext | cut -d. -f1)
+            local name=$(echo $ext | cut -d. -f2)
 
-            url="https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${publisher}/vsextensions/${name}/latest/vspackage"
-            target_file="$DOWNLOAD_DIR/${ext}.vsix"
+            local url="https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${pub}/vsextensions/${name}/latest/vspackage"
+            local target="$dl_dir/${ext}.vsix"
 
-            if curl -Lk "$url" -o "$target_file"; then
-                t SUCCESS "${HDR_F}$name${NC} download complete. Installing.."
+            curl -fkLs -H "User-Agent: Mozilla/5.0" "$url" -o "$target"
 
-                # Install the local file
-                code --install-extension "$target_file" --force
-
-                # Cleanup
-                rm "$target_file"
+            # Check if the file is actually a ZIP (VSIX) and not a text/html error page
+            if file "$target" | grep -q "Zip archive data"; then
+                t SUCCESS "${HDR_F}$ext${NC} download valid. Installing..."
+                code --install-extension "$target" --force
             else
-                t ERR "Failed to download ${HDR_F}$ext${NC}"
+                t ERR "Download failed for ${HDR_F}$ext${NC}. The firewall likely blocked the file."
+                # Debug: show the first few lines of what we actually downloaded
+                head -n 5 "$target"
             fi
         else
             code --install-extension "$ext" --force

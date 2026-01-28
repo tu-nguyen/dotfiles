@@ -625,8 +625,8 @@ ghs() {
 # Asana Search
 asa() {
     local me_flag=""
-    local collab_flag=""
-    local status_flag=""
+    local collab_param=""
+    local status_param=""
     local args=()
 
     # Parse arguments
@@ -662,7 +662,7 @@ asa() {
                 local user_id_collab=$(get_config "ASANA_${user_name_collab}_ID")
 
                 if [[ -n "$user_id_collab" ]]; then
-                    collab_flag="&collaborators.ids=${user_id_collab}"
+                    collab_param="&collaborators.ids=${user_id_collab}"
                 else
                     t ERR "No ID found for ASANA_${user_name_collab}_ID in config."
                     return 1
@@ -672,9 +672,9 @@ asa() {
             --status)
                 # Map the user input to Asana's URL parameters
                 case "$2" in
-                    completed) status_flag="&completion=complete" ;;
-                    incomplete) status_flag="&completion=incomplete" ;;
-                    deleted)   status_flag="&deleted=true" ;;
+                    completed|complete) status_param="&completion=complete" ;;
+                    incomplete) status_param="&completion=incomplete" ;;
+                    deleted|delete)   status_param="&deleted=true" ;;
                     *) t ERR "Status must be: incomplete, completed, or deleted" && return 1 ;;
                 esac
                 shift 2
@@ -696,7 +696,7 @@ asa() {
     local query=$(printf "%s+" "${args[@]}")
 
     # Open browser
-    _browser_open "https://app.asana.com/0/search?q=${query%?}&sort=last_modified&searched_type=task${me_flag}${collab_flag}${status_flag}"
+    _browser_open "https://app.asana.com/0/search?q=${query%?}&sort=last_modified&searched_type=task${me_flag}${collab_param}${status_param}"
 }
 
 

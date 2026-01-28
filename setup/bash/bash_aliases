@@ -88,6 +88,10 @@ alias rmd='rm -rfv'
 # Navigation & Listing
 # ------------------------------------------
 
+# cat
+alias qat='/usr/bin/cat'
+alias cat='bat --paging=never'
+
 # cd
 alias home='cd ~'
 alias ~='home'

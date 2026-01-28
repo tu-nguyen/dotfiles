@@ -223,7 +223,7 @@ _install_gitstatus() {
         if ! git pull origin master &> /dev/null; then
             t Warning "Failed to pull ${SUB_F}gitstatus${NC}. Using existing version."
         fi
-        printf "\033[1A\r\033[K"
+        # printf "\033[1A\r\033[K"
         local installed_or_updated="updated"
     else
         t "Cloning Gitstatus repository to '$GITSTATUS_DIR'.."
@@ -342,6 +342,10 @@ _install_packages() {
         _install_package coreutils
         _install_package less
         _install_package iptables
+
+        # post bat stuff
+        mkdir -p ~/.local/bin
+        ln -sf /usr/bin/batcat ~/.local/bin/bat
 
     # macOS only
     elif [[ "$OS_TYPE" == "macos" ]]; then

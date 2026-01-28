@@ -70,6 +70,16 @@ fi
 # Tools & Prompt
 # ------------------------------------------
 
+# bat theme and man
+# TODO: create my own?
+# Further themes can be installed to '/home/valcr/.config/bat/themes', and are added to the cache with `bat cache --build`. For more information, see:
+# https://github.com/sharkdp/bat#adding-new-themes
+if [[ -z "$BAT_THEME" ]]; then
+    export BAT_THEME='Visual Studio Dark+'
+fi
+export MANPAGER="bat -plman"
+# export BAT_PAGER="less -RFK"
+
 # direnv hook
 if command -v direnv &> /dev/null; then
     eval "$(direnv hook bash)"

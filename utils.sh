@@ -201,6 +201,10 @@ _install_uv() {
     else
         t OK "${HDR_F}$(uv --version)${NC} is already installed at $(command -v uv)"
     fi
+
+    if ! command -v uv-secure &> /dev/null; then
+        uv tool install uv-secure
+    else
 }
 
 # Function to install Fast Node Manager

@@ -563,6 +563,19 @@ ghs() {
                 fi
                 shift
                 ;;
+            --lang)
+                case "${2,,}" in # ,, converts to lowercase for easier matching
+                    py|python)       lang_query="+language:python" ;;
+                    js|javascript)   lang_query="+language:javascript" ;;
+                    ts|typescript)   lang_query="+language:typescript" ;;
+                    rb|ruby)         lang_query="+language:ruby" ;;
+                    go|golang)       lang_query="+language:go" ;;
+                    rs|rust)         lang_query="+language:rust" ;;
+                    cpp|c++)         lang_query="+language:cpp" ;;
+                    cs|csharp|c#)    lang_query="+language:csharp" ;;
+                    *)               lang_query="+language:$2" ;; # Fallback for literals
+                esac
+                shift 2 ;;
             --type)
                 # Map the user input to GitHub's type param
                 case "$2" in
@@ -575,7 +588,7 @@ ghs() {
                 esac
                 shift 2
                 ;;
-            --prs|--pr)
+            --pr|--prs)
                 # Map the user input to GitHub's type param
                 case "$2" in
                     nr) prs="pulls?q=label%3A%22needs+review" && shift ;;
@@ -583,7 +596,7 @@ ghs() {
                 esac
                 shift
                 ;;
-            --repos|--pr)
+            --repo|--repos)
                 repos=repos
                 shift
                 ;;
@@ -594,29 +607,42 @@ ghs() {
         esac
     done
 
+    # Validation
+    if [[ -z "$prs" && -z "$repos" && ${#args[@]} -eq 0 ]]; then
+        t ERR "Usage: ghs [--me] [--twork] ([--type <type>] [--lang <lang>] <query> | --prs [nr] | --repos)"
+        return 1
+    fi
+
+    # Standard Search Logic
     if [[ -z "$prs" && -z "$repos" ]]; then
-        # Check if we have a query
-        if [[ ${#args[@]} -eq 0 ]]; then
-            t ERR "Usage: ghs [--twork] [--type <code|repositories|issues|pullrequests|users>] <query>"
-            return 1
-        fi
-
-        # Format query
         local query=$(printf "%s+" "${args[@]}")
-
-        _browser_open "${gh_ins}/search?q=${query%?}${type_flag}"
+        _browser_open "${gh_ins}/search?q=${query%?}${lang_query}${type_flag}"
     fi
 
-    if [[ "$prs" ]]; then
-        local by_author=""
-        if [[ "$gh_username" ]]; then
-            by_author="%22+is%3Aopen+author%3A${gh_username}+"
+    # Pull Request Logic
+    if [[ -n "$prs" ]]; then
+        local pr_query=""
+        if [[ -n "$gh_username" ]]; then
+            # If prs already has a query (like 'nr'), append to it.
+            # Otherwise, start the query.
+            if [[ "$prs" == *"q="* ]]; then
+                pr_query="+author%3A${gh_username}"
+            else
+                pr_query="q=is%3Aopen+author%3A${gh_username}"
+            fi
         fi
-        _browser_open "${gh_ins}/${prs}${by_author}"
+        _browser_open "${gh_ins}/${prs}${pr_query}"
     fi
 
-    if [[ "$repos" ]]; then
-        _browser_open "${gh_ins}/${repos}"
+    # Repositories Logic
+    if [[ -n "$repos" ]]; then
+        if [[ -n "$gh_username" ]]; then
+            # Opens your specific profile's repo tab
+            _browser_open "${gh_ins}/${gh_username}?tab=repositories"
+        else
+            # _browser_open "${gh_ins}/${repos}"
+            _browser_open "${gh_ins}/trending"
+        fi
     fi
 }
 

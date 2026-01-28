@@ -93,6 +93,7 @@ _install_fira_font() {
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         if command -v fc-list >/dev/null; then
             if fc-list : family | grep -iq "$font_name"; then
+                t SUCCESS "${HDR_F}${font_name,,}${NC} found in Linux font cache."
                 fira_font_installed=1
             fi
         fi
@@ -105,10 +106,10 @@ _install_fira_font() {
     if [[ "$OS_TYPE" == "wsl" ]]; then
         # Check Registry for Font registration (more reliable than 'dir' in Fonts folder)
         if powershell.exe -NoProfile -Command "Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts' | Get-Member | Where-Object Name -like '*FiraCode*'" &>/dev/null; then
-            t SUCCESS "Found FiraCode in Windows Registry."
+            t SUCCESS "${HDR_F}${font_name,,}${NC} found in Windows Registry."
             font_installed=1
         else
-            t WARN "FiraCode not detected on Windows side."
+            t WARN "${HDR_F}${font_name,,}${NC} ${ERR}NOT${NC} detected on Windows side."
             font_installed=0 # Force reinstall/install if Windows side is missing
         fi
     fi
@@ -123,7 +124,7 @@ _install_fira_font() {
         local font_dir="$HOME/.local/share/fonts"
         mkdir -p "$font_dir"
 
-        t INFO "Downloading ${font_name,,} zip.."
+        t INFO "Downloading ${HDR_F}${font_name,,}${NC} zip.."
         curl -fLo "./FiraCode.zip" https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip
 
         unzip -o "./FiraCode.zip" -d "$font_dir" && rm "./FiraCode.zip"

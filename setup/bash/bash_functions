@@ -569,6 +569,7 @@ ghs() {
 # Asana Search
 asa() {
     local me_flag=""
+    local collab_flag=""
     local status_flag=""
     local args=()
 
@@ -599,6 +600,19 @@ asa() {
                 fi
                 shift 2
                 ;;
+            --collab)
+                # Convert input to uppercase (e.g., someguy -> SOMEGUY)
+                local user_name_collab="${2^^}"
+                local user_id_collab=$(get_config "ASANA_${user_name_collab}_ID")
+
+                if [[ -n "$user_id_collab" ]]; then
+                    collab_flag="&assignees.ids=${user_id_collab}"
+                else
+                    t ERR "No ID found for ASANA_${user_name_collab}_ID in config."
+                    return 1
+                fi
+                shift 2
+                ;;
             --status)
                 # Map the user input to Asana's URL parameters
                 case "$2" in
@@ -618,7 +632,7 @@ asa() {
 
     # Check if we have a query
     if [[ ${#args[@]} -eq 0 ]]; then
-        t ERR "Usage: as [--me] [--status <incomplete|completed|deleted>] <query>"
+        t ERR "Usage: asa [--me] [--user <USER>] [--collab <USER>] [--status <incomplete|completed|deleted>] <query>"
         return 1
     fi
 
@@ -626,7 +640,7 @@ asa() {
     local query=$(printf "%s+" "${args[@]}")
 
     # Open browser
-    _browser_open "https://app.asana.com/0/search?q=${query%?}&sort=last_modified&searched_type=task${me_flag}${status_flag}"
+    _browser_open "https://app.asana.com/0/search?q=${query%?}&sort=last_modified&searched_type=task${me_flag}${collab_flag}${status_flag}"
 }
 
 

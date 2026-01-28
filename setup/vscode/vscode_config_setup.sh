@@ -35,18 +35,36 @@ extensions=(
     "mechatroner.rainbow-csv"
 )
 
+if [[ -f "$DOTFILES_CONFIG_DIR/.bash_twork" ]]; then
+    t WARN "Work environment detected (.twork exists). Sideloading.."
+    DOWNLOAD_DIR="$./vscode_extensions_tmp"
+    mkdir -p "$DOWNLOAD_DIR"
+    t INFO "Starting Offline Extension Sync..."
+fi
+
 for ext in "${extensions[@]}"; do
     if code --list-extensions | grep -qi "$ext"; then
         t OK "${HDR_F}$ext${NC} is already installed."
     else
         t "Installing ${HDR_F}$ext${NC}.."
         if [[ -f "$DOTFILES_CONFIG_DIR/.bash_twork" ]]; then
-            t WARN "Work environment detected (.twork exists). PowerShell Bypass.."
-            powershell.exe -NoProfile -Command "
-                cd C:\;
-                \$env:NODE_TLS_REJECT_UNAUTHORIZED = '0';
-                code --install-extension $ext --force --use-system-certificates --ignore-certificate-errors
-            "
+            publisher=$(echo $ext | cut -d. -f1)
+            name=$(echo $ext | cut -d. -f2)
+
+            url="https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${publisher}/vsextensions/${name}/latest/vspackage"
+            target_file="$DOWNLOAD_DIR/${ext}.vsix"
+
+            if curl -Lk "$url" -o "$target_file"; then
+                t SUCCESS "${HDR_F}$name${NC} download complete. Installing.."
+
+                # Install the local file
+                code --install-extension "$target_file" --force
+
+                # Cleanup
+                rm "$target_file"
+            else
+                t ERR "Failed to download ${HDR_F}$ext${NC}"
+            fi
         else
             code --install-extension "$ext" --force
         fi
@@ -54,9 +72,8 @@ for ext in "${extensions[@]}"; do
 done
 
 # Cleanup
-if [[ -n "$ssl_flag" ]]; then
-    unset NODE_TLS_REJECT_UNAUTHORIZED
-    t SUCCESS "SSL Bypass disabled. Extensions synced."
+if [[ -d "$$DOWNLOAD_DIR" ]]; then
+    rmdir "$DOWNLOAD_DIR"
 fi
 
 t SUCCESS "VS Code extensions synced!"

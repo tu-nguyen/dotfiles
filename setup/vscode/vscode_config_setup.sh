@@ -33,6 +33,7 @@ extensions=(
     "ms-python.black-formatter"
     "irongeek.vscode-env"
     "mechatroner.rainbow-csv"
+    "davidanson.vscode-markdownlint"
 )
 
 failed_exts=()

@@ -609,7 +609,7 @@ ghs() {
 
     if [[ "$prs" ]]; then
         local by_author=""
-        if [[ "$gh_username" ]];
+        if [[ "$gh_username" ]]; then
             by_author="%22+is%3Aopen+author%3A${gh_username}+"
         fi
         _browser_open "${gh_ins}/${prs}${by_author}"

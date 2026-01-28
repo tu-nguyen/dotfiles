@@ -204,7 +204,7 @@ _install_uv() {
 
     if ! command -v uv-secure &> /dev/null; then
         uv tool install uv-secure
-    else
+    fi
 }
 
 # Function to install Fast Node Manager

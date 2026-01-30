@@ -133,6 +133,10 @@ alias clss='clear && lsa'
 alias h='history'
 alias x='exit'
 
+# installer
+alias p="sudo pacman"
+alias y="yaourt"
+
 # vim
 alias v='vim'
 alias svi='sudo vi'
@@ -140,9 +144,8 @@ alias vis='vim "+set si"'
 alias edit='vim'
 alias ebrc='vim ~/.bashrc'
 
-# installer
-alias p="sudo pacman"
-alias y="yaourt"
+# code
+alias c.='code .'
 
 # resource usage
 alias ps='[[ "$(uname)" == "Darwin" ]] && ps aux || ps auxf'

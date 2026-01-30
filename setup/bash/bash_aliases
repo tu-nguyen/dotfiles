@@ -91,8 +91,8 @@ alias rmd='rm -rfv'
 # cat
 # alias qat='/usr/bin/cat'
 # alias cat='bat --paging=never --force-colorization'
-alias qat='$(command -v cat)'
-alias cat='$(command -v batcat || command -v bat || echo "cat") --paging=never --style=numbers,changes'
+alias qat="$(command -v cat)"
+alias cat="$(command -v batcat || command -v bat || echo 'cat') --paging=never --force-colorization"
 
 # cd
 alias home='cd ~'

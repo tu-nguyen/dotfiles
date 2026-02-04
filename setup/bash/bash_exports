@@ -46,10 +46,10 @@ if [[ "$(uname)" == "Darwin" ]]; then
     path_prepend "/opt/homebrew/sbin"
 
     # force gnu make over apple's old version
-    path_prepend "/opt/homebrew/opt/make/libexec/gnubin"
+    path_prepend "$(brew --prefix)/opt/make/libexec/gnubin"
 
     # python & tooling
-    path_prepend "/opt/homebrew/opt/python@3.13/libexec/bin"
+    path_prepend "$(brew --prefix)/opt/python@3.13/bin"
     path_prepend "$HOME/Library/Python/3.13/bin"
 
     export HOMEBREW_NO_ENV_HINTS=1

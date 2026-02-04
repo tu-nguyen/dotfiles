@@ -239,5 +239,5 @@ else
     reset_bashrc
 fi
 
-t OK "${SUCCESS}All done! Relaunching bash!${NC}"
+t OK "${SUCCESS}All done!${NC}"
 exec bash

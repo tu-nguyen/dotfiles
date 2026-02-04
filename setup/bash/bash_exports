@@ -21,8 +21,8 @@ path_prepend() {
 }
 
 # standard paths
-path_prepend "$HOME/.local/bin"
 path_prepend "/usr/local/bin"
+path_prepend "$HOME/.local/bin"
 
 # ------------------------------------------
 # Language Specifics

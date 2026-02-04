@@ -458,16 +458,16 @@ ff() {
 }
 
 dot-update() {
-    t "INFO" "Starting global environment sync..."
+    t "INFO" "Starting global environment sync.."
 
     # update homebrew (os Level)
     if command -v brew &>/dev/null; then
-        t "INFO" "Homebrew packages.."
+        t "INFO" "Updating homebrew and homebrew packages.."
         brew update && brew upgrade && brew cleanup
     fi
 
     # update uv and python (interpreter level)
-    t "INFO" "Syncing uv and python3.13.."
+    t "INFO" "Updating uv and python3.13.."
     # update the uv binary itself
     uv self update
     # ensure ~/.local/bin is in PATH (usually only needs to run once)
@@ -479,9 +479,16 @@ dot-update() {
     # update all tools installed via 'uv tool install' (uv-secure, ruff, etc.)
     uv tool upgrade --all
 
+    # update fnm and node (js level)
+    if command -v fnm &>/dev/null; then
+        t "INFO" "Updating node.js via fnm..."
+        fnm install --lts
+        fnm default lts-latest
+    fi
+
     # refresh dotfiles (config level)
     if [[ -d "$DOTFILES_CONFIG_DIR/.git" ]]; then
-        t "INFO" "dotfiles from git..."
+        t "INFO" "updating dotfiles from git.."
         git -C "$DOTFILES_CONFIG_DIR" pull
     fi
 

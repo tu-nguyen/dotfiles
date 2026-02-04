@@ -224,6 +224,8 @@ _install_uv() {
         t OK "${HDR_F}$(uv --version)${NC} is already installed at $(command -v uv)"
     fi
 
+    uv python install 3.13
+
     # list of tools to install via 'uv tool' (for python-based)
     # or system packages/binary downloads
     local python_tools=("uv-secure" "ruff" "trufflehog")
@@ -310,15 +312,7 @@ _install_packages() {
         _install_package lesspipe
         _install_package htop
         _install_package rsync
-
-        # TODO: determine if this is still needed
-        # # check for python3, but do NOT install it
-        # if ! command -v python3 &>/dev/null; then
-        #     t ERROR "${ERR}python3${NC} is required but not installed. Please install Python 3 manually."
-        #     exit 1
-        # else
-        #     t SUCCESS "${HDR_F}python3${NC} is already installed."
-        # fi
+        _install_package python@3.13
     else
         t ERROR "Unsupported OS: ${ERR}$OS_TYPE${NC}. Please install the required packages manually."
         return 1

@@ -11,13 +11,13 @@ function _browser_open() {
     local url="$1"
 
     if [[ -n "$WSL_DISTRO_NAME" ]]; then
-        # WSL: Open in Windows default browser
+        # wsl: open in windows default browser
         powershell.exe -NoProfile -Command "Start-Process '$url'"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        # macos: Open in default Mac browser
+        # macos: open in default Mac browser
         open "$url"
     else
-        # Standard Linux: Use xdg-open
+        # standard linux: Use xdg-open
         xdg-open "$url" 2>/dev/null
     fi
 }
@@ -157,7 +157,7 @@ function t() {
 
     if [[ $# -eq 0 ]]; then
         echo -e "${GREEN}Hello world${NC}"
-        return
+        return 0
     elif [[ $# -eq 1 ]]; then
         severity="INFO"
         message="$1"
@@ -195,7 +195,7 @@ dless() {
 
 # ceate a directory and move into it immediately
 mkcd() {
-    mkdir -p "$1" && cd "$1" || return
+    mkdir -p "$1" && cd "$1" || return 1
 }
 
 # automatically 'ls' after every 'cd'

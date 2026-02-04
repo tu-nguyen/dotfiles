@@ -240,4 +240,4 @@ else
 fi
 
 t OK "${SUCCESS}All done! Relaunching bash!${NC}"
-exec bash "$0" "$@"
+exec bash

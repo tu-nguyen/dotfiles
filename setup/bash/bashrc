@@ -45,7 +45,7 @@ fi
 : ${DOTFILES_CONFIG_DIR:="$HOME/.config/dotfiles"}
 : ${DOTFILES_CONFIG_FILE:="$DOTFILES_CONFIG_DIR/.dotfile_config"}
 if [[ -f "$DOTFILES_CONFIG_FILE" ]]; then
-    echo "[ INFO ] Configuration loaded from $DOTFILES_CONFIG_FILE"
+    # echo "[ INFO ] Configuration loaded from $DOTFILES_CONFIG_FILE"
     . "$DOTFILES_CONFIG_FILE"
 fi
 
@@ -77,7 +77,7 @@ if [[ -d "$DOTFILES_CONFIG_DIR" ]]; then
 
             # if it takes longer than 50ms, scream pls
             # (50ms is barely noticeable, 100ms is when I'll punch my monitor)
-            if (( $(echo "$duration > 50" | bc -l) )); then
+            if (( duration_ms > 50 )); then
                 printf "${YELLOW}%-20s${NC} took ${RED}%0.2fms${NC}\n" "$(basename "$file")" "$duration"
             fi
         fi

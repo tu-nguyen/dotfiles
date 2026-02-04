@@ -110,8 +110,6 @@ alias labc='ls -lap'              # sort by alphabetical
 alias lf="ls -l | egrep -v '^d'"  # show files only
 alias l.='ls -d .* -G'            # show only hidden files
 
-alias mkcd='mkdir -p $1 && cd $1'
-
 # ------------------------------------------
 # System Monitoring & Tools
 # ------------------------------------------

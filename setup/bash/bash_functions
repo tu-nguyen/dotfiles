@@ -459,6 +459,7 @@ ff() {
 
 dot-update() {
     t "INFO" "Starting global environment sync.."
+    local stamp_file="$DOTFILES_CONFIG_DIR/.last_update"
 
     # update homebrew (os Level)
     if command -v brew &>/dev/null; then
@@ -467,17 +468,19 @@ dot-update() {
     fi
 
     # update uv and python (interpreter level)
-    t "INFO" "Updating uv and python3.13.."
-    # update the uv binary itself
-    uv self update
-    # ensure ~/.local/bin is in PATH (usually only needs to run once)
-    uv tool update-shell
-    # install 3.13 and set as default for uv commands
-    uv python install 3.13 --default
-    # patch update all installed Pythons (e.g., 3.13.1 -> 3.13.2)
-    uv python upgrade
-    # update all tools installed via 'uv tool install' (uv-secure, ruff, etc.)
-    uv tool upgrade --all
+    if command -v uv &>/dev/null; then
+        t "INFO" "Updating uv and python3.13.."
+        # update the uv binary itself
+        uv self update
+        # ensure ~/.local/bin is in PATH (usually only needs to run once)
+        uv tool update-shell
+        # install 3.13 and set as default for uv commands
+        uv python install 3.13 --default
+        # patch update all installed Pythons (e.g., 3.13.1 -> 3.13.2)
+        uv python upgrade
+        # update all tools installed via 'uv tool install' (uv-secure, ruff, etc.)
+        uv tool upgrade --all
+    fi
 
     # update fnm and node (js level)
     if command -v fnm &>/dev/null; then
@@ -487,12 +490,13 @@ dot-update() {
     fi
 
     # refresh dotfiles (config level)
-    if [[ -d "$DOTFILES_CONFIG_DIR/.git" ]]; then
+    if [[ -d "$DOTFILES_REPO_DIR/.git" ]]; then
         t "INFO" "updating dotfiles from git.."
-        git -C "$DOTFILES_CONFIG_DIR" pull
+        git -C "$DOTFILES_REPO_DIR" pull
     fi
 
-    t OK "Maintenance complete! Your environment is fresh."
+    date +%s > "$stamp_file"
+    t OK "Everything is up to date! Update timestamp refreshed."
 }
 
 # starship theme switcher

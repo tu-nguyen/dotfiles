@@ -224,18 +224,14 @@ _install_uv() {
         t OK "${HDR_F}$(uv --version)${NC} is already installed at $(command -v uv)"
     fi
 
-    # update uv
+    # update the uv binary itself
     uv self update
-
     # ensure ~/.local/bin is in your PATH
     uv tool update-shell
-
     # ensure python and python3 points to uv's python
     uv python install 3.13 --default
-
     # ensure python vmersion upgrades to latest supported patch release
     uv python upgrade
-
     # update all tools installed via 'uv tool install' (uv-secure, ruff, etc.)
     uv tool upgrade --all
 

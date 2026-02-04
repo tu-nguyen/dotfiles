@@ -1,42 +1,70 @@
 #!/usr/bin/env bash
 
-# --- Start Load Configuration ---
-if [ -z "$DOTFILES_CONFIG_DIR" ]; then
-    DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
-fi
 
-if [ -z "$DOTFILES_CONFIG_FILE" ]; then
-    DOTFILES_CONFIG_FILE="$DOTFILES_CONFIG_DIR/.dotfile_config"
-fi
+# ------------------------------------------
+# Helper functions
+# ------------------------------------------
+# generic prompt
+_prompt() {
+    local config="$1"
 
-if [ -f "$DOTFILES_CONFIG_FILE" ]; then
-    . "$DOTFILES_CONFIG_FILE"
-else
-    echo "[Error] Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
-    exit 1
-fi
+    # If FORCE_YES is set, we skip the prompt and return success (0)
+    [[ -n "$FORCE_YES" ]] && return 0
 
-DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
-[[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
-# --- End Load Configuration ---
+    # -p: prompt, -r: raw, -n 1: read only one character
+    read -p "Are you sure you want to ${H}$config${NC}? This may ${RED}erase existing data${NC}. [y/N] " -r -n 1
 
-# Function to keep sudo alive
-# See: https://gist.github.com/cowboy/3118588
-_sudo_keep() {
-    if ! command -v sudo &> /dev/null; then
-        t Error "${ERR}sudo${NC} is not installed. Please install sudo or run as root."
-        exit 1
+    # move to a new line immediately after the keypress so the next output is clean
+    echo ""
+
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        t "Skipping.."
+        return 1
     fi
 
-    # Ask for administrator password up-front
-    sudo -v
-
-    # Keep-alive: update existing sudo time stamp if set, otherwise do nothing.
-    while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+    t OK "${OK}Starting ${H}$config${OK} reset.${NC}"
+    return 0
 }
 
-# Function to linux packages via apt install
-# TODO: Add support for arch yoart
+# function to copy and source (cpp from setup/bash/bash_functions)
+_cp_and_src() {
+    cpp -s "$@"
+}
+
+# function to convert hex to 0-5 scale for ansi cube
+_hex_to_256() {
+    local hex=$(echo "$1" | sed 's/#//')
+    local r=$((16#${hex:0:2} * 5 / 255))
+    local g=$((16#${hex:2:2} * 5 / 255))
+    local b=$((16#${hex:4:2} * 5 / 255))
+    echo $((16 + 36*r + 6*g + b))
+}
+
+# function to convert color, mainly for starship atm
+_convert_hex_to_ansi() {
+    local input_file="$1"
+    local output_file="${2:-$input_file.converted}"
+
+    # Create a copy to work on
+    cpp "$input_file" "$output_file"
+
+    t OK "Converting Hex to ANSI 256 for: $(basename "$input_file")"
+
+    grep -oE '#[0-9a-fA-F]{6}' "$input_file" | sort -u | while read -r hex; do
+        ansi=$(_hex_to_256 "$hex")
+        t OK "Replacing $hex with $ansi"
+        sed -i '' "s|$hex|$ansi|g" "$output_file"
+    done
+
+    t OK "Hex to ANSI 256 conversion for $(basename $input_file) completed!"
+}
+
+
+# ------------------------------------------
+# Helper functions generic install
+# ------------------------------------------
+# function to linux packages via apt install
+# TODO: add support for arch yoart
 _install_linux_package() {
     if dpkg -s "$1" &>/dev/null; then
         t SUCCESS "${HDR_F}$1${NC} is already installed via apt."
@@ -46,15 +74,17 @@ _install_linux_package() {
     fi
 }
 
+# function to install brew
 _install_brew() {
     if ! command -v brew &> /dev/null; then
         t INFO "${HDR_F}homebrew${NC} not found. Installing ${HDR_F}homebrew${NC}.."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         # Add Homebrew to PATH for current session
         eval "$(/opt/homebrew/bin/brew shellenv)" || eval "$(brew shellenv)"
     fi
 }
 
+# function to mac packages via brew
 _install_mac_package() {
     _install_brew
     if brew list "$1" &>/dev/null; then
@@ -65,17 +95,7 @@ _install_mac_package() {
     fi
 }
 
-_install_pip_package() {
-    if ! pip3 show "$1" &>/dev/null; then
-        t SUCCESS "${HDR_F}$1${NC} is already installed via pip."
-    else
-        t "Installing ${HDR_F}$1${NC}.."
-        # tmp remove --user --break-system-packages
-        pip3 install "$@"
-    fi
-}
-
-# Function to install packages based on OS
+# function to install packages based on os; uses above helper functions
 _install_package() {
     local package_name="$1"
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
@@ -85,7 +105,11 @@ _install_package() {
     fi
 }
 
-# Function to install (patch) Fira Code (Nerd Font icons)
+
+# ------------------------------------------
+# Helper functions specific install
+# ------------------------------------------
+# function to install (patch) fira code (nerd font icons)
 _install_fira_font() {
     local font_name="FiraCode Nerd Font"
     local fira_font_installed=0
@@ -104,13 +128,13 @@ _install_fira_font() {
     fi
 
     if [[ "$OS_TYPE" == "wsl" ]]; then
-        # Check Registry for Font registration (more reliable than 'dir' in Fonts folder)
+        # check registry for Font registration (more reliable than 'dir' in Fonts folder)
         if powershell.exe -NoProfile -Command "Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts' | Get-Member | Where-Object Name -like '*FiraCode*'" &>/dev/null; then
             t SUCCESS "${HDR_F}${font_name,,}${NC} found in Windows Registry."
             font_installed=1
         else
             t WARN "${HDR_F}${font_name,,}${NC} ${ERR}NOT${NC} detected on Windows side."
-            font_installed=0 # Force reinstall/install if Windows side is missing
+            font_installed=0  # force reinstall/install if Windows side is missing
         fi
     fi
 
@@ -130,18 +154,18 @@ _install_fira_font() {
         unzip -o "./FiraCode.zip" -d "$font_dir" && rm "./FiraCode.zip"
         [ -x "$(command -v fc-cache)" ] && fc-cache -f
 
-        # If WSL, also trigger the Windows Side (Chocolatey)
+        # if WSL, also trigger the windows side (chocolatey)
         if [[ "$OS_TYPE" == "wsl" ]]; then
             t INFO "Installing Chocolatey and Fira Code.."
 
-            # Detect the mount point to find where to write the temp file
+            # detect the mount point to find where to write the temp file
             local win_temp="/c/Users/Public"
             [ -d "/mnt/c/Windows" ] && win_temp="/mnt/c/Users/Public"
             local ps1_path="$win_temp/install_choco_fira.ps1"
             local win_ps1_path="C:\\Users\\Public\\install_choco_fira.ps1"
 
-            # Write the PS1 file using a 'quoted' heredoc (qat << 'EOF')
-            # This ensures Bash does NOT touch any backslashes or variables inside.
+            # write the ps1 file using a 'quoted' heredoc (qat << 'EOF')
+            # this ensures bash does NOT touch any backslashes or variables inside.
             qat << 'EOF' > "$ps1_path"
 Set-Location C:\
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
@@ -160,18 +184,16 @@ $env:Path += ";$env:ALLUSERSPROFILE\chocolatey\bin"
 Write-Host "Installing Fira Code Nerd Font..." -ForegroundColor Cyan
 & choco install firacodenf -y
 EOF
-
-            # Elevate and Run
+            # elevate and Run
             # Set-Location C:\ is added to the initial call to kill the UNC/WSL path warning
             powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
                 Set-Location C:\\;
                 Start-Process powershell -ArgumentList '-NoProfile', '-ExecutionPolicy Bypass', '-File', '$win_ps1_path' -Verb RunAs -Wait
             "
 
-            # Cleanup and Verification
+            # cleanup and verification
             rm "$ps1_path"
         fi
-
     elif [[ "$OS_TYPE" == "macos" ]]; then
         brew tap homebrew/cask-fonts
         brew install --cask font-fira-code-nerd-font
@@ -179,7 +201,7 @@ EOF
     t SUCCESS "${SUCCESS}Installation complete!${NC}"
 }
 
-# Function to install Starship
+# function to install starship
 _install_starship() {
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         if ! command -v starship &> /dev/null; then
@@ -193,7 +215,7 @@ _install_starship() {
     fi
 }
 
-# Function to install uv
+# function to install uv
 _install_uv() {
     if ! command -v uv &> /dev/null; then
         t "Installing ${HDR_F}uv${NC}.."
@@ -202,12 +224,21 @@ _install_uv() {
         t OK "${HDR_F}$(uv --version)${NC} is already installed at $(command -v uv)"
     fi
 
-    if ! command -v uv-secure &> /dev/null; then
-        uv tool install uv-secure
-    fi
+    # list of tools to install via 'uv tool' (for python-based)
+    # or system packages/binary downloads
+    local python_tools=("uv-secure" "ruff" "trufflehog")
+
+    for tool in "${python_tools[@]}"; do
+        if ! command -v "$tool" &> /dev/null; then
+            t "Installing ${HDR_F}$tool${NC} via uv.."
+            uv tool install "$tool"
+        else
+            t OK "${HDR_F}$tool${NC} is already available."
+        fi
+    done
 }
 
-# Function to install Fast Node Manager
+# function to install fast node manager
 _install_fnm() {
     if ! command -v fnm &> /dev/null; then
         t "Installing ${HDR_F}fnm${NC}.."
@@ -217,7 +248,7 @@ _install_fnm() {
     fi
 }
 
-# Function to install Gitstatus
+# function to install gitstatus
 _install_gitstatus() {
     local original_dir=$(pwd)
     local installed_or_updated="installed"
@@ -241,103 +272,27 @@ _install_gitstatus() {
     t OK "${HDR_F}gitstatus${NC} $installed_or_updated successfully!"
 }
 
-cp_and_source() {
-    local quiet=false
-    local src=""
-    local dest=""
 
-    if [[ "$1" == "-q" ]]; then
-        quiet=true
-        src="$2"
-        dest="$3"
-    else
-        src="$1"
-        dest="$2"
-    fi
-
-    if [[ -z "$src" || -z "$dest" ]]; then
-        t ERROR "Usage: cp_and_source [-q] <source> <destination>"
-        return 1
-    fi
-
-    if [[ "$quiet" == false ]]; then
-        cpp "$src" "$dest"
-    else
-        cpp -q "$src" "$dest"
-    fi
-
-    if [[ -f "$dest" ]]; then
-        . "$dest"
-    else
-        t ERROR "Failed to copy $src to $dest."
-    fi
-}
-
-_prompt() {
-    RETURN=0
-    local config="$1"
-
-    if [ -z "$FORCE_YES" ]; then
-        read -p "Are you sure you want to ${H}$config${NC}? This will ${RED}erase existing data${NC}, might want to create a backup! [y/N] " -r
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            t "Skipping.."
-            RETURN=1
-            return
-        fi
-        t OK "${OK}Starting ${H}$config${OK} reset.${NC}"
-    fi
-}
-
-# Function to convert hex to 0-5 scale for ANSI cube
-_hex_to_256() {
-    local hex=$(echo "$1" | sed 's/#//')
-    local r=$((16#${hex:0:2} * 5 / 255))
-    local g=$((16#${hex:2:2} * 5 / 255))
-    local b=$((16#${hex:4:2} * 5 / 255))
-    echo $((16 + 36*r + 6*g + b))
-}
-
-# Function to convert color, mainly for starship atm
-_convert_hex_to_ansi() {
-    local input_file="$1"
-    local output_file="${2:-$input_file.converted}"
-
-    # Create a copy to work on
-    cpp "$input_file" "$output_file"
-
-    t OK "Converting Hex to ANSI 256 for: $(basename "$input_file")"
-
-    grep -oE '#[0-9a-fA-F]{6}' "$input_file" | sort -u | while read -r hex; do
-        ansi=$(_hex_to_256 "$hex")
-        t OK "Replacing $hex with $ansi"
-        sed -i '' "s|$hex|$ansi|g" "$output_file"
-    done
-
-    t OK "Hex to ANSI 256 conversion for $(basename $input_file) completed!"
-}
-
+# ------------------------------------------
+# Main
+# ------------------------------------------
+# main install packages function
 _install_packages() {
-    _install_package git
-    _install_package curl
-    _install_package unzip
-    _install_package vim
-    _install_package make
-    _install_package jq
-    _install_package colordiff
-    _install_package wget
-    _install_package direnv
-    _install_package tree
-    _install_package bat
+    local core_packages=("curl" "vim" "git" "make" "jq" "colordiff" "wget" "tree" "bat")
+
+    for core_package in "${core_packages[@]}"; do
+        _install_package "$core_package"
+    done
 
     _install_gitstatus
     _install_fira_font
     _install_starship
-
     _install_uv
     _install_fnm
 
-    # For both Linux & WSL only
+    # for both linux & wsl only
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
+        # TODO: Remove when we crawl back to arch
         if ! command -v apt &>/dev/null; then
             t ERROR "apt package manager not found. Please install it first."
             return 1
@@ -350,28 +305,27 @@ _install_packages() {
         # post bat stuff
         mkdir -p ~/.local/bin
         ln -sf /usr/bin/batcat ~/.local/bin/bat
-
-    # macOS only
+    # macos only
     elif [[ "$OS_TYPE" == "macos" ]]; then
         _install_package lesspipe
         _install_package htop
         _install_package rsync
 
-        # Check for python3, but do NOT install it
-        if ! command -v python3 &>/dev/null; then
-            t ERROR "${ERR}python3${NC} is required but not installed. Please install Python 3 manually."
-            exit 1
-        else
-            t SUCCESS "${HDR_F}python3${NC} is already installed."
-        fi
-
+        # TODO: determine if this is still needed
+        # # check for python3, but do NOT install it
+        # if ! command -v python3 &>/dev/null; then
+        #     t ERROR "${ERR}python3${NC} is required but not installed. Please install Python 3 manually."
+        #     exit 1
+        # else
+        #     t SUCCESS "${HDR_F}python3${NC} is already installed."
+        # fi
     else
         t ERROR "Unsupported OS: ${ERR}$OS_TYPE${NC}. Please install the required packages manually."
         return 1
     fi
 
     t SUCCESS "${SUCCESS}All required packages installed successfully.${NC}"
-    return
+    return 0
 }
 
 clone_or_pull_dotfiles
@@ -380,12 +334,12 @@ reset_pre() {
     t IMPORTANT "This should be ran at least once!"
     _prompt "run pre_setup"
     if [[ $RETURN -ne 0 ]]; then
-        return
+        return 0
     fi
 
     mkdir -p "$HOME/.config"
-    mkdir -p "$HOME/workplace"
-    mkdir -p "$HOME/workplace/repo"
+    # mkdir -p "$HOME/workplace"
+    # mkdir -p "$HOME/workplace/repo"
 
     _install_packages
 
@@ -395,13 +349,19 @@ reset_pre() {
 reset_bashrc() {
     _prompt "reset .bashrc" "$1"
     if [[ $RETURN -ne 0 ]]; then
-        return
+        return 0
     fi
 
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_style" "$DOTFILES_CONFIG_DIR/.bash_style"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/init" "$DOTFILES_CONFIG_DIR/.init"
-
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_aliases" "$DOTFILES_CONFIG_DIR/.bash_aliases"
+    _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bash_style" "$DOTFILES_CONFIG_DIR/.bash_style"
+    _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/init" "$DOTFILES_CONFIG_DIR/.init"
+    _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bash_aliases" "$DOTFILES_CONFIG_DIR/.bash_aliases"
+    _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bash_docker" "$DOTFILES_CONFIG_DIR/.bash_docker"
+    _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bash_functions" "$DOTFILES_CONFIG_DIR/.bash_functions"
+    _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bash_exports" "$DOTFILES_CONFIG_DIR/.bash_exports"
+    _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bash_motd" "$DOTFILES_CONFIG_DIR/.bash_motd"
+    _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bash_tt" "$DOTFILES_CONFIG_DIR/.bash_tt"
+    _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bashrc" "$HOME/.bashrc"
+    _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bash_profile" "$HOME/.bash_profile"
     echo "" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
     echo "alias cd-dot='cd $DOTFILES_REPO_DIR'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
     echo "alias cd-dotfile='cd-dot'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
@@ -410,20 +370,11 @@ reset_bashrc() {
         echo "alias dot='cd-dot'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
     fi
 
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_docker_functions" "$DOTFILES_CONFIG_DIR/.bash_docker_functions"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_functions" "$DOTFILES_CONFIG_DIR/.bash_functions"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_exports" "$DOTFILES_CONFIG_DIR/.bash_exports"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_motd" "$DOTFILES_CONFIG_DIR/.bash_motd"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_other" "$DOTFILES_CONFIG_DIR/.bash_other"
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bash_tt" "$DOTFILES_CONFIG_DIR/.bash_tt"
-
-    cp_and_source "$DOTFILES_REPO_DIR/setup/bash/bashrc" "$HOME/.bashrc"
-
     . "$HOME/.bashrc"
 
     TEMP_CONFIG_DIR=$(mktemp -d)
 
-    # Copy direnv config
+    # copy direnv config
     DIRENV_TEMPLATE_FILE="$DOTFILES_REPO_DIR/setup/bash/direnv/direnv.toml"
     DIRENV_DEST_FILE="$HOME/.config/direnv/direnv.toml"
     TEMP_DIRENV_TOML="$TEMP_CONFIG_DIR/direnv.toml"
@@ -431,13 +382,13 @@ reset_bashrc() {
     sed "s|/home/username|$HOME|g" "$DIRENV_TEMPLATE_FILE" > "$TEMP_DIRENV_TOML"
     cpp -q "$TEMP_DIRENV_TOML" "$DIRENV_DEST_FILE"
 
-    # Copy starship config
+    # copy starship config
     STARSHIP_SRC_DIR="$DOTFILES_REPO_DIR/setup/bash/starship"
     STARSHIP_DEST_DIR="$HOME/.config"
 
-    # Loop through all starship .toml files in the source directory
+    # loop through all starship .toml files in the source directory
     for template in "$STARSHIP_SRC_DIR"/starship*.toml; do
-        # Get just the filename (e.g., starship.gruvbox.toml)
+        # get just the filename (e.g., starship.gruvbox.toml)
         filename=$(basename "$template")
         temp_output="$TEMP_CONFIG_DIR/$filename"
         dest_output="$STARSHIP_DEST_DIR/$filename"
@@ -445,11 +396,11 @@ reset_bashrc() {
         if [[ "$OS_TYPE" == "macos" ]]; then
             _convert_hex_to_ansi "$template" "$temp_output"
         else
-            # Using -q for quiet preprocessing
+            # using -q for quiet preprocessing
             cpp -q "$template" "$temp_output"
         fi
 
-        # Final move/copy to destination
+        # final move/copy to destination
         if [[ ! -f "$dest_output" ]]; then
             cpp "$temp_output" "$dest_output"
         fi
@@ -467,9 +418,9 @@ reset_bashrc() {
 }
 
 reset_vimrc() {
-    _prompt "reset .vimrc"
-    if [[ $RETURN -ne 0 ]]; then
-        return
+    # TODO: replace with nvim?
+    if ! _prompt "reset .vimrc"; then
+        return 0
     fi
 
     cpp -q "$DOTFILES_REPO_DIR/setup/vim/vimrc" "$HOME/.vimrc"
@@ -486,9 +437,8 @@ reset_vimrc() {
 }
 
 reset_git_config() {
-    _prompt "reset .gitconfig"
-    if [[ $RETURN -ne 0 ]]; then
-        return
+    if ! _prompt "reset .gitconfig"; then
+        return 0
     fi
 
     chmod +x $DOTFILES_REPO_DIR/setup/git/git_config_setup.sh
@@ -498,9 +448,8 @@ reset_git_config() {
 }
 
 reset_vscode_config() {
-    _prompt "reset the vscode configs"
-    if [[ $RETURN -ne 0 ]]; then
-        return
+    if ! _prompt "reset the vscode configs"; then
+        return 0
     fi
 
     chmod +x $DOTFILES_REPO_DIR/setup/vscode/vscode_config_setup.sh
@@ -510,14 +459,13 @@ reset_vscode_config() {
 }
 
 reset_wsl_config() {
-    _prompt "reset the wsl configs"
-    if [[ $RETURN -ne 0 ]]; then
-        return
+    if ! _prompt "reset the wsl configs"; then
+        return 0
     fi
 
     if [[ "$OS_TYPE" != "wsl" ]]; then
-        t ERROR "This function is only for ${ERR}WSL${NC}. Skipping WSL configuration reset."
-        return
+        t WARN "This function is only for ${RED}WSL${NC}. Skipping WSL configuration reset."
+        return 0
     fi
 
     chmod +x $DOTFILES_REPO_DIR/setup/wsl/wsl_config_setup.sh
@@ -527,14 +475,13 @@ reset_wsl_config() {
 }
 
 reset_registry() {
-    _prompt "reset the registry entries"
-    if [[ $RETURN -ne 0 ]]; then
-        return
+    if ! _prompt "reset the registry entries"; then
+        return 0
     fi
 
     if [[ "$OS_TYPE" != "wsl" ]]; then
-        t ERROR "This function is only for ${ERR}WSL${NC}. Skipping registry reset."
-        return
+        t WARN "This function is only for ${RED}WSL${NC}. Skipping registry reset."
+        return 0
     fi
 
     chmod +x $DOTFILES_REPO_DIR/setup/registry/registry_script.ps1
@@ -545,9 +492,8 @@ reset_registry() {
 }
 
 reset_firefox() {
-    _prompt "reset the firefox configs"
-    if [[ $RETURN -ne 0 ]]; then
-        return
+    if ! _prompt "reset the firefox configs"; then
+        return 0
     fi
 
     chmod +x $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh
@@ -557,14 +503,13 @@ reset_firefox() {
 }
 
 reset_ps() {
-    _prompt "reset the PowerShell profile"
-    if [[ $RETURN -ne 0 ]]; then
-        return
+    if ! _prompt "reset the PowerShell profile"; then
+        return 0
     fi
 
     if [[ "$OS_TYPE" != "wsl" ]]; then
         t ERROR "This function is only for ${ERR}WSL${NC}. Skipping WSL configuration reset."
-        return
+        return 0
     fi
 
     chmod +x $DOTFILES_REPO_DIR/setup/powershell/ps1_setup.sh

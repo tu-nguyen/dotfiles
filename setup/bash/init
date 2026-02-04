@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-# ========================================== #
+# ===================================================================== #
 # DOTFILES INITIALIZATION (.init)
-# ========================================== #
+# ===================================================================== #
 # This file sets up the core environment variables and helper functions
 # used by the rest of the shell configuration.
-# Sourced from bash_style and bash_functions.
 
 # --- Start Load Configuration ---
 : "${DOTFILES_CONFIG_DIR:=$HOME/.config/dotfiles}"
@@ -13,23 +12,23 @@
 if [[ -f "$DOTFILES_CONFIG_FILE" ]]; then
     source "$DOTFILES_CONFIG_FILE"
 else
-    echo -e "\e[31m[Error]\e[0m Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
+    echo -e "\e[31m[ ERR  ]\e[0m Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
     return 1 2>/dev/null || exit 1
 fi
 # --- End Load Configuration ---
 
-if [[ -f "$DOTFILES_CONFIG_DIR/.bash_style" ]]; then
-    . "$DOTFILES_CONFIG_DIR/.bash_style"
-elif [[ -f "$DOTFILES_REPO_DIR/setup/bash/bash_style" ]]; then
+if [[ -f "$DOTFILES_REPO_DIR/setup/bash/bash_style" ]]; then
     . "$DOTFILES_REPO_DIR/setup/bash/bash_style"
+elif [[ -f "$DOTFILES_CONFIG_DIR/.bash_style" ]]; then
+    . "$DOTFILES_CONFIG_DIR/.bash_style"
 else
-    echo "\e[31m[WARNING]\e[0m Failed to load shell colors/styles"
+    echo "\e[31m[ WARN ]\e[0m Failed to load shell colors/styles"
 fi
 
-if [[ -f "$DOTFILES_CONFIG_DIR/.bash_functions" ]]; then
-    . "$DOTFILES_CONFIG_DIR/.bash_functions"
-elif [[ -f "$DOTFILES_REPO_DIR/setup/bash/bash_functions" ]]; then
+if [[ -f "$DOTFILES_REPO_DIR/setup/bash/bash_functions" ]]; then
     . "$DOTFILES_REPO_DIR/setup/bash/bash_functions"
+elif [[ -f "$DOTFILES_CONFIG_DIR/.bash_functions" ]]; then
+    . "$DOTFILES_CONFIG_DIR/.bash_functions"
 else
-    echo "\e[31m[WARNING]\e[0m Failed to load core shell bash_functions"
+    echo "\e[31m[ WARN ]\e[0m Failed to load core shell bash_functions"
 fi

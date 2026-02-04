@@ -1,127 +1,167 @@
 #!/usr/bin/env bash
+# ===================================================================== #
+# install dotfiles script
+# ===================================================================== #
 set -e
 
-unset DOTFILES_LOADED
-unset BASH_STYLE_LOADED
-unset DOTFILES_REPO
-unset DOTFILES_REPO_DIR
-unset DOTFILES_CONFIG_FILE
-unset DOTFILES_CONFIG_DIR
-unset OS_TYPE
-
-_get_os_type() {
-    if [ -z "$OS_TYPE" ]; then
-        echo "[INFO] Detecting OS.." >&2
-        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-            if grep -qi microsoft /proc/version; then
-                OS_TYPE="wsl"
-            else
-                OS_TYPE="linux"
-            fi
-        elif [[ "$OSTYPE" == "darwin"* ]]; then
-            OS_TYPE="macos"
-        else
-            echo "[ERROR] Unsupported OS: $OSTYPE"
-            exit 1
-        fi
-    fi
-
-    echo "$OS_TYPE"
-}
-
-# Load bash_function to use set_config
-. ./setup/bash/bash_functions || {
-    echo "Error: Could not source bash_functions"
+# ------------------------------------------
+# Pre-checks
+# ------------------------------------------
+# Keep sudo alive
+# See: https://gist.github.com/cowboy/3118588
+if ! command -v sudo &> /dev/null; then
+    t Error "${ERR}sudo${NC} is not installed. Please install sudo or run as root."
     exit 1
-}
+fi
 
-ENV_LOADED=false
-if [ -f .env ]; then
-    echo "[INFO] Configuration loaded from .env"
-    . .env
-    ENV_LOADED=true
-else
-    LOADED_DOTFILES_CONFIG_FILE="$HOME/.config/dotfiles/.dotfile_config"
-    if [[ -f "$LOADED_DOTFILES_CONFIG_FILE" ]]; then
-        echo "[INFO] Configuration loaded from $LOADED_DOTFILES_CONFIG_FILE"
-        . "$LOADED_DOTFILES_CONFIG_FILE"
-        ENV_LOADED=true
+# Ask for administrator password up-front
+sudo -v || true
+
+# Keep-alive: update existing sudo time stamp if set, otherwise do nothing.
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+# Get OS
+if [ -z "$OS_TYPE" ]; then
+    echo "[ INFO ] Detecting OS.." >&2
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        if grep -qi microsoft /proc/version; then
+            OS_TYPE="wsl"
+        else
+            OS_TYPE="linux"
+        fi
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        OS_TYPE="macos"
+    else
+        echo "[ ERR  ] Unsupported OS: $OSTYPE"
+        exit 1
     fi
 fi
 
-# Temp patch
-if [[ "$ENV_LOADED" == "false" && -z "$LOADED_DOTFILES_CONFIG_FILE" ]]; then
-    OLD_DOTFILES_CONFIG_FILE="$HOME/.config/dotfiles/.dotfile_config.env"
+# Check for modern bash
+if ((BASH_VERSINFO[0] < 4)); then
+    echo "[ WARN ] You are running ${BASH_VERSION}. Let's fix that."
+    if [ "$OS_TYPE" = 'linux' ]; then
+        echo "[ INFO ] Attempting to upgrade Bash.."
+        if command -v apt &>/dev/null; then
+            sudo apt update && sudo apt install bash -y
+        elif command -v dnf &>/dev/null; then
+            sudo dnf install bash -y
+        elif command -v pacman &>/dev/null; then
+            sudo pacman -S bash --noconfirm
+        fi
+
+        echo "[ INFO ] Relaunching script with updated Bash.."
+        exec bash "$0" "$@"
+    elif [ "$OS_TYPE" = 'macos' ]; then
+        if ! command -v brew &>/dev/null; then
+            echo "[ INFO ] Homebrew not found. Installing.."
+            NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+            eval "$(/opt/homebrew/bin/brew shellenv)" || eval "$(brew shellenv)"
+        fi
+
+        # Find the brew bash path
+        BREW_BASH=$(brew --prefix)/bin/bash
+
+        # Install bash if brew doesn't have it yet
+        [[ ! -f "$BREW_BASH" ]] && brew install bash
+
+        # Add it to the shells list
+        if ! grep -q "$BREW_BASH" /etc/shells; then
+            echo "$BREW_BASH" | sudo tee -a /etc/shells
+        fi
+
+        # Change your default shell to the new Bash
+        sudo chsh -s "$BREW_BASH" "$USER"
+
+        echo "[ INFO ] Shell changed to $(brew --prefix)/bin/bash."
+        echo "[ INFO ] Relaunching script with modern Bash.."
+        exec "$BREW_BASH" "$0" "$@"
+    fi
+fi
+
+# Defaults / Fallbacks
+: ${DOTFILES_REPO:="https://github.com/tu-nguyen/dotfiles.git"}
+: ${DOTFILES_CONFIG_DIR:="$HOME/.config/dotfiles"}
+: ${DOTFILES_CONFIG_FILE:="$DOTFILES_CONFIG_DIR/.dotfile_config"}
+: ${DOTFILES_REPO_DIR:=$(pwd)}
+# : ${OS_TYPE:=$OS_TYPE}  # Already set from above
+mkdir -p $DOTFILES_CONFIG_DIR
+
+# Helper to update or add a variable in your .dotfile_config
+# Copied from bash_functions
+_set_config() {
+    local key="$1"
+    local value="$2"
+
+    if [[ -z "$key" || -z "$value" ]]; then
+        t ERR "Usage: _set_config <KEY> <VALUE>"
+        return 1
+    fi
+
+    if grep -q "^$key=" "$DOTFILES_CONFIG_FILE"; then
+        # Line exists: Replace it
+        # Using '|' as a delimiter to safely handle paths/slashes in values
+        sed -i "s|^$key=.*|$key=$value|" "$DOTFILES_CONFIG_FILE"
+    else
+        # Line missing: Append it
+        echo "$key=$value" >> "$DOTFILES_CONFIG_FILE"
+    fi
+}
+
+# ------------------------------------------
+# Load env
+# ------------------------------------------
+DOTFILES_ENV_LOADED=false
+if [ -f .env ]; then
+    echo "[ INFO ] Configuration loaded from .env"
+    if [ "$OS_TYPE" = 'linux' ]; then
+        export $(grep -v '^#' .env | xargs -d '\n')
+    elif [ "$OS_TYPE" = 'macos' ]; then
+        export $(grep -v '^#' .env | xargs -0)
+    fi
+    DOTFILES_ENV_LOADED=true
+else
+    if [[ -f "$DOTFILES_CONFIG_FILE" ]]; then
+        echo "[ INFO ] Configuration loaded from $DOTFILES_CONFIG_FILE"
+        . "$DOTFILES_CONFIG_FILE"
+        DOTFILES_ENV_LOADED=true
+    fi
+fi
+
+# Temp fallback / Legacy
+if [[ "$DOTFILES_ENV_LOADED" == "false" ]]; then
+    OLD_DOTFILES_CONFIG_FILE="$DOTFILES_CONFIG_DIR/.dotfile_config.env"
     if [[ -f "$OLD_DOTFILES_CONFIG_FILE" ]]; then
-        echo "[INFO] Configuration loaded from $OLD_DOTFILES_CONFIG_FILE"
+        echo "[ INFO ] Configuration loaded from $OLD_DOTFILES_CONFIG_FILE"
         . "$OLD_DOTFILES_CONFIG_FILE"
 
-        mv "$OLD_DOTFILES_CONFIG_FILE" "$HOME/.config/dotfiles/.dotfile_config"
+        mv -f "$OLD_DOTFILES_CONFIG_FILE" "$DOTFILES_CONFIG_FILE"
 
-        set_config "DOTFILES_CONFIG_FILE" "$HOME/.config/dotfiles/.dotfile_config"
+        _set_config "DOTFILES_CONFIG_FILE" "$DOTFILES_CONFIG_FILE"
+        . "$DOTFILES_CONFIG_FILE"
+        DOTFILES_ENV_LOADED=true
     fi
 fi
 
-DEFAULT_DOTFILES_REPO="https://github.com/tu-nguyen/dotfiles.git"
-DEFAULT_DOTFILES_REPO_DIR="$(pwd)"
-DEFAULT_GITSTATUS_DIR="$HOME/.gitstatus"
-DEFAULT_DOTFILES_CONFIG_DIR=$HOME/.config/dotfiles
-DEFAULT_DOTFILES_CONFIG_FILE="$DEFAULT_DOTFILES_CONFIG_DIR/.dotfile_config"
-DEFAULT_OS_TYPE=$(_get_os_type)
-GITSTATUS_DIR="$HOME/.gitstatus"
+if [[ "$DOTFILES_ENV_LOADED" == "false" ]]; then
+    echo "[ WARN ] .env and .dotfile_config files not found. Script will rely on defaults."
 
-if [[ "$ENV_LOADED" == "false" ]]; then
-    echo "[WARNING] .env and .dotfile_config files not found. Script will rely on defaults."
-    : "${DOTFILES_REPO:="$DEFAULT_DOTFILES_REPO"}"
-    : "${DOTFILES_REPO_DIR:="$DEFAULT_DOTFILES_REPO_DIR"}"
-    : "${DOTFILES_CONFIG_DIR:="$DEFAULT_DOTFILES_CONFIG_DIR"}"
-    : "${DOTFILES_CONFIG_FILE:="$DEFAULT_DOTFILES_CONFIG_FILE"}"
-    : "${OS_TYPE:=$DEFAULT_OS_TYPE}"
+    if [[ ! -f "$DOTFILES_CONFIG_FILE" ]]; then
+        echo "[ INFO ] Creating new config file $DOTFILES_CONFIG_FILE"
+        touch $DOTFILES_CONFIG_FILE
+    fi
 
-    mkdir -p "$DOTFILES_CONFIG_DIR"
-    echo "DOTFILES_REPO=$DOTFILES_REPO" >> "$DOTFILES_CONFIG_FILE"
+    _set_config "DOTFILES_REPO" "$DOTFILES_REPO"
+    _set_config "DOTFILES_CONFIG_DIR" "$DOTFILES_CONFIG_DIR"
+    _set_config "DOTFILES_CONFIG_FILE" "$DOTFILES_CONFIG_FILE"
+    _set_config "DOTFILES_REPO_DIR" "$DOTFILES_REPO_DIR"
+    _set_config "OS_TYPE" "$OS_TYPE"
 fi
 
-if [ -z "$DOTFILES_REPO_DIR" ] || [ "$DOTFILES_REPO_DIR" == "/path/to/dotfiles" ]; then
-    echo "[WARNING] 'DOTFILES_REPO_DIR' was not set, falling to default $DEFAULT_DOTFILES_REPO_DIR."
-    : "${DOTFILES_REPO_DIR:="$DEFAULT_DOTFILES_REPO_DIR"}"
-
-    set_config "DOTFILES_REPO_DIR" "$DEFAULT_DOTFILES_REPO_DIR"
-fi
-
-if [ -z "$DOTFILES_REPO" ] || [ "$DOTFILES_REPO" == "https://github.com/YOUR_USERNAME/YOUR_DOTFILES_REPO.git" ]; then
-    echo "[WARNING] 'DOTFILES_REPO' was not set, falling to default $DEFAULT_DOTFILES_REPO."
-    : "${DOTFILES_REPO:="$DEFAULT_DOTFILES_REPO"}"
-
-    set_config "DOTFILES_REPO" "$DEFAULT_DOTFILES_REPO"
-fi
-
-if [ -z "$DOTFILES_CONFIG_DIR" ] || [ "$DOTFILES_CONFIG_DIR" == "/path/to/.config/dotfiles" ]; then
-    echo "[WARNING] 'DOTFILES_CONFIG_DIR' was not set, falling to default $DEFAULT_DOTFILES_CONFIG_DIR."
-    : "${DOTFILES_CONFIG_DIR:="$DEFAULT_DOTFILES_CONFIG_DIR"}"
-
-    set_config "DOTFILES_CONFIG_DIR" "$DEFAULT_DOTFILES_CONFIG_DIR"
-fi
-
-if [ -z "$DOTFILES_CONFIG_FILE" ] || [ "$DOTFILES_CONFIG_FILE" == "/path/to/.dotfile_config" ]; then
-    echo "[WARNING] 'DOTFILES_CONFIG_FILE' was not set, falling to default $DEFAULT_DOTFILES_CONFIG_FILE."
-    : "${DOTFILES_CONFIG_FILE:="$DEFAULT_DOTFILES_CONFIG_FILE"}"
-
-    set_config "DOTFILES_CONFIG_FILE" "$DEFAULT_DOTFILES_CONFIG_FILE"
-fi
-
-if [ -z "$OS_TYPE" ] || [ "$OS_TYPE" == "some_os" ]; then
-    echo "[WARNING] 'OS_TYPE' was not set, falling to default $DEFAULT_OS_TYPE."
-    : "${OS_TYPE:="$DEFAULT_OS_TYPE"}"
-
-    set_config "OS_TYPE" "$DEFAULT_OS_TYPE"
-fi
-
-unset BASH_STYLE_LOADED
-. "$DOTFILES_REPO_DIR/setup/bash/bash_style" || {
-    echo "Error: Could not source bash_style"
-    exit 1
-}
+# ------------------------------------------
+# Pre-reqs
+# ------------------------------------------
+# init should source bash_style and bash_functions (for t)
 . "$DOTFILES_REPO_DIR/setup/bash/init" || {
     echo "Error: Could not source init"
     exit 1
@@ -131,31 +171,29 @@ unset BASH_STYLE_LOADED
     exit 1
 }
 
-_sudo_keep
-
+# ------------------------------------------
+# Main
+# ------------------------------------------
 # A menu function to display options
 show_menu() {
     clear
     printf "${HDR_F}==========================================${NC}\n"
-    printf "    ${HDR_F}Dotfiles Setup -- Choose an Option${NC}    \n"
+    printf "              ${HDR_F}dotfiles setup              ${NC}\n"
     printf "${HDR_F}==========================================${NC}\n"
-    printf "${SEL_F}[1]${NC} Reset Pre-configuration\n"
-    printf "${SEL_F}[2]${NC} Reset .bashrc\n"
-    printf "${SEL_F}[3]${NC} Reset .vimrc\n"
-    printf "${SEL_F}[4]${NC} Reset Git Config\n"
-    printf "${SEL_F}[5]${NC} Reset VS Code Config\n"
-    printf "${SEL_F}[6]${NC} Reset Firefox\n"
-    printf "${SEL_F}[7]${NC} Reset WSL Config ${SUB_F}(WSL only)${NC}\n"
-    printf "${SEL_F}[8]${NC} Run Gaming Registry Tweaks ${SUB_F}(WSL only)${NC}\n"
-    printf "${SEL_F}[9]${NC} Reset PowerShell profile ${SUB_F}(WSL only)${NC}\n"
-    printf "${SEL_F}[0]${NC} Run All of the Above ${SUB_F}(Default)${NC}\n"
-    printf "${BOLD}${RED}[x] Exit${NC}\n"
-    printf "${BOLD}${WHITE}==========================================x${NC}\n"
+    printf "${SEL_F}[1]${NC} reset pre-configuration\n"
+    printf "${SEL_F}[2]${NC} reset .bashrc\n"
+    printf "${SEL_F}[3]${NC} reset .vimrc\n"
+    printf "${SEL_F}[4]${NC} reset gitconfig\n"
+    printf "${SEL_F}[5]${NC} reset vs code config\n"
+    printf "${SEL_F}[6]${NC} reset firefox\n"
+    printf "${SEL_F}[7]${NC} reset wsl config ${SUB_F}(wsl only)${NC}\n"
+    printf "${SEL_F}[8]${NC} run gaming registry tweaks ${SUB_F}(wsl only)${NC}\n"
+    printf "${SEL_F}[9]${NC} reset powerShell profile ${SUB_F}(wsl only)${NC}\n"
+    printf "${BOLD}${CYAN}[0] run all of the above (default)${NC}\n"
+    printf "${BOLD}${RED}[x] exit${NC}\n"
+    printf "${BOLD}${WHITE}==========================================${NC}\n"
 }
 
-t "Setting up configuration files.."
-
-# if [[ -z "$target" ]]; then
 if [[ $# -eq 0 ]]; then
     # User input loop
     while true; do
@@ -201,4 +239,5 @@ else
     reset_bashrc
 fi
 
-t OK "${SUCCESS}All done! You may need to exit and reopen!${NC}"
+t OK "${SUCCESS}All done! Relaunching bash!${NC}"
+exec bash "$0" "$@"

@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
+# ===================================================================== #
+# BASH DOCKER
+# ===================================================================== #
 
+# ------------------------------------------
+# Aliases
+# ------------------------------------------
 alias dk="docker"
 alias dkps="docker ps --format '{{.ID}} - {{.Names}} - {{.Image}} - {{.Status}}'"
 alias dkc="docker container ls -a '{{.ID}} - {{.Names}} - {{.Image}} - {{.Status}}'"
@@ -11,38 +17,41 @@ alias dks="docker service"
 alias dkrm="docker rm"
 
 KEEP_IMAGES=(
-    "ghcr.io/rsginc/rmove-base:2.3.0-312"
     "ghcr.io/astral-sh/uv:latest"
 )
 
-# Export a image to tar
+# ------------------------------------------
+# Functions
+# ------------------------------------------
+# export an image to tar
 dkexport() {
+	# TODO: add dest arg
 	docker save -o ${HOME}/Downloads/docker_image_backup.tar $1
 }
 
-### docker helper func remove images (filtered)
+# helper function to remove images (filtered)
 function dkrmif() {
-	# Fetch all existing images in the format "repo:tag"
-        EXISTING_IMAGES=$(docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}')
+	# fetch all existing images in the format "repo:tag"
+	EXISTING_IMAGES=$(docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}')
 
-        # Generate a list of images to keep, but only if they exist
-        KEEP_EXISTING_IMAGES=()
-        for image in "${KEEP_IMAGES[@]}"; do
-                IMAGE_ID=$(echo "$EXISTING_IMAGES" | grep -E "^${image} " | awk '{print $2}')
-                if [[ -n "$IMAGE_ID" ]]; then
-                        KEEP_EXISTING_IMAGES+=("$IMAGE_ID")
-                fi
-        done
+	# generate a list of images to keep, but only if they exist
+	KEEP_EXISTING_IMAGES=()
+	for image in "${KEEP_IMAGES[@]}"; do
+			IMAGE_ID=$(echo "$EXISTING_IMAGES" | grep -E "^${image} " | awk '{print $2}')
+			if [[ -n "$IMAGE_ID" ]]; then
+					KEEP_EXISTING_IMAGES+=("$IMAGE_ID")
+			fi
+	done
 
-        # Fetch all images IDs and remove those not in KEEP_EXISTING_IMAGES
-        REMOVE_IMAGES=$(docker images -q | grep -v -F "$(printf "%s\n" "${KEEP_EXISTING_IMAGES[@]}" | awk '{print $1}')")
+	# fetch all images IDs and remove those not in KEEP_EXISTING_IMAGES
+	REMOVE_IMAGES=$(docker images -q | grep -v -F "$(printf "%s\n" "${KEEP_EXISTING_IMAGES[@]}" | awk '{print $1}')")
 
-        if [[ -n "$REMOVE_IMAGES" ]]; then
-                t "Removing all images except the specified ones.."
-                docker rmi -f $REMOVE_IMAGES
-        else
-                t "No images to remove."
-        fi
+	if [[ -n "$REMOVE_IMAGES" ]]; then
+			t "Removing all images except the specified ones.."
+			docker rmi -f $REMOVE_IMAGES
+	else
+			t "No images to remove."
+	fi
 
 	t "These images were preserved:"
 	for image in "${KEEP_IMAGES[@]}"; do
@@ -50,7 +59,7 @@ function dkrmif() {
 	done
 }
 
-# Load a docker image from tar
+# load a docker image from tar
 dkimport () {
 	if [ -z "$1" ]; then
 		t WARNING "no arg given, defaulting to 'docker_image_backup.tar'"
@@ -62,45 +71,45 @@ dkimport () {
 	docker load -i $1
 }
 
-## docker prep
-function dkprep() {
-	t "pulling rmove-base"
-	docker pull ghcr.io/rsginc/rmove-base:2.3.0-312@sha256:b73f3a3ed32f6053d11b4342686cdba72e60fb8a523eac777fffc6e39e4e9d69
-	t "tagging rmove-base to tag used in current Dockerfile"
-	$RMOVEBASEIMAGEID=$(docker images)
-	docker tag $(docker images --filter=reference='ghcr.io/rsginc/rmove-base' -q) ghcr.io/rsginc/rmove-base:2.3.0-312
+# # docker prep
+# function dkprep() {
+# 	t "pulling rmove-base"
+# 	docker pull ghcr.io/rsginc/rmove-base:2.3.0-312@sha256:b73f3a3ed32f6053d11b4342686cdba72e60fb8a523eac777fffc6e39e4e9d69
+# 	t "tagging rmove-base to tag used in current Dockerfile"
+# 	$RMOVEBASEIMAGEID=$(docker images)
+# 	docker tag $(docker images --filter=reference='ghcr.io/rsginc/rmove-base' -q) ghcr.io/rsginc/rmove-base:2.3.0-312
 
-	t "pulling uv"
-	docker pull ghcr.io/astral-sh/uv:latest
-}
+# 	t "pulling uv"
+# 	docker pull ghcr.io/astral-sh/uv:latest
+# }
 
-## docker build
+# docker build
 function dkbuild() {
 	docker-compose build --no-cache
 }
 
-## docker up
+# docker up
 function dkup() {
 	docker-compose up -d
 }
 
-## docker down
+# docker down
 function dkdown() {
 	docker-compose down
 }
 
-## docker buildup
+# docker buildup
 function dkbuildup() {
-        docker-compose build --no-cache
-        docker-compose up -d
+	docker-compose build --no-cache
+	docker-compose up -d
 }
 
-## docker restart
+# docker restart
 function dkrestart() {
 	t "todo"
 }
 
-# Run stop, rmi, and prunes
+# run stop, rmi, and prunes
 dkclean() {
 	dkstop
 	docker container prune -f
@@ -110,7 +119,7 @@ dkclean() {
 	docker system df
 }
 
-# Stop a docker container
+# stop a docker container
 dkstop() {
 	if [ -n "$1" ]; then
 		docker stop "$1" && echo "Container $1 stopped successfully." || echo "Failed to stop container $1"
@@ -122,7 +131,7 @@ dkstop() {
     fi
 }
 
-# Kill a docker container
+# kill a docker container
 dkkill() {
 	if [ -n "$1" ]; then
 		docker stop "$1" && docker rm "$1" \
@@ -131,20 +140,20 @@ dkkill() {
 	else
 		docker ps -aq | while read -r container_id; do
 			docker stop "$container_id" && docker rm "$container_id" \
- 				&& t SUCCESS "Container $container_id stopped and removed successfully."
+			&& t SUCCESS "Container $container_id stopped and removed successfully."
 		done
 		[ "$(docker ps -aq)" ] || t WARNING "No containers to stop or remove."
 	fi
 }
 
-#
+# run docker stop, kill and rm images
 function dkkillp() {
 	dkstop
 	dkkill
 	dkrmif
 }
 
-# Do more than just clean
+# do more than just clean
 dknuke() {
     dkstop
 	docker rm $(docker ps -aq)

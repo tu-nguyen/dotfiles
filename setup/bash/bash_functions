@@ -1,64 +1,29 @@
 #!/usr/bin/env bash
+# ===================================================================== #
+# BASH FUNCTIONS
+# ===================================================================== #
 
+# ------------------------------------------
+# General Helper functions
+# ------------------------------------------
+# helper to handle the browser opening logic
+function _browser_open() {
+    local url="$1"
 
-## General Helper functions
-
-# Display date and time
-function now() {
-    echo "$(date +"%d-%m-%Y") $(date +"%T")"
-}
-
-# Helper to truncate text to a maximum length
-function truncate_text() {
-    local text="$1"
-    local maxlen="${2:-30}"
-    if [ ${#text} -gt "$maxlen" ]; then
-        echo "${text:0:$((maxlen-3))}.."
+    if [[ -n "$WSL_DISTRO_NAME" ]]; then
+        # WSL: Open in Windows default browser
+        powershell.exe -NoProfile -Command "Start-Process '$url'"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        # macos: Open in default Mac browser
+        open "$url"
     else
-        echo "$text"
+        # Standard Linux: Use xdg-open
+        xdg-open "$url" 2>/dev/null
     fi
 }
 
-# Helper to output standardize msg
-function t() {
-    # t "System started"                  # [INFO] System started
-    # t WARNING "Disk space low"          # [WARNING] Disk space low
-    # t ERROR "Failed to connect to DB"   # [ERROR] Failed to connect to DB
-    # t                                   # Hello world
-    local severity message color label
-    local timestamp=$(date +"%H:%M:%S")
-
-    if [[ $# -eq 0 ]]; then
-        echo -e "${GREEN}Hello world${NC}"
-        return
-    elif [[ $# -eq 1 ]]; then
-        severity="INFO"
-        message="$1"
-    else
-        severity=$(echo "$1" | tr '[:lower:]' '[:upper:]')
-        message="$2"
-    fi
-
-    # Define color and label mapping
-    case "$severity" in
-        INFO)           color="${INFO}";  label="[ INFO ]" ;;
-        IMPORTANT)      color="${INFO}";  label="[ INFO ]" ;;
-        WARN|WARNING)   color="${WARN}";  label="[ WARN ]" ;;
-        ERR|ERROR)      color="${ERR}";   label="[ ERR  ]" ;;
-        SUCCESS|OK)     color="${OK}";    label="[  OK  ]" ;;
-        ALERT)          color="${ALERT}"; label="[-ALERT]" ;;
-        TODO)           color="${ALERT}"; label="[ TODO ]" ;;
-        DEBUG)          color="${DEBUG}"; label="[-DEBUG]" ;;
-        *)              color="${BOLD}";  label="[-$severity]" ;;
-    esac
-
-    # Output formatted message
-    # Format: [HH:MM:SS] [LABEL] Message
-    echo -e "${DEBUG}${timestamp}${NC} ${color}${label}${NC} ${message}${NC}"
-}
-
-# Helper to get color for a status
-function status_colour() {
+# helper to get color for a status
+function _status_colour() {
     local status="$1"
     case "$status" in
         "To Do"|"New"|*"On Deck"*|"Story"|"Task") echo "$PINK" ;;
@@ -69,24 +34,19 @@ function status_colour() {
     esac
 }
 
-# Helper to handle the browser opening logic
-function _browser_open() {
-    local url="$1"
-
-    if [[ -n "$WSL_DISTRO_NAME" ]]; then
-        # WSL: Open in Windows default browser
-        powershell.exe -NoProfile -Command "Start-Process '$url'"
-    elif [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS: Open in default Mac browser
-        open "$url"
+# helper to truncate text to a maximum length
+function _truncate_text() {
+    local text="$1"
+    local maxlen="${2:-30}"
+    if [ ${#text} -gt "$maxlen" ]; then
+        echo "${text:0:$((maxlen-3))}.."
     else
-        # Standard Linux: Use xdg-open
-        xdg-open "$url" 2>/dev/null
+        echo "$text"
     fi
 }
 
-# Helper to load config
-function load_config() {
+# function to load config
+function _load_config() {
     if [ -z "$DOTFILES_CONFIG_DIR" ]; then
         DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
     fi
@@ -107,39 +67,43 @@ function load_config() {
     [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 }
 
-# Helper to update or add a variable in your .dotfile_config
-function set_config() {
+# helper to update or add a config/variable
+function _set_config() {
     local key="$1"
     local value="$2"
-    local config_file="$DOTFILES_CONFIG_DIR/.dotfile_config"
+    local config_file="${3:-$DOTFILES_CONFIG_FILE}"
 
     if [[ -z "$key" || -z "$value" ]]; then
-        t ERR "Usage: set_config <KEY> <VALUE>"
+        t ERR "Usage: _set_config <KEY> <VALUE> [CONFIG_FILE]"
         return 1
     fi
 
+    # ensure the directory exists
+    mkdir -p "$(dirname "$config_file")"
+    touch "$config_file"
+
     if grep -q "^$key=" "$config_file"; then
-        # Line exists: Replace it
-        # Using '|' as a delimiter to safely handle paths/slashes in values
+        # line exists: replace it
+        # using '|' as a delimiter to safely handle paths/slashes in values
         sed -i "s|^$key=.*|$key=$value|" "$config_file"
     else
-        # Line missing: Append it
+        # line missing: append it
         echo "$key=$value" >> "$config_file"
     fi
 }
 
-# Helper to fetch values from your specific dotfile config
-function get_config() {
+# helper to fetch config/variable
+function _get_config() {
     local var_name="$1"
-    local config_file="$DOTFILES_CONFIG_DIR/.dotfile_config"
+    local config_file="${2:-$DOTFILES_CONFIG_FILE}"
     local value=""
 
-    # Try to get from the config file first
+    # try to get from the config_file first
     if [[ -f "$config_file" ]]; then
         value=$(grep "^${var_name}=" "$config_file" | cut -d'=' -f2- | tr -d '\r')
     fi
 
-    # Fallback to shell environment if config file search was empty
+    # fallback to shell environment if config_file search was empty
     if [[ -z "$value" ]]; then
         # ${!var_name} is Bash indirect expansion (gets the value of the name stored in var_name)
         value="${!var_name}"
@@ -150,20 +114,19 @@ function get_config() {
     if [[ -n "$value" ]]; then
         echo "$value"
         return 0
-    else
-        return 1
     fi
+    return 1
 }
 
-# Helper to fetch value from .gitconfig
-function get_git_config() {
+# helper to fetch value from .gitconfig
+function _get_git_config() {
     if [ -z "$1" ]; then
         t ERR "Error: No configuration key provided." >&2
-        t ERR "Usage: get_git_config <section.key>" >&2
+        t ERR "Usage: _get_git_config <section.key>" >&2
         return 1
     fi
 
-    # Use git's internal engine to find the value
+    # use git's internal engine to find the value
     # --get returns the value, or nothing (and an exit code of 1) if not found
     local value
     value=$(git config --get "$1")
@@ -175,12 +138,76 @@ function get_git_config() {
     fi
 }
 
+# ------------------------------------------
+# util functions
+# ------------------------------------------
+# display date and time
+function now() {
+    echo "$(date +"%d-%m-%Y") $(date +"%T")"
+}
 
-## Reset flow: r & rr
+# output standardize msg
+function t() {
+    # t "System started"                  # [ INFO ] System started
+    # t WARNING "Disk space low"          # [ WARN ] Disk space low
+    # t ERROR "Failed to connect to DB"   # [ ERR  ] Failed to connect to DB
+    # t                                   # Hello world
+    local severity message color label
+    local timestamp=$(date +"%H:%M:%S")
 
-# Setup processes for r running dotfile install
+    if [[ $# -eq 0 ]]; then
+        echo -e "${GREEN}Hello world${NC}"
+        return
+    elif [[ $# -eq 1 ]]; then
+        severity="INFO"
+        message="$1"
+    else
+        severity=$(echo "$1" | tr '[:lower:]' '[:upper:]')
+        message="$2"
+    fi
+
+    # define color and label mapping
+    case "$severity" in
+        INFO)           color="${INFO}";  label="[ INFO ]" ;;
+        IMPORTANT)      color="${INFO}";  label="[ INFO ]" ;;
+        WARN|WARNING)   color="${WARN}";  label="[ WARN ]" ;;
+        ERR|ERROR)      color="${ERR}";   label="[ ERR  ]" ;;
+        SUCCESS|OK)     color="${OK}";    label="[  OK  ]" ;;
+        ALERT)          color="${ALERT}"; label="[-ALERT]" ;;
+        TODO)           color="${ALERT}"; label="[ TODO ]" ;;
+        DEBUG)          color="${DEBUG}"; label="[-DEBUG]" ;;
+        *)              color="${BOLD}";  label="[-$severity]" ;;
+    esac
+
+    # output formatted message
+    # format: [HH:MM:SS] [LABEL] Message
+    echo -e "${DEBUG}${timestamp}${NC} ${color}${label}${NC} ${message}${NC}"
+}
+
+# compare and pipe to less while preserving colors
+dless() {
+    if command -v colordiff >/dev/null 2>&1; then
+        colordiff -u "$1" "$2" | less -R
+    else
+        diff -u "$1" "$2" | less
+    fi
+}
+
+# ceate a directory and move into it immediately
+mkcd() {
+    mkdir -p "$1" && cd "$1" || return
+}
+
+# automatically 'ls' after every 'cd'
+cd() {
+    builtin cd "$@" && ls
+}
+
+# ------------------------------------------
+# reset flow: r & rr
+# ------------------------------------------
+# setup processes for r running dotfile install
 function pre_r() {
-    unset DOTFILES_LOADED
     unset BASH_STYLE_LOADED
 
     if [[ "$(pwd)" == *"/dotfiles" && -d ".git" ]]; then
@@ -197,7 +224,7 @@ function pre_r() {
         if [ -f "$DOTFILES_CONFIG_FILE" ]; then
             source "$DOTFILES_CONFIG_FILE"
         else
-            echo "[Error] Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
+            echo "[ ERR  ] Configuration file not found at $DOTFILES_CONFIG_FILE" >&2
             exit 1
         fi
 
@@ -206,20 +233,18 @@ function pre_r() {
         # --- End Load Configuration ---
     fi
 
-    echo "[INFO] Resetting settings.."
+    echo "[ INFO ] Resetting settings.."
     if [ "$IS_PROJECT_ROOT" = false ]; then
       if [[ -n "$DOTFILES_REPO_DIR" ]]; then
         pushd $DOTFILES_REPO_DIR > /dev/null
       else
-        echo "[ERROR] You are not in the root of the dotfile project! DOTFILES_REPO_DIR is not set. Exiting.."
+        echo "[ ERR  ] You are not in the root of the dotfile project! DOTFILES_REPO_DIR is not set. Exiting.."
         return 1
       fi
     fi
-
-    unset BASH_STYLE_LOADED
 }
 
-# Post processes after dotfile install
+# post processes after dotfile install
 function post_r() {
     if [ "$IS_PROJECT_ROOT" = false ]; then
       popd > /dev/null
@@ -231,7 +256,7 @@ function post_r() {
     # t SUCCESS "${SUCCESS}All set!${NC}"
 }
 
-# Re-run Dotfile installation
+# re-run dotfiles sync
 r() {
     pre_r
 
@@ -240,7 +265,7 @@ r() {
     post_r
 }
 
-# Re-run just bashrc installation (forced y)
+# re-run just bash sync (forced y)
 rr() {
     pre_r
 
@@ -249,7 +274,7 @@ rr() {
     post_r
 }
 
-# Reset and pull latest from repo, then re-run just bashrc installation (forced y)
+# reset and pull latest from repo, then re-run just bash sync (forced y)
 rrr() {
     pre_r
 
@@ -258,7 +283,10 @@ rrr() {
     post_r
 }
 
-# Copy generic .bash_twork starter file
+# ------------------------------------------
+# init special .bash_
+# ------------------------------------------
+# copy generic .bash_twork starter file
 set-tworktt() {
     if [ -z "$DOTFILES_REPO_DIR" ]; then
 		t ERROR "DOTFILES_REPO_DIR not set, check $HOME/.config/dotfiles/.dotfile_config"
@@ -280,7 +308,7 @@ set-tworktt() {
 	fi
 }
 
-# Copy generic .bash_personal starter file
+# copy generic .bash_personal starter file
 set-ptt() {
     if [ -z "$DOTFILES_REPO_DIR" ]; then
 		t ERROR "DOTFILES_REPO_DIR not set, check $HOME/.config/dotfiles/.dotfile_config"
@@ -302,7 +330,10 @@ set-ptt() {
 	fi
 }
 
-# Extract a file
+# ------------------------------------------
+# utils
+# ------------------------------------------
+# extract a file
 ex() {
     if [ -f $1 ] ; then
         case $1 in
@@ -324,23 +355,23 @@ ex() {
     fi
  }
 
-# Display a PDF of a given man page
+# display a PDF of a given man page
 pdfman() {
     man -t $@ | pstopdf -i -o /tmp/$1.pdf && open /tmp/$1.pdf
 }
 
-# Print env, use -l to only display core details
+# print env, use -l to only display core details
 printv() {
     local show_limited=false
     local env_file=""
     local limit_vars=("BASE_URL" "ALLOWED_HOSTS" "ENFIRONMENT", "POSTGRES_HOST", "POSTGRES_DB")
 
-    # Check for -l flag
+    # check for -l flag
     if [[ "$1" == "-l" ]]; then
         show_limited=true
     fi
 
-    # Search for .env in current and up to two parent directories
+    # search for .env in current and up to two parent directories
     for dir in "." ".." "../.."; do
         if [[ -f "$dir/.env" ]]; then
         env_file="$dir/.env"
@@ -364,7 +395,7 @@ printv() {
     fi
 }
 
-# Searches for text in all files in the current folder
+# searches for text in all files in the current folder
 ftext() {
 	# -i case-insensitive
 	# -I ignore binary files
@@ -376,50 +407,63 @@ ftext() {
 	grep -iIHrn --color=always "$1" . | less -r
 }
 
-# Copy file with a progress bar
+# copy file with a progress bar
 cpp() {
     local quiet=false
-    local src=""
-    local dest=""
+    local do_source=false
+    local args=()
 
-    if [[ "$1" == "-q" ]]; then
-        quiet=true
-        src="$2"
-        dest="$3"
-    else
-        src="$1"
-        dest="$2"
-    fi
+    # parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -q|--quiet)  quiet=true; shift ;;
+            -s|--source) do_source=true; shift ;;
+            -*)          t ERR "Unknown option: $1"; return 1 ;;
+            *)           args+=("$1"); shift ;;
+        esac
+    done
 
-    if [[ -z "$src" ]] || [[ -z "$dest" ]]; then
-        t ERR "Usage: cpp [-q] <source> <destination>"
+    local src="${args[0]}"
+    local dest="${args[1]}"
+
+    if [[ -z "$src" || -z "$dest" ]]; then
+        t ERR "Usage: cpp [-q] [-s] <source> <destination>"
         return 1
     fi
 
+    # perform the copy
     rsync -ah --info=progress2 "$src" "$dest"
+
+    # clear the rsync progress line
     printf "\033[1A\r\033[K"
 
     if [[ "$quiet" == false ]]; then
         t OK "Transfer of $(basename "$dest") complete."
     fi
 
-    # alt
-    # local size=$(stat -c '%s' "$1")
-    # pv -s "$size" "$1" > "$2"
+    # handle the sourcing logic
+    if [[ "$do_source" == true ]]; then
+        if [[ -f "$dest" ]]; then
+            source "$dest"
+        else
+            t ERR "Failed to source: $dest (file not found)"
+            return 1
+        fi
+    fi
 }
 
-# Find a file with a pattern in name:
+# find a file with a pattern in name:
 ff() {
     find . -type f -iname '*'"$*"'*' -ls ;
 }
 
-# Starship Theme Switcher
+# starship theme switcher
 sss() {
     local config_dir="$HOME/.config"
     local target="$config_dir/starship.toml"
 
-    # Find all .toml files in ~/.config, excluding the active starship.toml
-    # Strip the path to just show the filenames in the menu
+    # find all .toml files in ~/.config, excluding the active starship.toml
+    # strip the path to just show the filenames in the menu
     local themes=($(find "$config_dir" -maxdepth 1 -name "starship.*.toml" -printf "%f\n" | sort))
 
     printf "${HDR_F}==========================================${NC}\n"
@@ -428,7 +472,7 @@ sss() {
 
     local i=1
     for theme in "${themes[@]}"; do
-        # Clean up the name for the display (e.g., starship.gruvbox.toml -> gruvbox)
+        # clean up the name for the display (e.g., starship.gruvbox.toml -> gruvbox)
         local display_name=$(echo "$theme" | sed 's/starship.\(.*\).toml/\1/')
         printf "${SEL_F}[$i]${NC} Load ${display_name^} Theme ${SUB_F}($theme)${NC}\n"
         ((i++))
@@ -445,7 +489,7 @@ sss() {
     elif [[ "$opt" -gt 0 && "$opt" -le ${#themes[@]} ]]; then
         local selected_theme="${themes[$((opt-1))]}"
 
-        # Backup and Swap // Just swap no backup currently
+        # backup and Swap // Just swap no backup currently
         # [[ -f "$target" ]] && cp "$target" "$target.bak"
         cp "$config_dir/$selected_theme" "$target"
 
@@ -456,10 +500,10 @@ sss() {
     fi
 }
 
-
-# Searches/open link functions
-
-# DuckDuckGo Search
+# ------------------------------------------
+# searches/open link functions
+# ------------------------------------------
+# duckduckgo search
 ddg() {
     if [[ -z "$1" ]]; then
         t ERR "Usage: ddg <query>"
@@ -469,20 +513,20 @@ ddg() {
     _browser_open "https://duckduckgo.com/?q=${query%?}"
 }
 
-# Dictionary Search (Merriam-Webster)
+# dictionary search (Merriam-Webster)
 dict() {
     [[ -z "$1" ]] && { t ERR "Usage: dict <word>"; return 1; }
     _browser_open "https://www.merriam-webster.com/dictionary/$1"
 }
 
-# Urban Dictionary (Slang)
+# urban dictionary (Slang)
 urban() {
     [[ -z "$1" ]] && { t ERR "Usage: urban <query>"; return 1; }
     local query=$(printf "%s+" "$@")
     _browser_open "https://www.urbandictionary.com/define.php?term=${query%?}"
 }
 
-# YouTube Search
+# youtube search
 yt() {
     if [[ -z "$1" ]]; then
         t ERR "Usage: yt <query>"
@@ -492,7 +536,7 @@ yt() {
     _browser_open "https://www.youtube.com/results?search_query=${query%?}"
 }
 
-# Google Search
+# google search
 gg() {
     if [[ -z "$1" ]]; then
         t ERR "Usage: gg <query>"
@@ -502,7 +546,7 @@ gg() {
     _browser_open "https://www.google.com/search?q=${query%?}"
 }
 
-# GitHub Search
+# gitHub search
 ghs() {
     local gh_ins="https://github.com"
     local type_flag="&type=repositories"
@@ -511,15 +555,15 @@ ghs() {
     local repos=""
     local gh_username=""
 
-    # Parse arguments
+    # parse arguments
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --me)
-                local config_gh_username=$(get_config "GITHUB_USERNAME")
+                local config_gh_username=$(_get_config "GITHUB_USERNAME")
                 if [[ -n "$config_gh_username" ]]; then
                     gh_username="$config_gh_username"
                 else
-                    local gitconfig_gh_username=$(get_git_config user.name)
+                    local gitconfig_gh_username=$(_get_git_config user.name)
                     if [[ -n "$gitconfig_gh_username" ]]; then
                         gh_username="$gitconfig_gh_username"
                     else
@@ -530,7 +574,7 @@ ghs() {
                 shift
                 ;;
             --twork)
-                local twork_gh_ins=$(get_config "TWORK_GH_INSTACE")
+                local twork_gh_ins=$(_get_config "TWORK_GH_INSTACE")
                 if [[ -n "$twork_gh_ins" ]]; then
                     gh_ins="$twork_gh_ins"
                 else
@@ -583,19 +627,19 @@ ghs() {
         esac
     done
 
-    # Validation
+    # validation
     if [[ -z "$prs" && -z "$repos" && ${#args[@]} -eq 0 ]]; then
         t ERR "Usage: ghs [--me] [--twork] ([--type <type>] [--lang <lang>] <query> | --prs [nr] | --repos)"
         return 1
     fi
 
-    # Standard Search Logic
+    # standard search logic
     if [[ -z "$prs" && -z "$repos" ]]; then
         local query=$(printf "%s+" "${args[@]}")
         _browser_open "${gh_ins}/search?q=${query%?}${lang_query}${type_flag}"
     fi
 
-    # Pull Request Logic
+    # pr search logic
     if [[ -n "$prs" ]]; then
         local pr_query=""
         if [[ -n "$gh_username" ]]; then
@@ -610,10 +654,10 @@ ghs() {
         _browser_open "${gh_ins}/${prs}${pr_query}"
     fi
 
-    # Repositories Logic
+    # repos search logic
     if [[ -n "$repos" ]]; then
         if [[ -n "$gh_username" ]]; then
-            # Opens your specific profile's repo tab
+            # opens your specific profile's repo tab
             _browser_open "${gh_ins}/${gh_username}?tab=repositories"
         else
             # _browser_open "${gh_ins}/${repos}"
@@ -622,31 +666,31 @@ ghs() {
     fi
 }
 
-# Asana Search
+# asana search
 asa() {
     local me_flag=""
     local collab_param=""
     local status_param=""
     local args=()
 
-    # Parse arguments
+    # parse arguments
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --me)
-                local my_id=$(get_config "ASANA_ME_ID")
+                local my_id=$(_get_config "ASANA_ME_ID")
                 if [[ -n "$my_id" ]]; then
                     me_flag="&assignees.ids=${my_id}"
                 else
-                    # Fallback if variable is missing from the file
+                    # fallback if variable is missing from the file
                     t WARN "--me flag given but ASANA_ME_ID is not set, defaulting to 'me'"
                     me_flag="&assignees.ids=me"
                 fi
                 shift
                 ;;
             --user)
-                # Convert input to uppercase (e.g., someguy -> SOMEGUY)
+                # convert input to uppercase (e.g., someguy -> SOMEGUY)
                 local user_name="${2^^}"
-                local user_id=$(get_config "ASANA_${user_name}_ID")
+                local user_id=$(_get_config "ASANA_${user_name}_ID")
 
                 if [[ -n "$user_id" ]]; then
                     me_flag="&assignees.ids=${user_id}"
@@ -657,9 +701,9 @@ asa() {
                 shift 2
                 ;;
             --collab)
-                # Convert input to uppercase (e.g., someguy -> SOMEGUY)
+                # convert input to uppercase (e.g., someguy -> SOMEGUY)
                 local user_name_collab="${2^^}"
-                local user_id_collab=$(get_config "ASANA_${user_name_collab}_ID")
+                local user_id_collab=$(_get_config "ASANA_${user_name_collab}_ID")
 
                 if [[ -n "$user_id_collab" ]]; then
                     collab_param="&collaborators.ids=${user_id_collab}"
@@ -670,7 +714,7 @@ asa() {
                 shift 2
                 ;;
             --status)
-                # Map the user input to Asana's URL parameters
+                # map the user input to asana's url parameters
                 case "$2" in
                     completed|complete) status_param="&completion=complete" ;;
                     incomplete) status_param="&completion=incomplete" ;;
@@ -686,27 +730,27 @@ asa() {
         esac
     done
 
-    # Check if we have a query
+    # check if we have a query
     if [[ ${#args[@]} -eq 0 && -z "$status_param" && -z "$gh_username" ]]; then
         t ERR "Usage: asa [--me] [--user <USER>] [--collab <USER>] [--status <incomplete|completed|deleted>] [query]"
         return 1
     fi
 
-    # Format query
+    # format query
     local query=$(printf "%s+" "${args[@]}")
 
-    # Open browser
+    # open browser
     _browser_open "https://app.asana.com/0/search?q=${query%?}&sort=last_modified&searched_type=task${me_flag}${collab_param}${status_param}"
 }
 
-
-## Other functions (not listed via ftt)
-
-# Function to clone or pull dotfiles repository
+# ------------------------------------------
+# git functions
+# ------------------------------------------
+# function to clone or pull dotfiles repository
 function clone_or_pull_dotfiles() {
     local reset_bash=false
 
-    # Check for -rb flag
+    # check for -rb flag
     if [[ "$1" == "-rb" ]]; then
         reset_bash=true
     fi
@@ -714,37 +758,37 @@ function clone_or_pull_dotfiles() {
     t "Managing dotfiles repository.."
     if [ -d "$DOTFILES_REPO_DIR/.git" ]; then
         t "${SUB_F}dotfiles${NC} directory '$DOTFILES_REPO_DIR' already exists."
-        # Navigate to the dotfiles directory
+        # navigate to the dotfiles directory
         cd "$DOTFILES_REPO_DIR" || { t Error "Failed to change directory to $DOTFILES_REPO_DIR. Aborting."; exit 1; }
         printf "\033[1A\r\033[K"
 
         local stashed_changes=false
-        # Check if there are any uncommitted changes (staged or unstaged)
+        # check if there are any uncommitted changes (staged or unstaged)
         if [[ $(git status --porcelain) ]]; then
             t WARN "Uncommitted changes detected. Stashing them temporarily.."
-            # Use 'git stash push' for modern git, 'save' is deprecated but works
+            # use 'git stash push' for modern git, 'save' is deprecated but works
             if git stash push -m "Temporary stash by dotfiles script before pull"; then
                 stashed_changes=true
                 t OK "Changes stashed successfully."
             else
                 t Error "Failed to stash uncommitted changes. Aborting pull."
-                # Return to home directory before exiting on error
+                # return to home directory before exiting on error
                 cd "$HOME" || { t Error "Failed to return to home directory after stash error."; }
                 exit 1
             fi
         fi
 
         t "Pulling latest changes from '$DOTFILES_REPO'.."
-        # Ensure we pull from the correct branch, or just 'git pull' if upstream is set
+        # ensure we pull from the correct branch, or just 'git pull' if upstream is set
         local current_branch=$(git rev-parse --abbrev-ref HEAD)
         if ! git pull origin "$current_branch" &> /dev/null; then
             t Error "Failed to pull ${ERR}dotfiles${NC} from '$DOTFILES_REPO'. Please check your network or repository access."
-            # Attempt to reapply stash even if pull failed, so user can resolve
+            # attempt to reapply stash even if pull failed, so user can resolve
             if $stashed_changes; then
                 t WARN "Attempting to reapply stashed changes after pull failure.."
                 git stash pop || t Warning "Failed to pop stash. You may have conflicts to resolve manually."
             fi
-            # Return to home directory before exiting on error
+            # return to home directory before exiting on error
             cd "$HOME" || { t Error "Failed to return to home directory after pull error."; }
             printf "\033[1A\r\033[K"
             exit 1
@@ -757,7 +801,7 @@ function clone_or_pull_dotfiles() {
         if $stashed_changes; then
             t "Applying stashed changes.."
             # git stash pop will fail if there are conflicts, but the user requested it.
-            # We'll report if it fails.
+            # we'll report if it fails.
             if git stash pop &> /dev/null; then
                 t OK "Stashed changes applied successfully."
             else
@@ -765,23 +809,20 @@ function clone_or_pull_dotfiles() {
             fi
         fi
 
-    else # Repository does not exist, clone it
+    else # repository does not exist, clone it
         t OK "Cloning ${SUB_F}dotfiles${NC} repository '$DOTFILES_REPO' to '$DOTFILES_REPO_DIR'.."
-        mkdir -p "$DOTFILES_REPO_DIR" # Ensure parent directory exists
+        mkdir -p "$DOTFILES_REPO_DIR" # ensure parent directory exists
         if ! git clone "$DOTFILES_REPO" "$DOTFILES_REPO_DIR"; then
             t Error "Failed to clone ${ERR}dotfiles from${NC} '$DOTFILES_REPO'. Please check the URL and your network."
             exit 1
         fi
     fi
-    # Always return to home directory at the end of the function
+    # always return to home directory at the end of the function
     cd "$HOME" || { t Error "Failed to return to home directory."; exit 1; }
     printf "\033[1A\r\033[K"
 }
 
-
-## github related functions
-
-# Checkout via selecting from a menu
+# checkout via selecting from a menu
 function gco() {
     local branch=$1
 
@@ -794,17 +835,17 @@ function gco() {
         # local width=$(($(tput cols) - 5))
         local target_width=$((width + 6))
 
-        # Get raw and colored branch lists
+        # get raw and colored branch lists
         mapfile -t branches < <(git --no-pager branch --format="%(refname:short)")
 
-        # Use --color=always to keep your pink/green hex colors
+        # use --color=always to keep your pink/green hex colors
         # 'git -p' or 'git --no-pager' BEFORE 'branch'
         # truncate the line based on terminal width with 'cut'
         # Note: the subtraction (-3) accounts for the "[1]" prefix space
         # mapfile -t colored_branches < <(git --no-pager branch -vv --color=always | sed 's/^[ *]*//' | cut -c 1-$((width - 2)))
         mapfile -t colored_branches < <(git --no-pager branch -vv --color=always | sed 's/^[ *]*//')
 
-        # Display the menu
+        # display the menu
         # echo -e "${H}Select a branch to checkout (or type 'x' to exit):${NC}"
         for i in "${!colored_branches[@]}"; do
             # printf "${SEL_F}[%s] ${NC}%s\n" "$((i+1))" "${colored_branches[$i]}"
@@ -814,10 +855,10 @@ function gco() {
         echo "${BOLD}${RED}[x] Exit${NC}"
         printf "${BOLD}${WHITE}==========================================${NC}\n"
 
-        # Prompt for selection
+        # prompt for selection
         read -p "Checkout branch #: " choice
 
-        # Handle 'n' for New Branch
+        # handle 'n' for New Branch
         if [[ "$choice" == "n" ]]; then
             read -p "Enter new branch name: " new_branch
             if [[ -n "$new_branch" ]]; then
@@ -830,12 +871,12 @@ function gco() {
             return 0
         fi
 
-        # Handle 'x' for Exit
+        # handle 'x' for Exit
         if [[ "$choice" == "x" || "$choice" == "q" ]]; then
             return 0
         fi
 
-        # Handle numerical selection
+        # handle numerical selection
         if [[ "$choice" =~ ^[0-9]+$ ]] && [[ "$choice" -gt 0 && "$choice" -le "${#branches[@]}" ]]; then
             selected="${branches[$((choice-1))]}"
 
@@ -880,7 +921,7 @@ function gco() {
 #     fi
 # }
 
-# Checkout to a branch, create if it doesn't exist
+# checkout to a branch, create if it doesn't exist
 function gcob() {
     local branch=$1
     if [ -z "$branch" ]; then
@@ -913,7 +954,7 @@ function gpush() {
     git push -u origin "$branch"
 }
 
-# Rename git branch
+# rename git branch
 function grn() {
     local old_branch=$1
     local new_branch=$2
@@ -941,10 +982,10 @@ function grn() {
     fi
 }
 
-
-## azure related functions
-
-# Clear the Azure CLI cache
+# ------------------------------------------
+# azure related functions
+# ------------------------------------------
+# clear the azure cli cache
  function azr() {
     AZ_HTTP_CACHE_BIN="$HOME/.azure/msal_http_cache.bin"
     if [ -f $AZ_HTTP_CACHE_BIN ]; then
@@ -955,7 +996,7 @@ function grn() {
     fi
  }
 
-# Print current Azure DevOps iteration details and tasks assigned to the user
+# print current azure devops iteration details and tasks assigned to the user
 function print_azure_status() {
     if [[ $# -lt 4 ]]; then
         echo "Usage: print_current_iteration <AZURE_ORG> <AZURE_PROJECT> <AZURE_TEAM> <AZURE_DEVOPS_PAT>"
@@ -967,7 +1008,7 @@ function print_azure_status() {
     local AZURE_TEAM="$3"
     local AZURE_DEVOPS_PAT="$4"
 
-    # Get current iteration path
+    # get current iteration path
     local ITERATION_API="https://dev.azure.com/$AZURE_ORG/$AZURE_PROJECT/$AZURE_TEAM/_apis/work/teamsettings/iterations?\$timeframe=current&api-version=7.0"
     local ITERATION_PATH
     ITERATION_PATH=$(curl -s -u ":$AZURE_DEVOPS_PAT" "$ITERATION_API" | jq -r '.value[0].path')
@@ -976,7 +1017,7 @@ function print_azure_status() {
         return 1
     fi
 
-    # Get current iteration info
+    # get current iteration info
     local ITERATION_INFO
     ITERATION_INFO=$(curl -s -u ":$AZURE_DEVOPS_PAT" "$ITERATION_API" | jq '.value[0]')
     local ITERATION_NAME
@@ -986,7 +1027,7 @@ function print_azure_status() {
     local ITERATION_END
     ITERATION_END=$(echo "$ITERATION_INFO" | jq -r '.attributes.finishDate')
 
-    # Remove trailing Z if present (macOS date doesn't like it)
+    # remove trailing Z if present (macos date doesn't like it)
     local ITERATION_END_CLEAN=${ITERATION_END%Z}
 
     if date -j -f "%Y-%m-%dT%H:%M:%S" "$ITERATION_END_CLEAN" +%s >/dev/null 2>&1; then
@@ -995,7 +1036,7 @@ function print_azure_status() {
         END=$(date -d "$ITERATION_END" +%s)
     fi
 
-    # Calculate time remaining
+    # calculate time remaining
     local NOW
     NOW=$(date +%s)
     local SECS_LEFT=$((END - NOW))
@@ -1010,13 +1051,13 @@ function print_azure_status() {
         TIME_REMAINING="Time remaining: Ended"
     fi
 
-    # Print header with time remaining
+    # print header with time remaining
     local ITERATION_END_DATE="${ITERATION_END%%T*}"
 
     echo -e "${BOLD}${CYAN}Current Twork Iteration: $ITERATION_NAME ($ITERATION_START → $ITERATION_END_DATE)${NC}"
     echo "$TIME_REMAINING"
 
-    # Query all tasks/chores assigned to you in current iteration
+    # query all tasks/chores assigned to you in current iteration
     local WIQL="SELECT [System.Id], [System.Title], [System.WorkItemType], [System.Parent], [System.State] FROM WorkItems WHERE [System.IterationPath] = '$ITERATION_PATH' AND [System.AssignedTo] = @Me AND [System.WorkItemType] IN ('Task', 'Chore')"
     local WIQL_JSON
     WIQL_JSON=$(jq -n --arg q "$WIQL" '{query: $q}')
@@ -1032,18 +1073,18 @@ function print_azure_status() {
         return 0
     fi
 
-    # Get details for all tasks/chores
+    # get details for all tasks/chores
     local DETAILS_API="https://dev.azure.com/$AZURE_ORG/$AZURE_PROJECT/_apis/wit/workitems?ids=$TASK_IDS&fields=System.Id,System.Title,System.WorkItemType,System.Parent,System.State&api-version=7.0"
     local TASKS_JSON
     TASKS_JSON=$(curl -s -u ":$AZURE_DEVOPS_PAT" "$DETAILS_API")
 
-    # Collect unique parent IDs
+    # collect unique parent IDs
     local PARENT_IDS
     PARENT_IDS=$(echo "$TASKS_JSON" | jq -r '.value[] | .fields."System.Parent"? ' | sort -u | paste -sd, -)
 
     declare -A PARENTS
 
-    # Build associative array: id -> "type|state|title"
+    # build associative array: id -> "type|state|title"
     if [[ -n "$PARENT_IDS" ]]; then
         local PARENT_API="https://dev.azure.com/$AZURE_ORG/$AZURE_PROJECT/_apis/wit/workitems?ids=$PARENT_IDS&fields=System.Id,System.Title,System.WorkItemType,System.State&api-version=7.0"
         local PARENTS_JSON
@@ -1056,44 +1097,43 @@ function print_azure_status() {
     for pid in $(echo "$PARENT_IDS" | tr ',' ' '); do
         [[ -z "$pid" ]] && continue
         IFS='|' read -r ptype pstate ptitle <<< "${PARENTS[$pid]}"
-        pcolor=$(status_colour "$pstate")
-        short_title=$(truncate_text "$ptitle" 42)
+        pcolor=$(_status_colour "$pstate")
+        short_title=$(_truncate_text "$ptitle" 42)
         printf "${BOLD}  -- %s %s [%b%s%b${BOLD}]: %s${NC}\n" "$pid" "$ptype" "$pcolor" "$pstate" "$NC" "$short_title"
         echo "$TASKS_JSON" | jq -r --arg pid "$pid" '
             .value[] | select(.fields."System.Parent" == ($pid|tonumber)) |
             "\(.fields."System.Id")|\(.fields."System.WorkItemType")|\(.fields."System.State")|\(.fields."System.Title")"' |
         while IFS='|' read -r cid ctype cstate ctitle; do
-            ccolor=$(status_colour "$cstate")
-            cshort_title=$(truncate_text "$ctitle" 42)
+            ccolor=$(_status_colour "$cstate")
+            cshort_title=$(_truncate_text "$ctitle" 42)
             printf -- "   * ${HDR_F}%s${NC} %s [%b%s%b]: %s\n" "$cid" "$ctype" "$ccolor" "$cstate" "$NC" "$cshort_title"
         done
     done
 
-    # Orphan tasks/chores
+    # orphan tasks/chores
     echo "$TASKS_JSON" | jq -r '
         .value[] | select(.fields."System.Parent" == null) |
         "\(.fields."System.Id")|\(.fields."System.WorkItemType")|\(.fields."System.State")|\(.fields."System.Title")"' |
     while IFS='|' read -r cid ctype cstate ctitle; do
-        ccolor=$(status_colour "$cstate")
-        cshort_title=$(truncate_text "$ctitle" 42)
+        ccolor=$(_status_colour "$cstate")
+        cshort_title=$(_truncate_text "$ctitle" 42)
         printf "${HDR_F}%s${NC} %s [%b%s%b]: %s\n" "$cid" "$ctype" "$ccolor" "$cstate" "$NC" "$cshort_title"
     done
 }
 
-
-##asana related functions
-
-# Helper to generate the Asana Authorization header
+# ------------------------------------------
+# asana related functions
+# ------------------------------------------
+# helper to generate the asana authorization header
 function get_asa_header() {
-    local asana_pat=$(get_config "ASANA_PAT")
+    local asana_pat=$(_get_config "ASANA_PAT")
     if [[ -z "$asana_pat" ]]; then
         return 1
     fi
     echo "Authorization: Bearer $asana_pat"
 }
 
-
- # Print current Asana project details and tasks assigned to the user
+# print current asana project details and tasks assigned to the user
 function print_asana_status() {
     # if [[ $# -lt 2 ]]; then
     #     echo "Usage: print_asana_status <TODO>"
@@ -1102,27 +1142,27 @@ function print_asana_status() {
     # local asana_project_gid="$1"
     # local asana_pat="$2"
 
-    local asana_project_gid=$(get_config "ASANA_PROJECT_GID")
-    local asana_pat=$(get_config "ASANA_PAT")
+    local asana_project_gid=$(_get_config "ASANA_PROJECT_GID")
+    local asana_pat=$(_get_config "ASANA_PAT")
     local auth_header=$(get_asa_header)
     if [[ $? -ne 0 || -z "$ASANA_PROJECT_GID" ]]; then
         t ERR "Missing Asana config (PAT or Project GID) in .env file."
         return 1
     fi
 
-    # Get Project/Iteration Details
+    # get project/iteration details
     local project_api="https://app.asana.com/api/1.0/projects/$asana_project_gid"
     local project_json=$(curl -s -H "$auth_header" "$project_api")
     local project_name=$(echo "$project_json" | jq -r '.data.name // "Unknown Project"')
     if [[ "$TERM_PROGRAM" == "vscode" ]]; then
-        # If we are in VS Code, replace complex emojis with stable Nerd Font icons
+        # if we are in vs code, replace complex emojis with stable nerd font icons
         local smh_star=$'\uf005 '
         project_name=$(echo "$project_name" | sed "s/🏃‍♀️/$smh_star/g")
     fi
 
     local due_on=$(echo "$project_json" | jq -r '.data.due_on')
 
-    # Calculate Time Remaining (Handling empty due dates)
+    # calculate time remaining (handling empty due dates)
     local time_remaining="TIME REMAINING: ENDED"
     if [[ "$due_on" != "null" && -n "$due_on" ]]; then
         local end=$(date -d "$due_on" +%s 2>/dev/null || date -j -f "%Y-%m-%d" "$due_on" +%s)
@@ -1134,16 +1174,16 @@ function print_asana_status() {
         fi
     fi
 
-    # Print Header (Uppercase to match your previous style)
+    # print header (uppercase to match your previous style)
     local display_date=$(echo "$due_on" | tr '[:lower:]' '[:upper:]')
     echo -e "${H2}CURRENT ASANA PROJECT: $project_name (DUE: $display_date)${NC}"
     echo -e "${H}${time_remaining}${NC}"
     printf "%s\n" "$br"
 
-    # Get Your (hopefully) GID
+    # get your (hopefully) gid
     local me_gid=$(curl -sS -L --stderr /dev/null -H "$auth_header" "https://app.asana.com/api/1.0/users/me" | jq -r '.data.gid')
 
-    # Filter tasks assigned to you (pls)
+    # filter tasks assigned to you (pls)
     # local MY_TASKS=$(echo "$TASKS_JSON" | jq -c --arg me "$me_gid" '.data[] | select(.assignee.gid == $me)')
     # local MY_TASKS_DATA=$(echo "$TASKS_JSON" | jq -r --arg me "$me_gid" --arg pgid "$asana_project_gid" '
     local tasks_api="https://app.asana.com/api/1.0/tasks?project=$asana_project_gid&opt_fields=name,completed,assignee.gid,custom_fields.name,custom_fields.display_value,custom_fields.number_value,memberships.project.name,memberships.section.name"
@@ -1155,7 +1195,7 @@ function print_asana_status() {
     #     return 1
     # fi
 
-    # JQ Filter
+    # jq filter
     local tasks_data=$(curl -s -H "$auth_header" "$tasks_api" | jq -r --arg me "$me_gid" '
         .data[] | select(.assignee.gid == $me) |
         ( (.custom_fields[]? | select(.name | contains("Story Points")) | .number_value) // 0 ) as $p |
@@ -1172,20 +1212,20 @@ function print_asana_status() {
 
     local TOTAL_POINTS=0
 
-    # Display
+    # display
     while IFS='|' read -r r_sec r_tid r_pts r_type r_name r_gid; do
         TOTAL_POINTS=$((TOTAL_POINTS + r_pts))
 
-        # No emojis smh my head
+        # no emojis smh my head
         local clean_section=$(echo "$r_sec" | sed 's/[^[:alnum:][:space:]]//g' | xargs)
 
-        # Clean and trunc
+        # clean and trunc
         local clean_name=$(echo "$r_name" | sed -E "s/^${r_tid}[[:space:]]*[|:-]*[[:space:]]*//")
         [[ -z "$clean_name" ]] && clean_name="$r_name"
 
-        local display_name=$(truncate_text "$clean_name" 15)
-        local s_color=$(status_colour "$clean_section")
-        local t_color=$(status_colour "$r_type")
+        local display_name=$(_truncate_text "$clean_name" 15)
+        local s_color=$(_status_colour "$clean_section")
+        local t_color=$(_status_colour "$r_type")
 
         # --- OUTPUT ---
         # FML FML FML FML FML FML
@@ -1194,14 +1234,14 @@ function print_asana_status() {
         id="${r_gid#*|}"
         title=$(echo "$title" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
         id=$(echo "$id" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-        trunct_title=$(truncate_text "$title" 32)
-        # Ignore this pls
+        trunct_title=$(_truncate_text "$title" 32)
+        # ignore this pls
 
         printf "${BOLD}$s_color%-12s>${NC} %-10s${NC} $t_color%-5s (%s pts)${NC} %s[ ${BLUE}%s${NC} ] ${DIM_F}%s${NC}\n" \
             "$clean_section" "$r_tid" "$r_type" "$r_pts" "$trunct_title" "$id"
 
     done <<< "$tasks_data"
 
-    # Summary
+    # summary
     echo -e "${H2_F}TOTAL WORKLOAD: ${H_F}${TOTAL_POINTS}${H2_F} POINTS${NC}"
 }

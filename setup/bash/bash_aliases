@@ -1,43 +1,24 @@
 #!/usr/bin/env bash
-# ========================================== #
-# BASH ALIASES & FUNCTIONS
-# ========================================== #
-# aliases cause you're a lazy piece of shit smfh
-
-# ------------------------------------------
-# Functions (Aliasing with Arguments)
-# ------------------------------------------
-
-# Compare and pipe to less while preserving colors
-dless() {
-    if command -v colordiff >/dev/null 2>&1; then
-        colordiff -u "$1" "$2" | less -R
-    else
-        diff -u "$1" "$2" | less
-    fi
-}
-
-# Create a directory and move into it immediately
-mkcd() {
-    mkdir -p "$1" && cd "$1" || return
-}
+# ===================================================================== #
+# BASH ALIASES
+# ===================================================================== #
+# aliases cause you're a lazy pos smfh
 
 # ------------------------------------------
 # Safety & Administrative
 # ------------------------------------------
-
 # Escalation shortcuts
 alias root='sudo -i'
 alias su='sudo -i'
 alias svi='sudo vi'
 
-# Automatic sudo for system commands if not root
+# automatic sudo for system commands if not root
 if (( EUID != 0 )); then
     alias reboot='sudo reboot'
 
-    # Package Manager Detection
+    # package manager detection
     if [[ "$(uname)" == "Darwin" ]]; then
-        # macOS: Use Homebrew for 'update'
+        # macos: use homebrew for 'update'
         if command -v brew &>/dev/null; then
             alias update='brew update && brew upgrade'
         fi
@@ -49,9 +30,9 @@ if (( EUID != 0 )); then
         fi
     fi
 
-    # Firewall / iptables (Guard for macOS)
+    # firewall / iptables (Guard for macos)
     if [[ "$(uname)" == "Darwin" ]]; then
-        # macOS: Use pfctl equivalents
+        # macos: use pfctl equivalents
         alias ipt='sudo pfctl'
         alias iptlist='sudo pfctl -s rules'
         alias firewall='sudo pfctl -s info'
@@ -67,15 +48,15 @@ if (( EUID != 0 )); then
     fi
 fi
 
-# macOS compatibility for timeout
+# macos compatibility for timeout
 [[ "$(uname)" == "Darwin" ]] && alias timeout=gtimeout
 
-# Prevent catastrophic accidents on root
+# prevent catastrophic accidents on root
 alias chown='chown --preserve-root'
 alias chmod='chmod --preserve-root'
 alias chgrp='chgrp --preserve-root'
 
-# Interactive safety (stops accidental overwrites)
+# interactive safety (stops accidental overwrites)
 alias cp='cp -iv'
 alias ln='ln -iv'
 alias mv='mv -iv'
@@ -87,6 +68,11 @@ alias rmd='rm -rfv'
 # ------------------------------------------
 # Navigation & Listing
 # ------------------------------------------
+alias c='clear'
+alias cls='clear && ls'
+alias clss='clear && lsa'
+alias h='history'
+alias x='exit'
 
 # cat
 # alias qat='/usr/bin/cat'
@@ -95,16 +81,16 @@ alias qat="$(command -v cat)"
 alias cat="$(command -v batcat || command -v bat || echo 'cat') --paging=never --force-colorization"
 
 # cd
-alias home='cd ~'
-alias ~='home'
-alias cd~='home'
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-alias .4='cd ../../../..'
-alias .5='cd ../../../../..'
+alias home="cd ~"
+alias ~="home"
+alias cd~="home"
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .4="cd ../../../.."
+alias .5="cd ../../../../.."
 
-# ls variants (Colorized)
+# ls variants (colorized)
 if [[ "$(uname)" == "Darwin" ]]; then
     alias ls='ls -Gph'
 else
@@ -118,23 +104,17 @@ alias lla='ls -Alh'
 alias lsd="ls -d */"
 alias ldir="lsd"
 alias lsa="ls -la"
-alias lsd='ls -d */'              # List only directories
-alias lt='ls -Alht'               # Sort by time (newest first)
-alias labc='ls -lap'              # Sort by alphabetical
-alias lf="ls -l | egrep -v '^d'"  # Show files only
-alias l.='ls -d .* -G'            # Show only hidden files
+alias lsd='ls -d */'              # list only directories
+alias lt='ls -Alht'               # sort by time (newest first)
+alias labc='ls -lap'              # sort by alphabetical
+alias lf="ls -l | egrep -v '^d'"  # show files only
+alias l.='ls -d .* -G'            # show only hidden files
 
 alias mkcd='mkdir -p $1 && cd $1'
 
 # ------------------------------------------
 # System Monitoring & Tools
 # ------------------------------------------
-alias c='clear'
-alias cls='clear && ls'
-alias clss='clear && lsa'
-alias h='history'
-alias x='exit'
-
 # installer
 alias p="sudo pacman"
 alias y="yaourt"
@@ -172,8 +152,17 @@ alias mountedinfo='df -hT'
 alias myip="curl -s icanhazip.com"
 alias ping='ping -c 5'
 alias p4="ping 4.2.2.2 -c 4"
-alias header='curl -I'
 alias ports='[[ "$(uname)" == "Darwin" ]] && netstat -tulanp || ss -tulanp'
+alias header='curl -I'  # get web server headers
+alias headerc='curl -I --compress'  # find out if remote server supports gzip / mod_deflate or not
+alias dnstop='dnstop -l 5  eth1'  # all of our servers eth1 is connected to the internets via vlan / router etc
+alias vnstat='vnstat -i eth1'
+alias iftop='iftop -i eth1'
+alias tcpdump='tcpdump -i eth1'
+alias ethtool='ethtool eth1'
+# work on wlan0 by default #
+# only useful for laptop as all servers are without wireless interface
+alias iwconfig='iwconfig wlan0'
 
 # chmod
 alias mx='chmod a+x'
@@ -182,11 +171,6 @@ alias 644='chmod -R 644'
 alias 666='chmod -R 666'
 alias 755='chmod -R 755'
 alias 777='chmod -R 777'
-
-# grep
-alias grep='grep --color=auto'
-alias egrep='egrep --color=auto'
-alias fgrep='fgrep --color=auto'
 
 # ------------------------------------------
 # Archives (The "I always forget the flags" section)
@@ -208,6 +192,8 @@ alias gb='git b'
 alias gbr='git br'
 # alias gbr='git branch -vv --color=always | fzf --ansi | awk "{print \$1}" | sed "s/* //" | tr -d "\n" | (pbcopy 2>/dev/null || clip.exe 2>/dev/null || xclip -sel clip 2>/dev/null)'
 alias gbd='git branch -D'
+alias gd='git branch -D'
+alias grm='git branch -D'
 alias gc='git cam'
 alias gcl='git cl'
 alias gl="git l"
@@ -223,15 +209,8 @@ alias gfetch='git fetch'
 # ------------------------------------------
 # Other
 # ------------------------------------------
-
 # fnm / Node
 alias update-node='fnm install --lts && LTS_VER=$(fnm list | grep "lts-latest" | awk "{print \$2}") && fnm default "$LTS_VER" && date +%s > "$DOTFILES_CONFIG_DIR/.node_update_timestamp" && echo "Node LTS updated to $LTS_VER"'
-
-# Docker
-alias dk='docker'
-alias dkc='docker ps -a'
-alias dkps='docker ps'
-alias dki='docker images'
 
 alias so0="cmatrix"
 # alias mv='timeout 8 mv -iv'
@@ -239,25 +218,23 @@ alias so0="cmatrix"
 # alias rmd='rm  --recursive --force --verbose '
 # alias mkdir='mkdir -pv'
 
-# get web server headers #
-alias header='curl -I'
-# find out if remote server supports gzip / mod_deflate or not #
-alias headerc='curl -I --compress'
-# All of our servers eth1 is connected to the Internets via vlan / router etc  ##
-alias dnstop='dnstop -l 5  eth1'
-alias vnstat='vnstat -i eth1'
-alias iftop='iftop -i eth1'
-alias tcpdump='tcpdump -i eth1'
-alias ethtool='ethtool eth1'
-# work on wlan0 by default #
-# Only useful for laptop as all servers are without wireless interface
-alias iwconfig='iwconfig wlan0'
-
 if command -v colordiff >/dev/null 2>&1; then
     alias diff='colordiff'
-    # Side-by-side comparison
+    # side-by-side comparison
     alias diffy='colordiff -y -W $(tput cols)'
-else
-    # Fallback for systems without colordiff
+fi
+
+if command -v dircolors >/dev/null 2>&1; then
+    if [[ -r ~/.dircolors ]]; then
+        eval "$(dircolors -b ~/.dircolors)"
+    else
+        eval "$(dircolors -b)"
+    fi
+
+    # standard color aliases
+    # alias ls='ls --color=auto'  # set above
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
     alias diff='diff --color=auto'
 fi

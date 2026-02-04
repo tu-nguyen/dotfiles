@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
+# ===================================================================== #
+# BASH MOTD
+# ===================================================================== #
 
-#------------------------------------------
+# ------------------------------------------
 # Display a message of the day (MOTD) when starting a new terminal session
-#------------------------------------------
-
+# ------------------------------------------
+# motd display header aka short
 short_motd() {
-    # ==========================================
-    # MOTD Display Header aka short
-    # ==========================================
     echo -e "${MOTD_F} ------ $OS_TYPE ------ ${NC}"
 
     local USER=$(whoami | tr '[:upper:]' '[:lower:]')
     local HOSTNAME=$(hostname | tr '[:upper:]' '[:lower:]')
     local LEFT_TEXT="${USER}@${HOSTNAME}"
 
-    # Print date in "Friday, 2025-06-05" format
-    # Print time in "Time: 17:32:08" format
+    # print date in "Friday, 2025-06-05" format
+    # print time in "Time: 17:32:08" format
     local DATE=$(date '+%a %Y/%m/%d' | tr '[:upper:]' '[:lower:]')
     local TIME=$(date '+%H:%M:%S')
     local RIGHT_TEXT=${DATE}
@@ -29,28 +29,25 @@ short_motd() {
     # echo -e "${${MOTD_F}}Time:    ${NC}${TIME}"  # Comment out since we always display time
 }
 
+# motd display rest
 long_motd() {
-    # ==========================================
-    # MOTD Display Rest
-    # ==========================================
-
-    # System Standard
+    # system standard
     local USER=$(whoami | tr '[:upper:]' '[:lower:]')
 
-    # User Info (Mac/Linux compatibility: getent is rare on Mac)
+    # user info (Mac/Linux compatibility: getent is rare on Mac)
     if command -v getent >/dev/null; then
         local FULLNAME=$(getent passwd "$USER" | cut -d: -f5 | cut -d, -f1 | tr '[:upper:]' '[:lower:]')
     else
         local FULLNAME=$(id -P "$USER" | cut -d: -f8 | tr '[:upper:]' '[:lower:]')  # Mac fallback
     fi
 
-    # Shell Info
+    # shell Info
     local SHELL_NAME=$(basename "$SHELL")
     # Note: $SHELL --version works differently for zsh/bash
     local SHELL_VER="${BASH_VERSION%%(*)}"
     local SHELL_DISPLAY="${SHELL_NAME} ${SHELL_VER}"
 
-    # OS & Architecture
+    # os & architecture
     local ARCH=$(uname -m | tr '[:upper:]' '[:lower:]')
     if [ -f /etc/os-release ]; then
         local OS_BASE=$(source /etc/os-release && echo "$PRETTY_NAME" | tr '[:upper:]' '[:lower:]')
@@ -58,7 +55,7 @@ long_motd() {
         local OS_BASE=$(uname -s | tr '[:upper:]' '[:lower:]') # Mac fallback
     fi
 
-    # WSL specific logic
+    # wsl specific logic
     if grep -qi Microsoft /proc/version 2>/dev/null; then
         local WIN_MAJOR=$(cmd.exe /c "ver" 2>/dev/null | grep -oP 'Version \K\d+')
         local OS="${OS_BASE} on windows ${WIN_MAJOR} ${ARCH}"
@@ -66,13 +63,13 @@ long_motd() {
         local OS="$OS_BASE"
     fi
 
-    # Hardware & Performance
+    # hardware & performance
     local HOSTNAME=$(hostname | tr '[:upper:]' '[:lower:]')
     if [[ "$(uname)" == "Darwin" ]]; then
-        # macOS: Extract uptime from the standard string using sed
+        # macos: Extract uptime from the standard string using sed
         local UPTIME=$(uptime | sed -E 's/^.*up +([^,]+),.*$/\1/' | tr '[:upper:]' '[:lower:]')
     else
-        # Linux: Use the pretty flag
+        # linux: use the pretty flag
         local UPTIME=$(uptime -p | sed 's/up //' | tr '[:upper:]' '[:lower:]')
     fi
     local LOAD=$(uptime | awk -F'load average:' '{ print $2 }' | sed 's/,//g' | xargs)
@@ -80,14 +77,14 @@ long_motd() {
     local KERNEL=$(uname -r | tr '[:upper:]' '[:lower:]')
     local DISK_ROOT=$(df -h / | tail -1 | awk '{print $5}')
 
-    # Memory (Mac uses 'vm_stat', Linux uses 'free')
+    # memory (macos uses 'vm_stat', linux uses 'free')
     if command -v free >/dev/null; then
         local MEM_INFO=$(free -m | awk '/Mem:/ { print $3 "mib / " $2 "mib" }')
     else
         local MEM_INFO="N/A (mac)"
     fi
 
-    # CPU Logic
+    # cpu logic
     local CPU_CORES=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
     if [ -f /proc/cpuinfo ]; then
         local CPU_MODEL=$(grep 'model name' /proc/cpuinfo | head -1 | cut -d ':' -f 2 | xargs | tr '[:upper:]' '[:lower:]')
@@ -99,26 +96,26 @@ long_motd() {
             local CPU="${CPU_MODEL} (${CPU_CORES})"
         fi
     else
-        local CPU=$(sysctl -n machdep.cpu.brand_string | tr '[:upper:]' '[:lower:]') # Mac fallback
+        local CPU=$(sysctl -n machdep.cpu.brand_string | tr '[:upper:]' '[:lower:]') # macos fallback
     fi
 
-    # Misc
+    # misc
     local LAST_LOGIN=$(last -n 1 $USER | head -n 1 | awk '{ print $5, $6, $7 }')
     local RECENT_LOGINS=$(last -n 5 | awk '{print $1, $3, $5, $6, $7}')
     local LAST_COMMANDS=$(history | tail -n 5 | awk '{print $2, $3, $4, $5, $6, $7}')
     local LAST_SHUTDOWN
 
     if [[ "$(uname)" == "Darwin" ]]; then
-        # macOS: 'last shutdown' works without -x.
-        # We grab the first line and pick the relevant date columns.
+        # macos: 'last shutdown' works without -x.
+        # we grab the first line and pick the relevant date columns.
         LAST_SHUTDOWN=$(last shutdown | head -n 1 | awk '{print $3, $4, $5, $6}')
 
-        # If 'last shutdown' is empty (common on some Macs), check 'reboot'
+        # If 'last shutdown' is empty (common on some macos), check 'reboot'
         if [[ -z "$LAST_SHUTDOWN" ]]; then
             LAST_SHUTDOWN=$(last reboot | head -n 1 | awk '{print $3, $4, $5, $6}')
         fi
     else
-        # Linux: Uses -x to show shutdown events
+        # linux: uses -x to show shutdown events
         LAST_SHUTDOWN=$(last -x shutdown | head -n 1 | awk '{print $5, $6, $7, $8}')
     fi
 
@@ -135,7 +132,7 @@ long_motd() {
 motd() {
     if [ -z "$DOTFILES_CONFIG_DIR" ]; then
         DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
-        printf "${WARN}[WARNING]${NC} DOTFILES_CONFIG_DIR is not set, defaulting to $DOTFILES_CONFIG_DIR"
+        printf "${WARN}[ WARN ]${NC} DOTFILES_CONFIG_DIR is not set, defaulting to $DOTFILES_CONFIG_DIR"
     fi
 
     if [ "$1" == "auto" ]; then
@@ -155,7 +152,7 @@ motd() {
                 return 0
             fi
         fi
-        # Update timestamp only on auto-runs that actually display
+        # update timestamp only on auto-runs that actually display
         echo "$CURRENT_TIME" > "$COOLDOWN_FILE"
     fi
     short_motd

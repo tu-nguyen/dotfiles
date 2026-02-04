@@ -1,38 +1,35 @@
 #!/usr/bin/env bash
-# ========================================== #
+# ===================================================================== #
 #
-# #
-
 # TODO add comments later
-# ========================================== #
+# ===================================================================== #
 
 # ------------------------------------------
 # Pre-flight checks & Shell options
 # ------------------------------------------
-
-# Guard: If not running interactively, don't do anything to avoid breaking non-interactive scripts
+# guard: if not running interactively, don't do anything to avoid breaking non-interactive scripts
 [[ $- != *i* ]] && return
 
-# Input/Output behavior
-set -o vi                           # Use vi-style line editing
-set -o ignoreeof                    # Prevent Ctrl-D from accidentally exiting the shell
+# input/output behavior
+set -o vi                           # use vi-style line editing
+set -o ignoreeof                    # prevent Ctrl-D from accidentally exiting the shell
 
-# Shell Options (shopt)
-shopt -s autocd                     # If a directory name is typed alone, cd into it
-shopt -s dotglob                    # Include filenames beginning with a '.' in glob patterns
-shopt -s nullglob                   # If a pattern matches nothing, expand to nothing instead of the pattern itself
-shopt -s checkwinsize               # Update LINES and COLUMNS after each command if terminal size changed
-shopt -s cdspell                    # Correct minor typos in directory names during 'cd'
-shopt -s cdable_vars                # If an argument to 'cd' isn't a dir, assume it's a variable name
-shopt -s checkhash                  # Always check if a hashed command exists before executing
-shopt -s sourcepath                 # Force 'source' to use the PATH to find files
-shopt -s no_empty_cmd_completion    # Don't look for commands on PATH when trying to complete an empty line
-shopt -s cmdhist                    # Save multi-line commands as a single history entry
-shopt -s histappend                 # Append to history file instead of overwriting
-shopt -s histreedit                 # Allow user to re-edit a failed history substitution
-shopt -s histverify                 # Load history substitution into the editing buffer instead of executing immediately
+# shell Options (shopt)
+shopt -s autocd                     # if a directory name is typed alone, cd into it
+shopt -s dotglob                    # include filenames beginning with a '.' in glob patterns
+shopt -s nullglob                   # if a pattern matches nothing, expand to nothing instead of the pattern itself
+shopt -s checkwinsize               # update LINES and COLUMNS after each command if terminal size changed
+shopt -s cdspell                    # correct minor typos in directory names during 'cd'
+shopt -s cdable_vars                # if an argument to 'cd' isn't a dir, assume it's a variable name
+shopt -s checkhash                  # always check if a hashed command exists before executing
+shopt -s sourcepath                 # force 'source' to use the PATH to find files
+shopt -s no_empty_cmd_completion    # don't look for commands on PATH when trying to complete an empty line
+shopt -s cmdhist                    # save multi-line commands as a single history entry
+shopt -s histappend                 # append to history file instead of overwriting
+shopt -s histreedit                 # allow user to re-edit a failed history substitution
+shopt -s histverify                 # load history substitution into the editing buffer instead of executing immediately
 
-# Enable Programmable Completion
+# enable programmable completion
 if ! shopt -oq posix; then
     if [ -f /usr/share/bash-completion/bash_completion ]; then
         . /usr/share/bash-completion/bash_completion
@@ -42,37 +39,78 @@ if ! shopt -oq posix; then
 fi
 
 # ------------------------------------------
-# Load custom bash files
+# load custom bash files
 # ------------------------------------------
-# Dynamically loads all .bash_* files from your custom dotfiles directory (~/.config/dotfiles).
-export DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
+# dynamically loads all .bash_* files from your custom dotfiles directory (~/.config/dotfiles).
+: ${DOTFILES_CONFIG_DIR:="$HOME/.config/dotfiles"}
+: ${DOTFILES_CONFIG_FILE:="$DOTFILES_CONFIG_DIR/.dotfile_config"}
+if [[ -f "$DOTFILES_CONFIG_FILE" ]]; then
+    echo "[ INFO ] Configuration loaded from $DOTFILES_CONFIG_FILE"
+    . "$DOTFILES_CONFIG_FILE"
+fi
 
 if [[ -d "$DOTFILES_CONFIG_DIR" ]]; then
-
+    # load core/style first (explicitly)
+    [[ -f "$DOTFILES_CONFIG_DIR/.bash_style" ]] && . "$DOTFILES_CONFIG_DIR/.bash_style"
     [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 
+    shopt -s nullglob
     for file in "$DOTFILES_CONFIG_DIR"/.bash_*; do
-        [[ "$file" == *"/.bash_style" ]] && continue
-        [[ "$file" == *"/.init" ]] && continue
-        [[ -f "$file" && -r "$file" ]] && . "$file"
+        # skip files we already loaded or specifically want to ignore
+        case "$(basename "$file")" in
+            .bash_style|.init) continue ;;
+        esac
+
+        if [[ -f "$file" && -r "$file" ]]; then
+            # start timer
+            start_time=$EPOCHREALTIME
+
+            . "$file"
+
+            # end timer (calculate difference in milliseconds)
+            # use bc for float math if needed, but simple string manipulation works too
+            end_time=$EPOCHREALTIME
+
+            # calculate duration in ms (1 second = 1000ms)
+            # using simple math via $(( )) for integer comparison
+            duration=$(echo "$end_time - $start_time" | awk '{print $1 * 1000}')
+
+            # if it takes longer than 50ms, scream pls
+            # (50ms is barely noticeable, 100ms is when I'll punch my monitor)
+            if (( $(echo "$duration > 50" | bc -l) )); then
+                printf "${YELLOW}%-20s${NC} took ${RED}%0.2fms${NC}\n" "$(basename "$file")" "$duration"
+            fi
+        fi
     done
+    shopt -u nullglob
 
 else
-    # Use your custom 't' function if available, otherwise fallback to standard echo
-    if declare -f t > /dev/null; then
-        t ERR "Config directory not found: $DOTFILES_CONFIG_DIR"
-    else
-        echo -e "\033[0;31m[ERR]\033[0m Config directory not found: $DOTFILES_CONFIG_DIR"
-    fi
+    msg="Config directory not found: $DOTFILES_CONFIG_DIR"
+    declare -f t >/dev/null && t ERR "$msg" || echo -e "\033[0;31m[ ERR  ]\033[0m $msg"
+fi
+
+# ------------------------------------------
+# Lesspipe & Pager Enhancements
+# ------------------------------------------
+# allows 'less' to open and view contents of archives, pdfs, etc.
+if [[ -x /usr/bin/lesspipe ]]; then
+    eval "$(SHELL=/bin/sh lesspipe)"
+fi
+
+# ------------------------------------------
+# Debian/Chroot Detection
+# ------------------------------------------
+# set variable identifying the chroot you work in (used in the prompt below)
+if [[ -z "${debian_chroot:-}" ]] && [[ -r /etc/debian_chroot ]]; then
+    debian_chroot=$(qat /etc/debian_chroot)
 fi
 
 # ------------------------------------------
 # Tools & Prompt
 # ------------------------------------------
-
 # bat theme and man
 # TODO: create my own?
-# Further themes can be installed to '/home/valcr/.config/bat/themes', and are added to the cache with `bat cache --build`. For more information, see:
+# further themes can be installed to '/home/valcr/.config/bat/themes', and are added to the cache with `bat cache --build`. For more information, see:
 # https://github.com/sharkdp/bat#adding-new-themes
 if [[ -z "$BAT_THEME" ]]; then
     export BAT_THEME='Visual Studio Dark+'
@@ -85,12 +123,12 @@ if command -v direnv &> /dev/null; then
     eval "$(direnv hook bash)"
 fi
 
-# Starship Prompt: Cross-shell customizable prompt
+# starship Prompt: Cross-shell customizable prompt
 if command -v starship &> /dev/null; then
     eval "$(starship init bash)"
 fi
 
-# Transient prompt for Starship
+# transient prompt for Starship
 _starship_transient_prompt() {
     if [[ $? -eq 0 ]]; then
         printf "${OK_F}❯ ${NC}"
@@ -99,7 +137,7 @@ _starship_transient_prompt() {
     fi
 }
 
-# FNM (Fast Node Manager) with 24-hour Auto-Update check
+# fnm (Fast Node Manager) with 24-hour Auto-Update check
 FNM_PATH="$HOME/.local/share/fnm"
 if [[ -d "$FNM_PATH" ]]; then
     export PATH="$FNM_PATH:$PATH"
@@ -111,7 +149,7 @@ if [[ -d "$FNM_PATH" ]]; then
     UPDATE_INTERVAL=86400
 
     if [[ ! -f "$TIMESTAMP_FILE" ]] || (( CURRENT_TIME - $(qat "$TIMESTAMP_FILE") > UPDATE_INTERVAL )); then
-        # Determine latest LTS and set as default
+        # determine latest LTS and set as default
         LTS_VER=$(fnm list | grep 'lts-latest' | awk '{print $2}')
         if [[ -n "$LTS_VER" ]]; then
             fnm default "$LTS_VER" >/dev/null
@@ -120,26 +158,24 @@ if [[ -d "$FNM_PATH" ]]; then
     fi
 fi
 
-# Window Title: Sets terminal tab title to "♥ CurrentDir"
+# -----------------------------------------
+# Window
+# ------------------------------------------
+# window title: sets terminal tab title to "♥ CurrentDir"
 set_win_title() {
     echo -ne "\033]2;♥ ${PWD##*/}\007"
 }
 
-# Update window title and maintain existing PROMPT_COMMAND logic
+# update window title and maintain existing PROMPT_COMMAND logic
 export PROMPT_COMMAND="set_win_title; $PROMPT_COMMAND"
 
 # -----------------------------------------
 # Greeting, motd, and colors
 # ------------------------------------------
-
-# Display the Message of the Day if the 'motd' command is available
+# display the Message of the Day if the 'motd' command is available
 if [[ -f "$DOTFILES_CONFIG_DIR/.bash_motd" ]]; then
-    # Assuming 'motd' is a function or alias defined in your .bash_ files
+    # assuming 'motd' is a function or alias defined in your .bash_ files
     motd auto
 else
     [[ $(type -t t) == "function" ]] && t WARNING "MOTD file not found at $DOTFILES_CONFIG_DIR/.bash_motd\n"
 fi
-
-unset DOTFILES_LOADED
-unset BASH_STYLE_LOADED
-alias now='unset DOTFILES_LOADED BASH_STYLE_LOADED && source ~/.bashrc'

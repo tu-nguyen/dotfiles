@@ -190,6 +190,48 @@ _check_update_age() {
 }
 _check_update_age
 
+dot-clean() {
+    t "INFO" "Starting deep clean of temporary files and caches.."
+
+    # clean homebrew cache
+    if command -v brew &>/dev/null; then
+        t "INFO" "Removing old Homebrew downloads.."
+        brew cleanup -s
+        rm -rf "$(brew --cache)"
+    fi
+
+    # clean uv/python caches
+    if command -v uv &>/dev/null; then
+        t "INFO" "Clearing uv cache..."
+        uv cache clean
+    fi
+    t "INFO" "Removing recursive __pycache__ folders.."
+    find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null
+
+    # clean Node/npm/Yarn
+    t "INFO" "Clearing npm/yarn caches..."
+    [[ -d "$HOME/.npm" ]] && rm -rf "$HOME/.npm"/*
+    [[ -d "$HOME/.yarn/berry/cache" ]] && rm -rf "$HOME/.yarn/berry/cache"/*
+
+    # deep project cleaning (interactive)
+    # This looks for node_modules in the current directory and subdirectories
+    local node_dirs=$(find . -name "node_modules" -type d -prune | wc -l | xargs)
+    if [[ "$node_dirs" -gt 0 ]]; then
+        t "WARN" "Found $node_dirs 'node_modules' directories in the current path."
+        read -p "Do you want to delete ALL node_modules in $(pwd)? (y/N) " confirm
+        if [[ "$confirm" == [yY] ]]; then
+            find . -name "node_modules" -type d -prune -exec rm -rf {} +
+            t OK "All node_modules deleted."
+        fi
+    fi
+
+    # clear system logs/caches (safe subset)
+    t "INFO" "Clearing user logs..."
+    rm -rf "$HOME/Library/Logs"/*
+
+    t OK "Deep clean complete! Your SSD thanks you."
+}
+
 # -----------------------------------------
 # Window
 # ------------------------------------------

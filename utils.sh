@@ -236,6 +236,9 @@ _install_uv() {
     # ensure python vmersion upgrades to latest supported patch release
     uv python upgrade
 
+    # update all tools installed via 'uv tool install' (uv-secure, ruff, etc.)
+    uv tool upgrade --all
+
     # list of tools to install via 'uv tool' (for python-based)
     # or system packages/binary downloads
     local python_tools=("uv-secure" "ruff" "trufflehog")

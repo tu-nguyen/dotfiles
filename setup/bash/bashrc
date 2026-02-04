@@ -158,6 +158,24 @@ if [[ -d "$FNM_PATH" ]]; then
     fi
 fi
 
+# upkeep stuff
+_check_update_age() {
+    local stamp_file="$DOTFILES_CONFIG_DIR/.last_update"
+    local now=$(date +%s)
+
+    # create file if it doesn't exist
+    [[ ! -f "$stamp_file" ]] && echo "$now" > "$stamp_file"
+
+    local last_update=$(cat "$stamp_file")
+    local diff=$(( (now - last_update) / 86400 )) # convert seconds to days
+
+    if (( diff >= 14 )); then
+        t "INFO" "It has been $diff days since your last 'dot-update'."
+        t "INFO" "Run 'dot-update' to keep your tools fresh."
+    fi
+}
+_check_update_age
+
 # -----------------------------------------
 # Window
 # ------------------------------------------

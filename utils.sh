@@ -224,18 +224,17 @@ _install_uv() {
         t OK "${HDR_F}$(uv --version)${NC} is already installed at $(command -v uv)"
     fi
 
+    # update uv
     uv self update
-    uv python install 3.13
-    # link python3.13 as the system default
-    local uv_python_bin
-    uv_python_bin=$(uv python find 3.13)
 
-    local target_dir="$HOME/.local/bin"
-    mkdir -p "$target_dir"
+    # ensure ~/.local/bin is in your PATH
+    uv tool update-shell
 
-    ln -sf "$uv_python_bin" "$target_dir/python"
-    ln -sf "$uv_python_bin" "$target_dir/python3"
-    t "python3.13 linked to your PATH.."
+    # ensure python and python3 points to uv's python
+    uv python install 3.13 --default
+
+    # ensure python vmersion upgrades to latest supported patch release
+    uv python upgrade
 
     # list of tools to install via 'uv tool' (for python-based)
     # or system packages/binary downloads

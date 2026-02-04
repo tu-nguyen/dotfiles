@@ -225,6 +225,9 @@ _install_uv() {
     fi
 
     uv python install 3.13
+    # link python3.13 as the system default
+    uv python link --force 3.13
+    t "python3.13 linked to your PATH.."
 
     # list of tools to install via 'uv tool' (for python-based)
     # or system packages/binary downloads

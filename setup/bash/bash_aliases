@@ -170,9 +170,10 @@ alias 666='chmod -R 666'
 alias 755='chmod -R 755'
 alias 777='chmod -R 777'
 
-# python and uv
-alias python3='uv run python3'
-alias python='uv run python'
+# # python and uv
+# commented out, using 'uv python link 3.13' instead
+# alias python3='uv run --python 3.13 python3'
+# alias python='uv run --python 3.13 python'
 
 # ------------------------------------------
 # Archives (The "I always forget the flags" section)

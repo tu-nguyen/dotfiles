@@ -230,6 +230,11 @@ flip() {
 # rngesus
 rng() {
     # TODO: add history for last x results?
+    # handle "x-y" format by replacing '-' with ' ' to create two args
+    if [[ $# -eq 1 && $1 =~ ^[0-9]+-[0-9]+$ ]]; then
+        set -- ${1/-/ }
+    fi
+
     # no arguments - return 1-20
     if [ $# -eq 0 ]; then
         echo -e "${PINK}$(( (RANDOM % 20) + 1 ))${NC}"

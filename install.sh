@@ -242,4 +242,4 @@ else
 fi
 
 t OK "${SUCCESS}All done!${NC}"
-exec bash
+exec bash --init-file <(echo "source ~/.bashrc; cd $(pwd)")

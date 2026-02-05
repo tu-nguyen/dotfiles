@@ -924,7 +924,7 @@ function _gco() {
         return 1
     fi
 
-    if git checkout "$branch" 2>/dev/null; then
+    if git checkout "$branch"; then
         t SUCCESS "Switched to existing branch ${H2}$branch${NC}"
         return 0
     else
@@ -935,7 +935,7 @@ function _gco() {
             return 1
         fi
 
-        if git checkout -B "$branch" 2>/dev/null; then
+        if git checkout -B "$branch"; then
             t SUCCESS "Created and switched to ${H2}$branch${NC}"
             return 0
         else

@@ -239,7 +239,8 @@ else
     clear
     t WARN "${WARN}Forcing bashrc reset..${NC}"
     reset_bashrc
+    clear
 fi
 
 t OK "${SUCCESS}All done!${NC}"
-exec bash --init-file <(echo "source ~/.bashrc; cd $(pwd)")
+exec bash -c "cd '$PWD'; exec bash"

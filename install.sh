@@ -243,4 +243,4 @@ else
 fi
 
 t OK "${SUCCESS}All done!${NC}"
-exec bash -c "cd '$PWD'; exec bash"
+exec bash --rcfile <(echo "source ~/.bashrc; cd '$PWD'")

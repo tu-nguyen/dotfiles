@@ -243,4 +243,5 @@ else
 fi
 
 t OK "${SUCCESS}All done!${NC}"
-exec bash --rcfile <(echo "source ~/.bashrc; cd '$PWD'")
+curr_dir=$(pwd)
+exec bash --rcfile <(echo "source ~/.bashrc; cd '$curr_dir'")

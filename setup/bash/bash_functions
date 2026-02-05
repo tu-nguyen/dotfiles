@@ -884,7 +884,7 @@ function _gco() {
         read -p "The branch ${H}$branch${NC} does not exist. Do you want to ${H2}create${NC} it? [y/N] " -r -n 1
         echo ""
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            t "Skipping.."
+            t "Exiting.."
             return 1
         fi
 
@@ -955,12 +955,11 @@ function gco() {
                     read -p "Enter new branch name: " new_branch
                     if [[ -n "$new_branch" ]]; then
                         git checkout -b "$new_branch"
-                        t OK "'$new_branch' created.."
+                        t OK "'$new_branch' created. Switching.."
+                        return 0
                     else
-                        echo -e "${ERR}Branch name cannot be empty.${NC}"
+                        t ERR "${ERR}Branch name cannot be empty.${NC}"
                     fi
-                    t OK "Switching to '$new_branch'.."
-                    return 0
                 fi
 
                 # handle 'x' for Exit
@@ -971,24 +970,15 @@ function gco() {
                 # handle numerical selection
                 if [[ "$choice" =~ ^[0-9]+$ ]] && [[ "$choice" -gt 0 && "$choice" -le "${#branches[@]}" ]]; then
                     selected="${branches[$((choice-1))]}"
-
-                    # if command -v pbcopy >/dev/null; then
-                    #     echo -n "$selected" | pbcopy
-                    # elif command -v clip.exe >/dev/null; then
-                    #     echo -n "$selected" | clip.exe
-                    # elif command -v xclip >/dev/null; then
-                    #     echo -n "$selected" | xclip -sel clip
-                    # fi
-
-                    # echo -e "${OK}✓ Copied '$selected' to clipboard!${NC}"
                     t OK "Switching to '$selected'.."
                     git checkout "$selected"
                     break
                 else
-                    # if invalid, try _gco route first
-                    # t ERR "Invalid selection."
                     if _gco "$choice"; then
                         return 0
+                    else
+                        # exit or we clear?
+                        break
                     fi
                 fi
             done

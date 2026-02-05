@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# ===================================================================== #
+# Gitconfig
+# ===================================================================== #
+DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
+[[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 
 # identity
 # checks if user is set; if not, it uses defaults

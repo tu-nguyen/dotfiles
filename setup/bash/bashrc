@@ -14,7 +14,7 @@
 set -o vi                           # use vi-style line editing
 set -o ignoreeof                    # prevent Ctrl-D from accidentally exiting the shell
 
-# shell Options (shopt)
+# shell options (shopt)
 shopt -s autocd                     # if a directory name is typed alone, cd into it
 shopt -s dotglob                    # include filenames beginning with a '.' in glob patterns
 shopt -s nullglob                   # if a pattern matches nothing, expand to nothing instead of the pattern itself
@@ -28,6 +28,7 @@ shopt -s cmdhist                    # save multi-line commands as a single histo
 shopt -s histappend                 # append to history file instead of overwriting
 shopt -s histreedit                 # allow user to re-edit a failed history substitution
 shopt -s histverify                 # load history substitution into the editing buffer instead of executing immediately
+shopt -s nocaseglob                 # case-insensitive globbing (used in pathname expansion)
 
 # enable programmable completion
 if ! shopt -oq posix; then
@@ -54,7 +55,6 @@ if [[ -d "$DOTFILES_CONFIG_DIR" ]]; then
     [[ -f "$DOTFILES_CONFIG_DIR/.bash_style" ]] && . "$DOTFILES_CONFIG_DIR/.bash_style"
     [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 
-    shopt -s nullglob
     for file in "$DOTFILES_CONFIG_DIR"/.bash_*; do
         # skip files we already loaded or specifically want to ignore
         case "$(basename "$file")" in
@@ -82,7 +82,6 @@ if [[ -d "$DOTFILES_CONFIG_DIR" ]]; then
             fi
         fi
     done
-    shopt -u nullglob
 
 else
     msg="Config directory not found: $DOTFILES_CONFIG_DIR"
@@ -108,22 +107,7 @@ fi
 # ------------------------------------------
 # Tools & Prompt
 # ------------------------------------------
-# bat theme and man
-# TODO: create my own?
-# further themes can be installed to '/home/valcr/.config/bat/themes', and are added to the cache with `bat cache --build`. For more information, see:
-# https://github.com/sharkdp/bat#adding-new-themes
-if [[ -z "$BAT_THEME" ]]; then
-    export BAT_THEME='Visual Studio Dark+'
-fi
-export MANPAGER="bat -plman"
-# export BAT_PAGER="less -RFK"
-
-# direnv hook
-if command -v direnv &> /dev/null; then
-    eval "$(direnv hook bash)"
-fi
-
-# starship Prompt: Cross-shell customizable prompt
+# starship prompt: cross-shell customizable prompt
 if command -v starship &> /dev/null; then
     eval "$(starship init bash)"
 fi
@@ -136,6 +120,22 @@ _starship_transient_prompt() {
         printf "${ERR_F}❯ ${NC}"
     fi
 }
+
+# direnv hook
+if command -v direnv &> /dev/null; then
+    eval "$(direnv hook bash)"
+fi
+
+# bat theme and man
+# TODO: create my own?
+# further themes can be installed to '/home/valcr/.config/bat/themes', and are added to the cache with `bat cache --build`. For more information, see:
+# https://github.com/sharkdp/bat#adding-new-themes
+if [[ -z "$BAT_THEME" ]]; then
+    export BAT_THEME='Visual Studio Dark+'
+fi
+export MANPAGER="bat -plman"
+# export BAT_PAGER="less -RFK"
+export BAT_PAGER=cat
 
 # fnm (Fast Node Manager) with 24-hour Auto-Update check
 FNM_PATH="$HOME/.local/share/fnm"
@@ -157,6 +157,8 @@ if [[ -d "$FNM_PATH" ]]; then
         fi
     fi
 fi
+
+# TODO: nvim
 
 # upkeep stuff
 _check_update_age() {

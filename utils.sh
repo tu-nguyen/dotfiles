@@ -237,7 +237,7 @@ _install_uv() {
 
     # list of tools to install via 'uv tool' (for python-based)
     # or system packages/binary downloads
-    local python_tools=("uv-secure" "ruff" "trufflehog")
+    local python_tools=("uv-secure" "ruff" "trufflehog" "thefuck")
 
     for tool in "${python_tools[@]}"; do
         if ! command -v "$tool" &> /dev/null; then
@@ -467,7 +467,7 @@ reset_wsl_config() {
     fi
 
     if [[ "$OS_TYPE" != "wsl" ]]; then
-        t WARN "This function is only for ${RED}WSL${NC}. Skipping WSL configuration reset."
+        t WARN "This function is only for ${RED}wsl${NC}. Skipping wsl configuration reset."
         return 0
     fi
 
@@ -483,7 +483,7 @@ reset_registry() {
     fi
 
     if [[ "$OS_TYPE" != "wsl" ]]; then
-        t WARN "This function is only for ${RED}WSL${NC}. Skipping registry reset."
+        t WARN "This function is only for ${RED}wsl${NC}. Skipping registry reset."
         return 0
     fi
 
@@ -492,17 +492,6 @@ reset_registry() {
     powershell.exe -Command "Start-Process powershell.exe -Verb RunAs -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"$(wslpath -w $DOTFILES_REPO_DIR/setup/registry/registry_script.ps1)\"'"  || t WARNING "Some error occured during reset_registry()"
 
     t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_registry()${SUCCESS} completed!!${NC}"
-}
-
-reset_firefox() {
-    if ! _prompt "reset the firefox configs"; then
-        return 0
-    fi
-
-    chmod +x $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh
-    $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh || t WARNING "Some error occured during reset_firefox()"
-
-    t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_firefox()${SUCCESS} completed!!${NC}"
 }
 
 reset_ps() {
@@ -519,4 +508,31 @@ reset_ps() {
     $DOTFILES_REPO_DIR/setup/powershell/ps1_setup.sh  || t WARNING "Some error occured during reset_ps()"
 
     t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_ps()${SUCCESS} completed!!${NC}"
+}
+
+reset_firefox() {
+    if ! _prompt "reset the firefox configs"; then
+        return 0
+    fi
+
+    chmod +x $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh
+    $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh || t WARNING "Some error occured during reset_firefox()"
+
+    t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_firefox()${SUCCESS} completed!!${NC}"
+}
+
+reset_macos_config() {
+    if ! _prompt "reset the macos configs"; then
+        return 0
+    fi
+
+    if [[ "$OS_TYPE" != "macos" ]]; then
+        t WARN "This function is only for ${RED}macos${NC}. Skipping macos configuration reset."
+        return 0
+    fi
+
+    chmod +x $DOTFILES_REPO_DIR/setup/macos/macos_config_setup.sh
+    $DOTFILES_REPO_DIR/setup/macos/macos_config_setup.sh  || t WARNING "Some error occured during reset_macos_config()"
+
+    t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_macos_config()${SUCCESS} completed!!${NC}"
 }

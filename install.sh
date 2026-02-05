@@ -204,11 +204,12 @@ if [[ $# -eq 0 ]]; then
             2) reset_bashrc ;;
             3) reset_vimrc ;;
             4) reset_git_config ;;
-            5) reset_vscode_config ;;
-            6) reset_firefox ;;
-            7) reset_wsl_config ;;
+            5) reset_wsl_config ;;
+            6) reset_vscode_config ;;
+            7) reset_firefox ;;
             8) reset_registry ;;
             9) reset_ps ;;
+            # 10) reset_macos_config ;;
             "" | 0)
                 echo "Running ${RED}all${NC} dotfiles resets.."
                 reset_pre
@@ -216,10 +217,11 @@ if [[ $# -eq 0 ]]; then
                 reset_vimrc
                 reset_git_config
                 reset_vscode_config
-                reset_firefox
                 reset_wsl_config
                 reset_registry
                 reset_ps
+                reset_firefox
+                # reset_macos_config
                 break
                 ;;
             x | X | q | Q)

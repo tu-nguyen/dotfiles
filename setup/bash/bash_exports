@@ -9,14 +9,14 @@
 # append path
 path_append() {
     if [[ -d "$1" ]] && [[ ":$PATH:" != *":$1:"* ]]; then
-        export PATH="$PATH:$1"
+        PATH="$PATH:$1"
     fi
 }
 
 # prepend path
 path_prepend() {
     if [[ -d "$1" ]] && [[ ":$PATH:" != *":$1:"* ]]; then
-        export PATH="$1:$PATH"
+        PATH="$1:$PATH"
     fi
 }
 
@@ -55,6 +55,11 @@ if [[ "$(uname)" == "Darwin" ]]; then
     export HOMEBREW_NO_ENV_HINTS=1
 fi
 
+# remove duplicates
+PATH=$(echo -n $PATH | awk -v RS=: '{ if (!arr[$0]++) {printf("%s%s",!ln++?"":":",$0)}}')
+
+export PATH
+
 # ------------------------------------------
 # History Configuration
 # ------------------------------------------
@@ -64,16 +69,12 @@ export HISTFILESIZE=20000                  # commands to keep in the history fil
 # sync history across all open terminals after every command
 export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 
-# store multi-line commands as one entry
-shopt -s cmdhist
-
-# append to history file immediately rather than overwriting on exit
-shopt -s histappend
-
 # ------------------------------------------
 # System & Localization
 # ------------------------------------------
+export CLICOLOR=1
 export COLORTERM=truecolor
+
 export LANG='en_US.UTF-8'
 export LC_ALL='en_US.UTF-8'
 

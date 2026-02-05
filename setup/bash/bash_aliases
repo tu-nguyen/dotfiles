@@ -3,7 +3,7 @@
 # BASH ALIASES
 # ===================================================================== #
 # aliases cause you're a lazy pos smfh
-
+uname="$(uname)"
 # ------------------------------------------
 # Safety & Administrative
 # ------------------------------------------
@@ -17,7 +17,7 @@ if (( EUID != 0 )); then
     alias reboot='sudo reboot'
 
     # package manager detection
-    if [[ "$(uname)" == "Darwin" ]]; then
+    if [[ "$uname" == "Darwin" ]]; then
         # macos: use homebrew for 'update'
         if command -v brew &>/dev/null; then
             alias update='brew update && brew upgrade'
@@ -31,7 +31,7 @@ if (( EUID != 0 )); then
     fi
 
     # firewall / iptables (Guard for macos)
-    if [[ "$(uname)" == "Darwin" ]]; then
+    if [[ "$uname" == "Darwin" ]]; then
         # macos: use pfctl equivalents
         alias ipt='sudo pfctl'
         alias iptlist='sudo pfctl -s rules'
@@ -49,7 +49,7 @@ if (( EUID != 0 )); then
 fi
 
 # macos compatibility for timeout
-[[ "$(uname)" == "Darwin" ]] && alias timeout=gtimeout
+[[ "$uname" == "Darwin" ]] && alias timeout=gtimeout
 
 # prevent catastrophic accidents on root
 alias chown='chown --preserve-root'
@@ -90,8 +90,15 @@ alias ....="cd ../../.."
 alias .4="cd ../../../.."
 alias .5="cd ../../../../.."
 
+# open folder
+if [[ "$uname" == "Darwin" ]]; then
+    alias f='open -a Finder'
+else
+    alias f='explorer.exe'
+fi
+
 # ls variants (colorized)
-if [[ "$(uname)" == "Darwin" ]]; then
+if [[ "$uname" == "Darwin" ]]; then
     alias ls='ls -Gph'
 else
     alias ls='ls -Fph --color=auto --group-directories-first'
@@ -117,24 +124,32 @@ alias l.='ls -d .* -G'            # show only hidden files
 alias p="sudo pacman"
 alias y="yaourt"
 
+# lang
+alias rb='ruby'
+alias py='python'
+
 # vim
 alias v='vim'
 alias svi='sudo vi'
 alias vis='vim "+set si"'
 alias edit='vim'
 alias ebrc='vim ~/.bashrc'
+alias vb='vim ~/.bashrc'
+alias vimh='vim -c ":h | only"'
+alias vc='vim $DOTFILES_CONFIG_FILE'
+alias vdot='vim $DOTFILES_CONFIG_FILE'
 
 # code
 alias c.='code .'
 
 # resource usage
-alias ps='[[ "$(uname)" == "Darwin" ]] && ps aux || ps auxf'
+alias ps='[[ "$uname" == "Darwin" ]] && ps aux || ps auxf'
 alias j='jobs -l'
 alias df='df -H'
 alias du='du -ch'
 alias top='htop'
-alias top10='[[ "$(uname)" == "Darwin" ]] && ps -arcwwwxo pid,comm,%cpu,%mem | head -n 11 || ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 11'
-alias uptime='[[ "$(uname)" == "Darwin" ]] && uptime || uptime -p'
+alias top10='[[ "$uname" == "Darwin" ]] && ps -arcwwwxo pid,comm,%cpu,%mem | head -n 11 || ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 11'
+alias uptime='[[ "$uname" == "Darwin" ]] && uptime || uptime -p'
 alias nowtime='date +"%T"'
 alias nowdate='date +"%d-%m-%Y"'
 alias path='echo -e ${PATH//:/\\n}'
@@ -145,12 +160,17 @@ alias wc='wc -l -w -c'
 alias tree='tree -CAhF --dirsfirst'
 alias treed='tree -CAFd'
 alias mountedinfo='df -hT'
+alias fkill="ps -e | fzf | awk '{print $1}' | xargs kill"
+if ! command -v cpu &> /dev/null; then
+    cpu_speed_mhz=$(wmic.exe cpu get MaxClockSpeed 2>/dev/null | tail -n +2 | tr -d '\r' | xargs)
+    alias cpu="$(echo "$cpu_speed_mhz" | awk '{printf "%.3f", $1/1000}')Ghz"
+fi
 
 # networking
 alias myip="curl -s icanhazip.com"
 alias ping='ping -c 5'
 alias p4="ping 4.2.2.2 -c 4"
-alias ports='[[ "$(uname)" == "Darwin" ]] && netstat -tulanp || ss -tulanp'
+alias ports='[[ "$uname" == "Darwin" ]] && netstat -tulanp || ss -tulanp'
 alias header='curl -I'  # get web server headers
 alias headerc='curl -I --compress'  # find out if remote server supports gzip / mod_deflate or not
 alias dnstop='dnstop -l 5  eth1'  # all of our servers eth1 is connected to the internets via vlan / router etc
@@ -161,6 +181,11 @@ alias ethtool='ethtool eth1'
 # work on wlan0 by default #
 # only useful for laptop as all servers are without wireless interface
 alias iwconfig='iwconfig wlan0'
+alias speedtest="wget -O /dev/null http://speed.transip.nl/100mb.bin"
+if ! command -v host &> /dev/null; then
+    alias host="sudo $EDITOR /etc/hosts"
+    alias hosts="sudo $EDITOR /etc/hosts"
+fi
 
 # chmod
 alias mx='chmod a+x'
@@ -174,6 +199,9 @@ alias 777='chmod -R 777'
 # commented out, using 'uv python link 3.13' instead
 # alias python3='uv run --python 3.13 python3'
 # alias python='uv run --python 3.13 python'
+
+# irc
+alias irc='${IRC_CLIENT:-irc}'
 
 # ------------------------------------------
 # Archives (The "I always forget the flags" section)
@@ -212,8 +240,22 @@ alias gfetch='git fetch'
 # ------------------------------------------
 # Other
 # ------------------------------------------
-# fnm / Node
+# composer
+alias coi='composer install'
+alias corem='composer remove'
+alias coup='composer update'
+alias coupg='composer upgrade'
+alias cols='composer list'
+
+# fnm / npm / node
 alias update-node='fnm install --lts && LTS_VER=$(fnm list | grep "lts-latest" | awk "{print \$2}") && fnm default "$LTS_VER" && date +%s > "$DOTFILES_CONFIG_DIR/.node_update_timestamp" && echo "Node LTS updated to $LTS_VER"'
+alias nr='npm run'
+alias nls='npm list --depth=0 2>/dev/null'
+alias ni='npm install'
+alias nis='npm install --save'
+alias nu='npm uninstall'
+alias nus='npm uninstall --save'
+alias nup='npm update'
 
 alias so0="cmatrix"
 # alias mv='timeout 8 mv -iv'

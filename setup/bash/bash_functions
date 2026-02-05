@@ -869,104 +869,138 @@ function clone_or_pull_dotfiles() {
     printf "\033[1A\r\033[K"
 }
 
-# checkout via selecting from a menu
-function gco() {
+# old gco used as helper for current gco
+function _gco() {
     local branch=$1
-
     if [ -z "$branch" ]; then
+        t "Usage: gco <branch_name>"
+        return 1
+    fi
 
-        printf "${HDR_F}==========================================${NC}\n"
-        printf "    ${HDR_F}git checkout b -- Choose an Option${NC}    \n"
-        printf "${HDR_F}==========================================${NC}\n"
-        local width=$(tput cols)
-        # local width=$(($(tput cols) - 5))
-        local target_width=$((width + 6))
-
-        # get raw and colored branch lists
-        mapfile -t branches < <(git --no-pager branch --format="%(refname:short)")
-
-        # use --color=always to keep your pink/green hex colors
-        # 'git -p' or 'git --no-pager' BEFORE 'branch'
-        # truncate the line based on terminal width with 'cut'
-        # Note: the subtraction (-3) accounts for the "[1]" prefix space
-        # mapfile -t colored_branches < <(git --no-pager branch -vv --color=always | sed 's/^[ *]*//' | cut -c 1-$((width - 2)))
-        mapfile -t colored_branches < <(git --no-pager branch -vv --color=always | sed 's/^[ *]*//')
-
-        # display the menu
-        # echo -e "${H}Select a branch to checkout (or type 'x' to exit):${NC}"
-        for i in "${!colored_branches[@]}"; do
-            # printf "${SEL_F}[%s] ${NC}%s\n" "$((i+1))" "${colored_branches[$i]}"
-            printf "${SEL_F}[%s] ${NC}%.${target_width}s\n" "$((i+1))" "${colored_branches[$i]}"
-        done
-        echo "${SEL_F}[n] Create new branch${NC}"
-        echo "${BOLD}${RED}[x] Exit${NC}"
-        printf "${BOLD}${WHITE}==========================================${NC}\n"
-
-        # prompt for selection
-        read -p "Checkout branch #: " choice
-
-        # handle 'n' for New Branch
-        if [[ "$choice" == "n" ]]; then
-            read -p "Enter new branch name: " new_branch
-            if [[ -n "$new_branch" ]]; then
-                git checkout -b "$new_branch"
-                t OK "'$new_branch' created.."
-            else
-                echo -e "${ERR}Branch name cannot be empty.${NC}"
-            fi
-            t OK "Switching to '$new_branch'.."
-            return 0
-        fi
-
-        # handle 'x' for Exit
-        if [[ "$choice" == "x" || "$choice" == "q" ]]; then
-            return 0
-        fi
-
-        # handle numerical selection
-        if [[ "$choice" =~ ^[0-9]+$ ]] && [[ "$choice" -gt 0 && "$choice" -le "${#branches[@]}" ]]; then
-            selected="${branches[$((choice-1))]}"
-
-            # if command -v pbcopy >/dev/null; then
-            #     echo -n "$selected" | pbcopy
-            # elif command -v clip.exe >/dev/null; then
-            #     echo -n "$selected" | clip.exe
-            # elif command -v xclip >/dev/null; then
-            #     echo -n "$selected" | xclip -sel clip
-            # fi
-
-            # echo -e "${OK}✓ Copied '$selected' to clipboard!${NC}"
-            t OK "Switching to '$selected'.."
-            git checkout "$selected"
-        else
-            t ERR "Invalid selection."
-        fi
+    if git checkout "$branch" 2>/dev/null; then
+        t SUCCESS "Switched to existing branch ${H2}$branch${NC}"
+        return 0
     else
-        if git checkout "$branch" 2>/dev/null; then
-            t SUCCESS "Switched to existing branch ${H2}$branch${NC}"
+        read -p "The branch ${H}$branch${NC} does not exist. Do you want to ${H2}create${NC} it? [y/N] " -r -n 1
+        echo ""
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            t "Skipping.."
+            return 1
+        fi
+
+        if git checkout -B "$branch" 2>/dev/null; then
+            t SUCCESS "Created and switched to ${H2}$branch${NC}"
+            return 0
         else
-            if git checkout -b "$branch"; then
-                t SUCCESS "Created and switched to ${H2}$branch${NC}"
-            else
-                t ERROR "Failed to create branch ${H2}$branch${NC}"
-            fi
+            t ERROR "Failed to create branch ${H2}$branch${NC}"
+            return 1
         fi
     fi
 }
 
-# removing in favour of new flow above
-# function gco() {
-#     local branch=$1
-#     if [ -z "$branch" ]; then
-#         t "Usage: gco <branch_name>"
-#         return 1
-#     fi
-#     if git checkout "$branch"; then
-#         t SUCCESS "Switched to branch ${H2}$branch${NC}"
-#     else
-#         t ERROR "Could not find branch ${H2}$branch${NC}"
-#     fi
-# }
+# checkout via selecting from a menu
+function gco() {
+    local branch=""
+    local menu=()
+
+    if [[ ! -d .git ]]; then
+        t ERR "Not a git repository"
+        return 1
+    fi
+
+    if [[ $# -eq 1 ]]; then
+        branch=$1
+        shift
+    fi
+
+    menu+=("${HDR_F}==========================================${NC}")
+    menu+=("            ${HDR_F}git checkout bb               ${NC}")
+    menu+=("${HDR_F}==========================================${NC}")
+    local width=$(tput cols)
+    local target_width=$((width + 6))
+
+    # get raw and colored branch lists
+    mapfile -t branches < <(git --no-pager branch --format="%(refname:short)")
+
+    # use --color=always to keep your pink/green hex colors
+    # 'git -p' or 'git --no-pager' BEFORE 'branch'
+    # truncate the line based on terminal width with 'cut'
+    # Note: the subtraction (-3) accounts for the "[1]" prefix space
+    # mapfile -t colored_branches < <(git --no-pager branch -vv --color=always | sed 's/^[ *]*//' | cut -c 1-$((width - 2)))
+    mapfile -t colored_branches < <(git --no-pager branch -vv --color=always | sed 's/^[ *]*//')
+
+    # display the menu
+    # echo -e "${H}Select a branch to checkout (or type 'x' to exit):${NC}"
+    for i in "${!colored_branches[@]}"; do
+        # printf "${SEL_F}[%s] ${NC}%s\n" "$((i+1))" "${colored_branches[$i]}"
+        menu+=("${SEL_F}[$((i+1))] ${NC}$(printf "%.${target_width}s" "${colored_branches[$i]}")")
+    done
+    menu+=("${SEL_F}[n] Create new branch${NC}")
+    menu+=("${BOLD}${RED}[x] Exit${NC}")
+    menu+=("${BOLD}${WHITE}==========================================${NC}")
+
+    if [[ $# -eq 0 ]]; then
+        if [ -z "$branch" ]; then
+            while true; do
+                clear
+                for line in "${menu[@]}"; do
+                    echo -e "$line${NC}"
+                done
+
+                # prompt for selection
+                read -p "Checkout branch #: " choice
+
+                # handle 'n' for New Branch
+                if [[ "$choice" == "n" ]]; then
+                    read -p "Enter new branch name: " new_branch
+                    if [[ -n "$new_branch" ]]; then
+                        git checkout -b "$new_branch"
+                        t OK "'$new_branch' created.."
+                    else
+                        echo -e "${ERR}Branch name cannot be empty.${NC}"
+                    fi
+                    t OK "Switching to '$new_branch'.."
+                    return 0
+                fi
+
+                # handle 'x' for Exit
+                if [[ "$choice" == "x" || "$choice" == "q" ]]; then
+                    return 0
+                fi
+
+                # handle numerical selection
+                if [[ "$choice" =~ ^[0-9]+$ ]] && [[ "$choice" -gt 0 && "$choice" -le "${#branches[@]}" ]]; then
+                    selected="${branches[$((choice-1))]}"
+
+                    # if command -v pbcopy >/dev/null; then
+                    #     echo -n "$selected" | pbcopy
+                    # elif command -v clip.exe >/dev/null; then
+                    #     echo -n "$selected" | clip.exe
+                    # elif command -v xclip >/dev/null; then
+                    #     echo -n "$selected" | xclip -sel clip
+                    # fi
+
+                    # echo -e "${OK}✓ Copied '$selected' to clipboard!${NC}"
+                    t OK "Switching to '$selected'.."
+                    git checkout "$selected"
+                    break
+                else
+                    # if invalid, try _gco route first
+                    # t ERR "Invalid selection."
+                    if _gco "$choice"; then
+                        return 0
+                    fi
+                fi
+            done
+        else
+            if _gco "$branch"; then
+                return 0
+            else
+                return 1
+            fi
+        fi
+    fi
+}
 
 # checkout to a branch, create if it doesn't exist
 function gcob() {

@@ -242,5 +242,5 @@ else
     clear
 fi
 
-t OK "${SUCCESS}All done!${NC}"
+t OK "${SUCCESS}dotfiles refresh completed!${NC}"
 source ~/.bashrc

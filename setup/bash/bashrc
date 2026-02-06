@@ -52,13 +52,12 @@ fi
 
 if [[ -d "$DOTFILES_CONFIG_DIR" ]]; then
     # Load core/style first (explicitly)
-    [[ -f "$DOTFILES_CONFIG_DIR/.bash_style" ]] && . "$DOTFILES_CONFIG_DIR/.bash_style"
     [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 
     for file in "$DOTFILES_CONFIG_DIR"/.bash_*; do
         # Skip files we already loaded or specifically want to ignore
         case "$(basename "$file")" in
-            .bash_style|.init) continue ;;
+            .bash_functions|.bash_style|.init) continue ;;
         esac
 
         if [[ -f "$file" && -r "$file" ]]; then

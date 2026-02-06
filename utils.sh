@@ -70,6 +70,7 @@ _install_linux_packages() {
         # update once before batch installing to ensure we get latest versions
         sudo apt update -y
         sudo apt install -y "${missing_pkgs[@]}"
+    fi
 }
 
 # Function to install brew

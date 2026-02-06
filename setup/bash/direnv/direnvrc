@@ -30,6 +30,15 @@ layout_uv() {
     # Respect UV_PROJECT_VENV if set, otherwise default to .venv
     local default_venv="${UV_PROJECT_VENV:-.venv}"
     local venv="$PWD/$default_venv"
+    local expected_version=""
+
+    # Determine Expected Version
+    if [[ -f .python-version ]]; then
+        expected_version=$(cat .python-version | tr -d '[:space:]')
+    elif [[ -f pyproject.toml ]]; then
+        # Extracts 'requires-python = ">=3.12"' -> '3.12'
+        expected_version=$(grep "requires-python" pyproject.toml | sed 's/.*"\(.*\)".*/\1/' | tr -d '>=<^ ')
+    fi
 
     # Check if a venv is currently active
     if [[ -n "$VIRTUAL_ENV" ]]; then
@@ -46,16 +55,26 @@ layout_uv() {
     fi
 
     if [[ -d "$venv" ]]; then
-        source_env "$venv/bin/activate"
+        source_env "$venv/bin/activate" 2>/dev/null
     elif [[ -d .venv ]]; then
-        source_env .venv/bin/activate
+        source_env .venv/bin/activate 2>/dev/null
     elif [[ -d venv ]]; then
-        source_env venv/bin/activate
+        source_env venv/bin/activate 2>/dev/null
         venv=venv
     else
-        t INFO "uv project detected but no venv found at ${SUB_F}$venv_name${NC}, run `${HDR_F}uv sync${NC}`"
+        t WARN "uv project detected but no venv found at ${SUB_F}$venv_name${NC}, run `${HDR_F}uv sync${NC}`"
     fi
-    t SUCCESS "${HDR_F}uv${NC}: Activated ${HDR_F}$(python --version)${NC} from ${SUB_F}$venv${NC}"
+
+    # Version Check
+    local actual_version
+    actual_version=$(python -c 'import platform; print(platform.python_version())')
+
+    if [[ -n "$expected_version" && "$actual_version" != "$expected_version"* ]]; then
+        t WARN "Version mismatch! Expected ${HDR_F}$expected_version${NC}, but venv has ${SUB_F}$actual_version${NC}"
+        t INFO "Run '${HDR_F}uv sync${NC}' to update the environment."
+    else
+        t SUCCESS "${HDR_F}uv${NC} activated ${HDR_F}python $actual_version${NC} from ${SUB_F}$(basename "$venv_path")${NC}"
+    fi
 }
 
 # Custom layout for node
@@ -89,13 +108,31 @@ layout_node() {
 # Custom layout for env
 layout_dotenv() {
     if [[ -f .env ]]; then
-        t INFO "Loading ${HDR_F}.env${NC} variables..."
         dotenv
 
-        local vars=$(grep -E '^[A-Z0-9_]+=' .env | cut -d= -f1 | tr '\n' ',' | sed 's/,$//')
+        # local vars=$(grep -E '^[A-Z0-9_]+=' .env | cut -d= -f1 | tr '\n' ',' | sed 's/,$//')
 
-        if [[ -n "$vars" ]]; then
-            t INFO "Loaded: $vars"
+        # if [[ -n "$vars" ]]; then
+        #     t OK "Loaded: $vars"
+        # fi
+        local mapfile_keys
+        mapfile -t mapfile_keys < <(grep -E '^[A-Z0-9_]+=' .env | cut -d= -f1)
+
+        local total=${#mapfile_keys[@]}
+        local display_limit=5
+        local output=""
+
+        if (( total > 0 )); then
+            # Take the first 5 variables
+            output=$(echo "${mapfile_keys[@]:0:$display_limit}" | tr ' ' ', ')
+
+            # If there are more than 5, add the "and X others" suffix
+            if (( total > display_limit )); then
+                local remaining=$(( total - display_limit ))
+                output="$output (and $remaining others)"
+            fi
+
+            t OK "Loaded from ${SUB_F}.env${NC}: $output"
         fi
     fi
 }

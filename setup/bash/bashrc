@@ -238,12 +238,7 @@ set_win_title() {
     echo -ne "\033]2;♥ ${PWD##*/}\007"
 }
 
-[[ "$PROMPT_COMMAND" != *"set_win_title"* ]] && PROMPT_COMMAND="set_win_title; $PROMPT_COMMAND"
-
-# starship prompt: cross-shell customizable prompt
-if command -v starship &> /dev/null; then
-    eval "$(starship init bash)"
-fi
+export VIRTUAL_ENV_DISABLE_PROMPT=1
 
 # transient prompt for Starship
 _starship_transient_prompt() {
@@ -258,5 +253,9 @@ if command -v starship &> /dev/null; then
     # Custom transient logic
     starship_precmd_user_func() {
        _starship_transient_prompt
+
+       set_win_title
     }
+
+    eval "$(starship init bash)"
 fi

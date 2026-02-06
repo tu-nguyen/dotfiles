@@ -105,62 +105,8 @@ if [[ -z "${debian_chroot:-}" ]] && [[ -r /etc/debian_chroot ]]; then
 fi
 
 # ------------------------------------------
-# Tools & Prompt
+# Upkeep Stuff
 # ------------------------------------------
-# starship prompt: cross-shell customizable prompt
-if command -v starship &> /dev/null; then
-    eval "$(starship init bash)"
-fi
-
-# transient prompt for Starship
-_starship_transient_prompt() {
-    if [[ $? -eq 0 ]]; then
-        printf "${OK_F}❯ ${NC}"
-    else
-        printf "${ERR_F}❯ ${NC}"
-    fi
-}
-
-# direnv hook
-if command -v direnv &> /dev/null; then
-    eval "$(direnv hook bash)"
-fi
-
-# bat theme and man
-# TODO: create my own?
-# further themes can be installed to '/home/valcr/.config/bat/themes', and are added to the cache with `bat cache --build`. For more information, see:
-# https://github.com/sharkdp/bat#adding-new-themes
-if [[ -z "$BAT_THEME" ]]; then
-    export BAT_THEME='Visual Studio Dark+'
-fi
-export MANPAGER="bat -plman"
-# export BAT_PAGER="less -RFK"
-export BAT_PAGER=cat
-
-# fnm (Fast Node Manager) with 24-hour Auto-Update check
-FNM_PATH="$HOME/.local/share/fnm"
-if [[ -d "$FNM_PATH" ]]; then
-    export PATH="$FNM_PATH:$PATH"
-    eval "$(fnm env --use-on-cd --shell bash)"
-
-    # Check for Node LTS updates once every 24 hours (86400 seconds)
-    TIMESTAMP_FILE="$DOTFILES_CONFIG_DIR/.node_update_timestamp"
-    CURRENT_TIME=$(date +%s)
-    UPDATE_INTERVAL=86400
-
-    if [[ ! -f "$TIMESTAMP_FILE" ]] || (( CURRENT_TIME - $(qat "$TIMESTAMP_FILE") > UPDATE_INTERVAL )); then
-        # determine latest LTS and set as default
-        LTS_VER=$(fnm list | grep 'lts-latest' | awk '{print $2}')
-        if [[ -n "$LTS_VER" ]]; then
-            fnm default "$LTS_VER" >/dev/null
-            echo "$CURRENT_TIME" > "$TIMESTAMP_FILE"
-        fi
-    fi
-fi
-
-# TODO: nvim
-
-# upkeep stuff
 _check_update_age() {
     local stamp_file="$DOTFILES_CONFIG_DIR/.last_update"
     local now=$(date +%s)
@@ -235,17 +181,6 @@ dot-clean() {
 }
 
 # -----------------------------------------
-# Window
-# ------------------------------------------
-# window title: sets terminal tab title to "♥ CurrentDir"
-set_win_title() {
-    echo -ne "\033]2;♥ ${PWD##*/}\007"
-}
-
-# update window title and maintain existing PROMPT_COMMAND logic
-export PROMPT_COMMAND="set_win_title; $PROMPT_COMMAND"
-
-# -----------------------------------------
 # Greeting, motd, and colors
 # ------------------------------------------
 # display the Message of the Day if the 'motd' command is available
@@ -254,4 +189,74 @@ if [[ -f "$DOTFILES_CONFIG_DIR/.bash_motd" ]]; then
     motd auto
 else
     [[ $(type -t t) == "function" ]] && t WARNING "MOTD file not found at $DOTFILES_CONFIG_DIR/.bash_motd\n"
+fi
+
+# ------------------------------------------
+# Tools & Prompt
+# ------------------------------------------
+# bat theme and man
+# TODO: create my own?
+# further themes can be installed to '/home/valcr/.config/bat/themes', and are added to the cache with `bat cache --build`. For more information, see:
+# https://github.com/sharkdp/bat#adding-new-themes
+if [[ -z "$BAT_THEME" ]]; then
+    export BAT_THEME='Visual Studio Dark+'
+fi
+export MANPAGER="bat -plman"
+# export BAT_PAGER="less -RFK"
+export BAT_PAGER=cat
+
+# fnm (Fast Node Manager) with 24-hour Auto-Update check
+FNM_PATH="$HOME/.local/share/fnm"
+if [[ -d "$FNM_PATH" ]]; then
+    export PATH="$FNM_PATH:$PATH"
+    eval "$(fnm env --use-on-cd --shell bash)"
+
+    # Check for Node LTS updates once every 24 hours (86400 seconds)
+    TIMESTAMP_FILE="$DOTFILES_CONFIG_DIR/.node_update_timestamp"
+    CURRENT_TIME=$(date +%s)
+    UPDATE_INTERVAL=86400
+
+    if [[ ! -f "$TIMESTAMP_FILE" ]] || (( CURRENT_TIME - $(qat "$TIMESTAMP_FILE") > UPDATE_INTERVAL )); then
+        # determine latest LTS and set as default
+        LTS_VER=$(fnm list | grep 'lts-latest' | awk '{print $2}')
+        if [[ -n "$LTS_VER" ]]; then
+            fnm default "$LTS_VER" >/dev/null
+            echo "$CURRENT_TIME" > "$TIMESTAMP_FILE"
+        fi
+    fi
+fi
+
+# TODO: nvim
+
+# direnv hook
+if command -v direnv &> /dev/null; then
+    eval "$(direnv hook bash)"
+fi
+
+# window title: sets terminal tab title to "♥ CurrentDir"
+set_win_title() {
+    echo -ne "\033]2;♥ ${PWD##*/}\007"
+}
+
+[[ "$PROMPT_COMMAND" != *"set_win_title"* ]] && PROMPT_COMMAND="set_win_title; $PROMPT_COMMAND"
+
+# starship prompt: cross-shell customizable prompt
+if command -v starship &> /dev/null; then
+    eval "$(starship init bash)"
+fi
+
+# transient prompt for Starship
+_starship_transient_prompt() {
+    if [[ $? -eq 0 ]]; then
+        printf "${OK_F}❯ ${NC}"
+    else
+        printf "${ERR_F}❯ ${NC}"
+    fi
+}
+
+if command -v starship &> /dev/null; then
+    # Custom transient logic
+    starship_precmd_user_func() {
+       _starship_transient_prompt
+    }
 fi

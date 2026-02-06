@@ -193,16 +193,6 @@ dless() {
     fi
 }
 
-# pretty print out json with jq
-jat() {
-    jq --color-output . "$@" | bat
-}
-
-# pretty print out yaml with jq
-yat() {
-    jq --color-output . "$@" | bat
-}
-
 # ceate a directory and move into it immediately
 mkcd() {
     mkdir -p "$1" && cd "$1" || return 1
@@ -592,6 +582,19 @@ sss() {
         t ERR "${SEL_F}[!]${NC} Invalid selection."
         return 1
     fi
+}
+
+# ------------------------------------------
+# bat functions
+# ------------------------------------------
+# pretty print out json with jq
+jat() {
+    jq --color-output . "$@" | bat
+}
+
+# pretty print out yaml with jq
+yat() {
+    jq --color-output . "$@" | bat
 }
 
 # ------------------------------------------

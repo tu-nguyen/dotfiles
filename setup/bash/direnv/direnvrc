@@ -55,11 +55,11 @@ layout_uv() {
     fi
 
     if [[ -d "$venv" ]]; then
-        source_env "$venv/bin/activate" 2>/dev/null
+        source_env "$venv/bin/activate" >/dev/null 2>&1
     elif [[ -d .venv ]]; then
-        source_env .venv/bin/activate 2>/dev/null
+        source_env .venv/bin/activate >/dev/null 2>&1
     elif [[ -d venv ]]; then
-        source_env venv/bin/activate 2>/dev/null
+        source_env venv/bin/activate >/dev/null 2>&1
         venv=venv
     else
         t WARN "uv project detected but no venv found at ${SUB_F}$venv_name${NC}, run `${HDR_F}uv sync${NC}`"

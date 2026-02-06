@@ -357,6 +357,7 @@ reset_bashrc() {
     t OK "${OK}Starting ${H}bash${OK} reset.${NC}"
 
     _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bash_style" "$DOTFILES_CONFIG_DIR/.bash_style"
+    _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bash_t" "$DOTFILES_CONFIG_DIR/.bash_t"
     _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/init" "$DOTFILES_CONFIG_DIR/.init"
     _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bash_aliases" "$DOTFILES_CONFIG_DIR/.bash_aliases"
     _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bash_docker" "$DOTFILES_CONFIG_DIR/.bash_docker"

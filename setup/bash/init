@@ -17,6 +17,14 @@ else
 fi
 # --- End Load Configuration ---
 
+if [[ -f "$DOTFILES_REPO_DIR/setup/bash/bash_t" ]]; then
+    . "$DOTFILES_REPO_DIR/setup/bash/bash_t"
+elif [[ -f "$DOTFILES_CONFIG_DIR/.bash_t" ]]; then
+    . "$DOTFILES_CONFIG_DIR/.bash_t"
+else
+    echo "\e[31m[ WARN ]\e[0m Failed to load core shell bash_t"
+fi
+
 if [[ -f "$DOTFILES_REPO_DIR/setup/bash/bash_functions" ]]; then
     . "$DOTFILES_REPO_DIR/setup/bash/bash_functions"
 elif [[ -f "$DOTFILES_CONFIG_DIR/.bash_functions" ]]; then

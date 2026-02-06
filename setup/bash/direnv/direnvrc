@@ -1,15 +1,108 @@
+# ===================================================================== #
+# DIRENVRC
+# ===================================================================== #
+# ------------------------------------------
+# Pre-Reqs
+# ------------------------------------------
+BASH_STYLE="$DOTFILES_CONFIG_DIR/.bash_style"
+[[ -f "$BASH_STYLE" ]] && . "$BASH_STYLE"
+
+BASH_T="$DOTFILES_CONFIG_DIR/.bash_t"
+[[ -f "$BASH_T" ]] && . "$BASH_T"
+
+# Fallback for t
+if ! command -v t &>/dev/null; then
+    t() { echo "[$1] $2"; }
+fi
+
+# ------------------------------------------
+# Layouts
+# ------------------------------------------
 # Custom layout for uv
 layout_uv() {
-    local venv="${UV_PROJECT_VENV:-.venv}"
-    if [[ -n "$UV_PROJECT_VENV" && -d "$UV_PROJECT_VENV" ]]; then
-        source_env "$UV_PROJECT_VENV/bin/activate"
+    # Respect UV_PROJECT_VENV if set, otherwise default to .venv
+    local default_venv="${UV_PROJECT_VENV:-.venv}"
+    local venv="$PWD/$default_venv"
+
+    # Check if a venv is currently active
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        # If the active venv is NOT the one in this project, swap
+        if [[ "$VIRTUAL_ENV" != "$target_venv" ]]; then
+            # Note: direnv doesn't need a manual 'deactivate' command because
+            # it handles the $PATH diffing automatically.
+            # We just log that we are switching.
+            t INFO "Switching venv: $(basename "$VIRTUAL_ENV") -> $venv_name"
+        else
+            # Already in the right place, no action needed
+            return 0
+        fi
+    fi
+
+    if [[ -d "$venv" ]]; then
+        source_env "$venv/bin/activate"
     elif [[ -d .venv ]]; then
         source_env .venv/bin/activate
     elif [[ -d venv ]]; then
         source_env venv/bin/activate
+        venv=venv
+    else
+        t INFO "uv project detected but no venv found at ${SUB_F}$venv_name${NC}, run `${HDR_F}uv sync${SUB_F}`"
+    fi
+    t SUCCESS "${HDR_F}uv${NC}: Activated ${HDR_F}$(python --version)${NC} from ${HDR_F}$venv${NC}"
+}
+
+# Custom layout for node
+layout_node() {
+    if command -v fnm &>/dev/null; then
+    local node_version
+    # Priority: .node-version > .nvmrc > package.json engines > default
+    if [[ -f .node-version ]]; then
+        node_version=$(cat .node-version)
+    elif [[ -f .nvmrc ]]; then
+        node_version=$(cat .nvmrc)
+    else
+        node_version="default"
+    fi
+
+    t INFO "${HDR_F}fnm${NC}: Switching to ${HDR_F}Node $node_version${NC}"
+    eval "$(fnm env --use-on-cd --shell bash)"
+    fnm use "$node_version" >/dev/null
+
+    if [[ -f package.json && -f .node-version ]]; then
+            local engine=$(grep '"node":' package.json | sed 's/.*"node": "\(.*\)".*/\1/' | tr -d '>=<^ ')
+            if [[ -n "$engine" && "$(cat .node-version)" != "$engine"* ]]; then
+                t WARN "Node mismatch: ${SUB_F}.node-version${NC} ($(cat .node-version)) != ${SUB_F}package.json${NC} ($engine)"
+            fi
+        fi
+    else
+        t ERR "${ERR}fnm${NC} not found. Node auto-layout skipped."
     fi
 }
 
-if [[ -f uv.lock || -f pyproject.toml ]]; then
-    layout_uv
+# Custom layout for env
+layout_dotenv() {
+    if [[ -f .env ]]; then
+        t INFO "Loading ${HDR_F}.env${SUB_F} variables..."
+        dotenv
+    fi
+}
+
+# ------------------------------------------
+# Global Detection
+# ------------------------------------------
+if [[ "$PWD" != "$HOME" ]]; then
+    # Check for Python/UV
+    if [[ -f uv.lock || -f pyproject.toml || -d .venv || -d venv ]]; then
+        layout_uv
+    fi
+
+    # Check for Node
+    if [[ -f package.json || -f .node-version || -f .nvmrc ]]; then
+        layout_node
+    fi
+
+    # Check for Secrets
+    if [[ -f .env ]]; then
+        layout_dotenv
+    fi
 fi

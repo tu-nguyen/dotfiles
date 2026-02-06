@@ -202,44 +202,6 @@ function now() {
     echo "$(date +"%d-%m-%Y") $(date +"%T")"
 }
 
-# Output standardize msg
-function t() {
-    # t "System started"                  # [ INFO ] System started
-    # t WARNING "Disk space low"          # [ WARN ] Disk space low
-    # t ERROR "Failed to connect to DB"   # [ ERR  ] Failed to connect to DB
-    # t                                   # Hello world
-    local severity message color label
-    local timestamp=$(date +"%H:%M:%S")
-
-    if [[ $# -eq 0 ]]; then
-        echo -e "${GREEN}Hello world${NC}"
-        return 0
-    elif [[ $# -eq 1 ]]; then
-        severity="INFO"
-        message="$1"
-    else
-        severity=$(echo "$1" | tr '[:lower:]' '[:upper:]')
-        message="$2"
-    fi
-
-    # Define color and label mapping
-    case "$severity" in
-        INFO)           color="${INFO}";  label="[ INFO ]" ;;
-        IMPORTANT)      color="${INFO}";  label="[ INFO ]" ;;
-        WARN|WARNING)   color="${WARN}";  label="[ WARN ]" ;;
-        ERR|ERROR)      color="${ERR}";   label="[ ERR  ]" ;;
-        SUCCESS|OK)     color="${OK}";    label="[  OK  ]" ;;
-        ALERT)          color="${ALERT}"; label="[-ALERT]" ;;
-        TODO)           color="${ALERT}"; label="[ TODO ]" ;;
-        DEBUG)          color="${DEBUG}"; label="[-DEBUG]" ;;
-        *)              color="${BOLD}";  label="[-$severity]" ;;
-    esac
-
-    # Output formatted message
-    # format: [HH:MM:SS] [LABEL] Message
-    echo -e "${DEBUG}${timestamp}${NC} ${color}${label}${NC} ${message}${NC}"
-}
-
 # Compare and pipe to less while preserving colors
 dless() {
     if command -v colordiff >/dev/null 2>&1; then

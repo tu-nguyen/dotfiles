@@ -57,7 +57,7 @@ if [[ -d "$DOTFILES_CONFIG_DIR" ]]; then
     for file in "$DOTFILES_CONFIG_DIR"/.bash_*; do
         # Skip files we already loaded or specifically want to ignore
         case "$(basename "$file")" in
-            .bash_functions|.bash_style|.init) continue ;;
+            .bash_functions|bash_t|.bash_style|.init) continue ;;
         esac
 
         if [[ -f "$file" && -r "$file" ]]; then

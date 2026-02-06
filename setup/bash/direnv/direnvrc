@@ -4,11 +4,9 @@
 # ------------------------------------------
 # Pre-Reqs
 # ------------------------------------------
-BASH_STYLE="$DOTFILES_CONFIG_DIR/.bash_style"
-[[ -f "$BASH_STYLE" ]] && . "$BASH_STYLE"
-
-BASH_T="$DOTFILES_CONFIG_DIR/.bash_t"
-[[ -f "$BASH_T" ]] && . "$BASH_T"
+DOTFILES_CONFIG_DIR="${DOTFILES_CONFIG_DIR:-$HOME/.config/dotfiles}"
+[[ -f "$DOTFILES_CONFIG_DIR/.bash_style" ]] && . "$DOTFILES_CONFIG_DIR/.bash_style"
+[[ -f "$DOTFILES_CONFIG_DIR/.bash_t" ]] && . "$DOTFILES_CONFIG_DIR/.bash_t"
 
 # Fallback for t
 if ! command -v t &>/dev/null; then
@@ -55,9 +53,9 @@ layout_uv() {
         source_env venv/bin/activate
         venv=venv
     else
-        t INFO "uv project detected but no venv found at ${SUB_F}$venv_name${NC}, run `${HDR_F}uv sync${SUB_F}`"
+        t INFO "uv project detected but no venv found at ${SUB_F}$venv_name${NC}, run `${HDR_F}uv sync${NC}`"
     fi
-    t SUCCESS "${HDR_F}uv${NC}: Activated ${HDR_F}$(python --version)${NC} from ${HDR_F}$venv${NC}"
+    t SUCCESS "${HDR_F}uv${NC}: Activated ${HDR_F}$(python --version)${NC} from ${SUB_F}$venv${NC}"
 }
 
 # Custom layout for node
@@ -91,8 +89,8 @@ layout_node() {
 # Custom layout for env
 layout_dotenv() {
     if [[ -f .env ]]; then
-        t INFO "Loading ${HDR_F}.env${SUB_F} variables..."
-        dotenv
+        t INFO "Loading ${HDR_F}.env${NC} variables..."
+        dotenv | t INFO
     fi
 }
 

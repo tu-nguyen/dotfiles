@@ -4,6 +4,15 @@
 # ===================================================================== #
 
 # ------------------------------------------
+# Pre-Reqs
+# ------------------------------------------
+# init should source bash_functions and bash_style (for t)
+. "$DOTFILES_REPO_DIR/setup/bash/init" || {
+    echo "Error: Could not source init"
+    exit 1
+}
+
+# ------------------------------------------
 # Helper Functions
 # ------------------------------------------
 # Generic reset prompt
@@ -289,7 +298,7 @@ _install_gitstatus() {
 # ------------------------------------------
 # Main
 # ------------------------------------------
-clone_or_pull_dotfiles
+# clone_or_pull_dotfiles
 
 reset_pre() {
     t IMPORTANT "This should be ran at least once!"

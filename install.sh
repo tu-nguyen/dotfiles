@@ -155,7 +155,9 @@ fi
 # ------------------------------------------
 # A menu function to display options
 show_menu() {
-    clear
+    if [[ ! "$DOT_DEBUG" == "1" ]]; then
+        clear
+    fi
     printf "${HDR_F}==========================================${NC}\n"
     printf "              ${HDR_F}dotfiles setup              ${NC}\n"
     printf "${HDR_F}==========================================${NC}\n"

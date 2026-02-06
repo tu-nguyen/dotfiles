@@ -555,10 +555,6 @@ ff() {
     find . -type f -iname '*'"$*"'*' -ls ;
 }
 
-        if [[ -z "$DOT_PYTHON_VERSION "]]; then
-            DOT_PYTHON_VERSION
-        fi
-
 # Function to update uv
 _update_uv() {
     # Determine python version: Argument > Env Var > 3.13

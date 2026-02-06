@@ -402,11 +402,7 @@ reset_bashrc() {
             # using -q for quiet preprocessing
             cpp -q "$template" "$temp_output"
         fi
-
-        # final move/copy to destination
-        if [[ ! -f "$dest_output" ]]; then
-            cpp "$temp_output" "$dest_output"
-        fi
+        cpp "$temp_output" "$dest_output"
     done
     t OK "Transfer of starship tomls complete."
 

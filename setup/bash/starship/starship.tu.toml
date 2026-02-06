@@ -154,7 +154,7 @@ truncation_symbol = "…"
 
 [git_status]
 conflicted = "[ ! CONFLICT](bold color_red)"
-ahead = "[ > ](bold color_pastel_pink)"
+ahead = "[ > ](bold color_blue)"
 behind = "[ < ](bold color_white)"
 diverged = "[ <> ](bold color_black)"
 renamed = "[ r ](bold color_red)"

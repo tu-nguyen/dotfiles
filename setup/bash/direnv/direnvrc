@@ -90,7 +90,13 @@ layout_node() {
 layout_dotenv() {
     if [[ -f .env ]]; then
         t INFO "Loading ${HDR_F}.env${NC} variables..."
-        dotenv | t INFO
+        dotenv --quiet
+
+        local vars=$(grep -E '^[A-Z0-9_]+=' .env | cut -d= -f1 | tr '\n' ',' | sed 's/,$//')
+
+        if [[ -n "$vars" ]]; then
+            t INFO "Loaded: $vars"
+        fi
     fi
 }
 

@@ -387,7 +387,7 @@ reset_bashrc() {
     mkdir -p "$(dirname "$DIRENV_DEST_FILE")"
     sed "s|/home/username|$HOME|g" "$DIRENV_TEMPLATE_FILE" > "$TEMP_DIRENV_TOML"
     cpp -q "$TEMP_DIRENV_TOML" "$DIRENV_DEST_FILE"
-    cpp -q "$DOTFILES_REPO_DIR/setup/bash/direnv/direnvrc" "$HOME/.config/direnv/direnvrc"
+    cpp "$DOTFILES_REPO_DIR/setup/bash/direnv/direnvrc" "$HOME/.config/direnv/direnvrc"
 
     # Copy starship config
     STARSHIP_SRC_DIR="$DOTFILES_REPO_DIR/setup/bash/starship"
@@ -414,7 +414,7 @@ reset_bashrc() {
 
     if [[ ! -f "$STARSHIP_DEST_DIR/starship.toml" ]]; then
         t "starship.toml not found. Initializing with default theme.."
-        cpp -q "$STARSHIP_DEST_DIR/starship.tu.toml" "$STARSHIP_DEST_DIR/starship.toml"
+        cpp "$STARSHIP_DEST_DIR/starship.tu.toml" "$STARSHIP_DEST_DIR/starship.toml"
     fi
 
     t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_bashrc()${SUCCESS} completed!!${NC}"
@@ -427,7 +427,7 @@ reset_vimrc() {
     fi
     t OK "${OK}Starting ${H}vim${OK} reset.${NC}"
 
-    cpp -q "$DOTFILES_REPO_DIR/setup/vim/vimrc" "$HOME/.vimrc"
+    cpp "$DOTFILES_REPO_DIR/setup/vim/vimrc" "$HOME/.vimrc"
 
     if [ ! -f ~/.vim/autoload/plug.vim ]; then
         t "Installing ${HDR_F}Vim-Plug${NC}.."

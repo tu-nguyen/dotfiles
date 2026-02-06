@@ -54,7 +54,7 @@ _convert_hex_to_ansi() {
 _install_linux_packages() {
     local missing_pkgs=()
 
-    # find what's actually missing
+    # Find what's actually missing
     for pkg in "$@"; do
         if dpkg -s "$pkg" &>/dev/null; then
             t SUCCESS "${HDR_F}$pkg${NC} is already installed!"
@@ -63,16 +63,13 @@ _install_linux_packages() {
         fi
     done
 
-    # if missing packages, install them in one batch
+    # If missing packages, install them in one batch
     if [ ${#missing_pkgs[@]} -gt 0 ]; then
         t "Installing missing packages: ${HDR_F}${missing_pkgs[*]}${NC}.."
 
         # update once before batch installing to ensure we get latest versions
         sudo apt update -y
         sudo apt install -y "${missing_pkgs[@]}"
-    else
-        t SUCCESS "All Linux packages are already up to date."
-    fi
 }
 
 # Function to install brew
@@ -108,9 +105,6 @@ _install_mac_packages() {
         brew install "${missing_pkgs[@]}"
 
         t SUCCESS "Installation of ${HDR_F}${missing_pkgs[*]}${NC} complete."
-    else
-        t SUCCESS "All requested macos packages are already present."
-    fi
 }
 
 # Function to install packages based on os; uses above helper functions
@@ -275,6 +269,7 @@ _install_fnm() {
 _install_gitstatus() {
     local original_dir=$(pwd)
     local installed_or_updated="installed"
+    GITSTATUS_DIR="$HOME/.gitstatus"
     if [ -d "$GITSTATUS_DIR/.git" ]; then
         t OK "${SUB_F}gitstatus${NC} directory '$GITSTATUS_DIR' already exists. Pulling latest changes.."
         cd "$GITSTATUS_DIR"
@@ -284,7 +279,7 @@ _install_gitstatus() {
         # printf "\033[1A\r\033[K"
         local installed_or_updated="updated"
     else
-        t "Cloning Gitstatus repository to '$GITSTATUS_DIR'.."
+        t "Cloning ${HDR_F}gitstatus${NC} repository to '$GITSTATUS_DIR'.."
         if ! git clone https://github.com/romkatv/gitstatus.git "$GITSTATUS_DIR"; then
             t Error"Failed to clone ${ERR}gitstatus${NC} repository."
         fi

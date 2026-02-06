@@ -561,7 +561,7 @@ _update_uv() {
     local target_version="${1:-${DOT_PYTHON_VERSION:-3.13}}"
 
     if command -v uv &>/dev/null; then
-        t "INFO" "Updating uv and python $target_version.."
+        t "INFO" "Updating ${HDR_F}uv${NC} and ${HDR_F}python $target_version${NC}.."
 
         # Update the uv binary itself
         uv self update
@@ -578,9 +578,9 @@ _update_uv() {
         # Update all tools installed via 'uv tool install'
         uv tool upgrade --all
 
-        t SUCCESS "uv and python $target_version are up to date."
+        t SUCCESS "${HDR_F}uv${NC} and ${HDR_F}python $target_version ${NC}are up to date."
     else
-        t ERR "uv command not found. Please install uv first."
+        t ERR "${HDR_F}uv${NC} command not found. Please install ${HDR_F}uv${NC} first."
     fi
 }
 

@@ -15,6 +15,15 @@ if ! command -v t &>/dev/null; then
     t() { echo "[$1] $2"; }
 fi
 
+# Override direnv's internal log_status to t
+log_status() {
+    t INFO "$1"
+}
+
+log_error() {
+    t ERR "$1"
+}
+
 # ------------------------------------------
 # Layouts
 # ------------------------------------------

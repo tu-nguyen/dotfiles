@@ -386,7 +386,7 @@ reset_bashrc() {
     TEMP_DIRENV_TOML="$TEMP_CONFIG_DIR/direnv.toml"
     mkdir -p "$(dirname "$DIRENV_DEST_FILE")"
     sed "s|/home/username|$HOME|g" "$DIRENV_TEMPLATE_FILE" > "$TEMP_DIRENV_TOML"
-    cpp -q "$TEMP_DIRENV_TOML" "$DIRENV_DEST_FILE"
+    cpp "$TEMP_DIRENV_TOML" "$DIRENV_DEST_FILE"
     cpp "$DOTFILES_REPO_DIR/setup/bash/direnv/direnvrc" "$HOME/.config/direnv/direnvrc"
 
     # Copy starship config

@@ -106,6 +106,7 @@ _install_mac_packages() {
         brew install "${missing_pkgs[@]}"
 
         t SUCCESS "Installation of ${HDR_F}${missing_pkgs[*]}${NC} complete."
+    fi
 }
 
 # Function to install packages based on os; uses above helper functions

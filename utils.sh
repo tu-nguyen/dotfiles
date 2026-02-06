@@ -223,7 +223,7 @@ _install_starship() {
             t "Installing ${HDR_F}Starship${NC}.."
             curl -sS https://starship.rs/install.sh | sh
         else
-            t OK "${HDR_F}$(starship -V)${NC} is already installed at $(command -v starship)"
+            t OK "${HDR_F}$(starship -V)${NC} is already installed at ${SUB_F}$(command -v starship)${NC}"
         fi
     elif [[ "$OS_TYPE" == "macos" ]]; then
         _install_mac_package starship
@@ -236,7 +236,7 @@ _install_uv() {
         t "Installing ${HDR_F}uv${NC}.."
         curl -LsSf https://astral.sh/uv/install.sh | sh
     else
-        t OK "${HDR_F}$(uv --version)${NC} is already installed at $(command -v uv)"
+        t OK "${HDR_F}$(uv --version)${NC} is already installed at ${SUB_F}$(command -v uv)${NC}"
     fi
 }
 
@@ -263,7 +263,7 @@ _install_fnm() {
         t "Installing ${HDR_F}fnm${NC}.."
         curl -fsSL https://fnm.vercel.app/install | bash
     else
-        t OK "${HDR_F}$(fnm --version)${NC} is already installed at $(command -v fnm)"
+        t OK "${HDR_F}$(fnm --version)${NC} is already installed at ${SUB_F}$(command -v fnm)${NC}"
     fi
 }
 
@@ -273,15 +273,15 @@ _install_gitstatus() {
     local installed_or_updated="installed"
     GITSTATUS_DIR="$HOME/.gitstatus"
     if [ -d "$GITSTATUS_DIR/.git" ]; then
-        t OK "${SUB_F}gitstatus${NC} directory '$GITSTATUS_DIR' already exists. Pulling latest changes.."
+        t OK "${HDR_F}gitstatus${NC} directory '${SUB_F}$GITSTATUS_DIR${NC}' already exists. Pulling latest changes.."
         cd "$GITSTATUS_DIR"
         if ! git pull origin master &> /dev/null; then
-            t Warning "Failed to pull ${SUB_F}gitstatus${NC}. Using existing version."
+            t Warning "Failed to pull ${HDR_F}gitstatus${NC}. Using existing version."
         fi
         # printf "\033[1A\r\033[K"
         local installed_or_updated="updated"
     else
-        t "Cloning ${HDR_F}gitstatus${NC} repository to '$GITSTATUS_DIR'.."
+        t "Cloning ${HDR_F}gitstatus${NC} repository to '${SUB_F}$GITSTATUS_DIR${NC}'.."
         if ! git clone https://github.com/romkatv/gitstatus.git "$GITSTATUS_DIR"; then
             t Error"Failed to clone ${ERR}gitstatus${NC} repository."
         fi

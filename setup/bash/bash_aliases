@@ -12,11 +12,11 @@ alias root='sudo -i'
 alias su='sudo -i'
 alias svi='sudo vi'
 
-# automatic sudo for system commands if not root
+# Automatic sudo for system commands if not root
 if (( EUID != 0 )); then
     alias reboot='sudo reboot'
 
-    # package manager detection
+    # Package manager detection
     if [[ "$uname" == "Darwin" ]]; then
         # macos: use homebrew for 'update'
         if command -v brew &>/dev/null; then
@@ -30,7 +30,7 @@ if (( EUID != 0 )); then
         fi
     fi
 
-    # firewall / iptables (Guard for macos)
+    # Firewall / iptables (Guard for macos)
     if [[ "$uname" == "Darwin" ]]; then
         # macos: use pfctl equivalents
         alias ipt='sudo pfctl'
@@ -51,12 +51,12 @@ fi
 # macos compatibility for timeout
 [[ "$uname" == "Darwin" ]] && alias timeout=gtimeout
 
-# prevent catastrophic accidents on root
+# Prevent catastrophic accidents on root
 alias chown='chown --preserve-root'
 alias chmod='chmod --preserve-root'
 alias chgrp='chgrp --preserve-root'
 
-# interactive safety (stops accidental overwrites)
+# Interactive safety (stops accidental overwrites)
 alias cp='cp -iv'
 alias ln='ln -iv'
 alias mv='mv -iv'
@@ -90,7 +90,7 @@ alias ....="cd ../../.."
 alias .4="cd ../../../.."
 alias .5="cd ../../../../.."
 
-# open folder
+# Open folder
 if [[ "$uname" == "Darwin" ]]; then
     alias f='open -a Finder'
 else
@@ -120,15 +120,15 @@ alias l.='ls -d .* -G'            # show only hidden files
 # ------------------------------------------
 # System Monitoring & Tools
 # ------------------------------------------
-# installer
+# Installer
 alias p="sudo pacman"
 alias y="yaourt"
 
-# lang
+# Lang
 alias rb='ruby'
 alias py='python'
 
-# vim
+# Vim
 alias v='vim'
 alias svi='sudo vi'
 alias vis='vim "+set si"'
@@ -139,10 +139,10 @@ alias vimh='vim -c ":h | only"'
 alias vc='vim $DOTFILES_CONFIG_FILE'
 alias vdot='vim $DOTFILES_CONFIG_FILE'
 
-# code
+# Code
 alias c.='code .'
 
-# resource usage
+# Resource usage
 alias ps='[[ "$uname" == "Darwin" ]] && ps aux || ps auxf'
 alias j='jobs -l'
 alias df='df -H'
@@ -166,7 +166,7 @@ if ! command -v cpu &> /dev/null; then
     alias cpu="$(echo "$cpu_speed_mhz" | awk '{printf "%.3f", $1/1000}')Ghz"
 fi
 
-# networking
+# Networking
 alias myip="curl -s icanhazip.com"
 alias ping='ping -c 5'
 alias p4="ping 4.2.2.2 -c 4"
@@ -178,8 +178,8 @@ alias vnstat='vnstat -i eth1'
 alias iftop='iftop -i eth1'
 alias tcpdump='tcpdump -i eth1'
 alias ethtool='ethtool eth1'
-# work on wlan0 by default #
-# only useful for laptop as all servers are without wireless interface
+# Work on wlan0 by default #
+# Only useful for laptop as all servers are without wireless interface
 alias iwconfig='iwconfig wlan0'
 alias speedtest="wget -O /dev/null http://speed.transip.nl/100mb.bin"
 if ! command -v host &> /dev/null; then
@@ -276,7 +276,7 @@ if command -v dircolors >/dev/null 2>&1; then
         eval "$(dircolors -b)"
     fi
 
-    # standard color aliases
+    # Standard color aliases
     # alias ls='ls --color=auto'  # set above
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'

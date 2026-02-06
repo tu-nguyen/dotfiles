@@ -23,18 +23,18 @@ KEEP_IMAGES=(
 # ------------------------------------------
 # Functions
 # ------------------------------------------
-# export an image to tar
+# Export an image to tar
 dkexport() {
 	# TODO: add dest arg
 	docker save -o ${HOME}/Downloads/docker_image_backup.tar $1
 }
 
-# helper function to remove images (filtered)
+# Helper function to remove images (filtered)
 function dkrmif() {
-	# fetch all existing images in the format "repo:tag"
+	# Fetch all existing images in the format "repo:tag"
 	EXISTING_IMAGES=$(docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}')
 
-	# generate a list of images to keep, but only if they exist
+	# Generate a list of images to keep, but only if they exist
 	KEEP_EXISTING_IMAGES=()
 	for image in "${KEEP_IMAGES[@]}"; do
 			IMAGE_ID=$(echo "$EXISTING_IMAGES" | grep -E "^${image} " | awk '{print $2}')
@@ -43,7 +43,7 @@ function dkrmif() {
 			fi
 	done
 
-	# fetch all images IDs and remove those not in KEEP_EXISTING_IMAGES
+	# Fetch all images IDs and remove those not in KEEP_EXISTING_IMAGES
 	REMOVE_IMAGES=$(docker images -q | grep -v -F "$(printf "%s\n" "${KEEP_EXISTING_IMAGES[@]}" | awk '{print $1}')")
 
 	if [[ -n "$REMOVE_IMAGES" ]]; then
@@ -59,7 +59,7 @@ function dkrmif() {
 	done
 }
 
-# load a docker image from tar
+# Load a docker image from tar
 dkimport () {
 	if [ -z "$1" ]; then
 		t WARNING "no arg given, defaulting to 'docker_image_backup.tar'"
@@ -71,7 +71,7 @@ dkimport () {
 	docker load -i $1
 }
 
-# # docker prep
+# # Docker prep
 # function dkprep() {
 # 	t "pulling rmove-base"
 # 	docker pull ghcr.io/rsginc/rmove-base:2.3.0-312@sha256:b73f3a3ed32f6053d11b4342686cdba72e60fb8a523eac777fffc6e39e4e9d69
@@ -83,33 +83,33 @@ dkimport () {
 # 	docker pull ghcr.io/astral-sh/uv:latest
 # }
 
-# docker build
+# Docker build
 function dkbuild() {
 	docker-compose build --no-cache
 }
 
-# docker up
+# Docker up
 function dkup() {
 	docker-compose up -d
 }
 
-# docker down
+# Docker down
 function dkdown() {
 	docker-compose down
 }
 
-# docker buildup
+# Docker buildup
 function dkbuildup() {
 	docker-compose build --no-cache
 	docker-compose up -d
 }
 
-# docker restart
+# Docker restart
 function dkrestart() {
 	t "todo"
 }
 
-# run stop, rmi, and prunes
+# Run stop, rmi, and prunes
 dkclean() {
 	dkstop
 	docker container prune -f
@@ -119,7 +119,7 @@ dkclean() {
 	docker system df
 }
 
-# stop a docker container
+# Stop a docker container
 dkstop() {
 	if [ -n "$1" ]; then
 		docker stop "$1" && echo "Container $1 stopped successfully." || echo "Failed to stop container $1"
@@ -131,7 +131,7 @@ dkstop() {
     fi
 }
 
-# kill a docker container
+# Kill a docker container
 dkkill() {
 	if [ -n "$1" ]; then
 		docker stop "$1" && docker rm "$1" \
@@ -146,14 +146,14 @@ dkkill() {
 	fi
 }
 
-# run docker stop, kill and rm images
+# Run docker stop, kill and rm images
 function dkkillp() {
 	dkstop
 	dkkill
 	dkrmif
 }
 
-# do more than just clean
+# Do more than just clean
 dknuke() {
     dkstop
 	docker rm $(docker ps -aq)

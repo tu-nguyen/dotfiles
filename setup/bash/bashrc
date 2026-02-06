@@ -10,11 +10,11 @@
 # guard: if not running interactively, don't do anything to avoid breaking non-interactive scripts
 [[ $- != *i* ]] && return
 
-# input/output behavior
+# Input/output behavior
 set -o vi                           # use vi-style line editing
 set -o ignoreeof                    # prevent Ctrl-D from accidentally exiting the shell
 
-# shell options (shopt)
+# Shell options (shopt)
 shopt -s autocd                     # if a directory name is typed alone, cd into it
 shopt -s dotglob                    # include filenames beginning with a '.' in glob patterns
 shopt -s nullglob                   # if a pattern matches nothing, expand to nothing instead of the pattern itself
@@ -30,7 +30,7 @@ shopt -s histreedit                 # allow user to re-edit a failed history sub
 shopt -s histverify                 # load history substitution into the editing buffer instead of executing immediately
 shopt -s nocaseglob                 # case-insensitive globbing (used in pathname expansion)
 
-# enable programmable completion
+# Enable programmable completion
 if ! shopt -oq posix; then
     if [ -f /usr/share/bash-completion/bash_completion ]; then
         . /usr/share/bash-completion/bash_completion
@@ -40,9 +40,9 @@ if ! shopt -oq posix; then
 fi
 
 # ------------------------------------------
-# load custom bash files
+# Load Custom bash files
 # ------------------------------------------
-# dynamically loads all .bash_* files from your custom dotfiles directory (~/.config/dotfiles).
+# Dynamically loads all .bash_* files from your custom dotfiles directory (~/.config/dotfiles).
 : ${DOTFILES_CONFIG_DIR:="$HOME/.config/dotfiles"}
 : ${DOTFILES_CONFIG_FILE:="$DOTFILES_CONFIG_DIR/.dotfile_config"}
 if [[ -f "$DOTFILES_CONFIG_FILE" ]]; then
@@ -51,31 +51,31 @@ if [[ -f "$DOTFILES_CONFIG_FILE" ]]; then
 fi
 
 if [[ -d "$DOTFILES_CONFIG_DIR" ]]; then
-    # load core/style first (explicitly)
+    # Load core/style first (explicitly)
     [[ -f "$DOTFILES_CONFIG_DIR/.bash_style" ]] && . "$DOTFILES_CONFIG_DIR/.bash_style"
     [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 
     for file in "$DOTFILES_CONFIG_DIR"/.bash_*; do
-        # skip files we already loaded or specifically want to ignore
+        # Skip files we already loaded or specifically want to ignore
         case "$(basename "$file")" in
             .bash_style|.init) continue ;;
         esac
 
         if [[ -f "$file" && -r "$file" ]]; then
-            # start timer
+            # Start timer
             start_time=$EPOCHREALTIME
 
             . "$file"
 
-            # end timer (calculate difference in milliseconds)
-            # use bc for float math if needed, but simple string manipulation works too
+            # End timer (calculate difference in milliseconds)
+            # Use bc for float math if needed, but simple string manipulation works too
             end_time=$EPOCHREALTIME
 
-            # calculate duration in ms (1 second = 1000ms)
-            # using simple math via $(( )) for integer comparison
+            # Calculate duration in ms (1 second = 1000ms)
+            # Using simple math via $(( )) for integer comparison
             duration=$(echo "$end_time - $start_time" | awk '{print $1 * 1000}')
 
-            # if it takes longer than 50ms, scream pls
+            # If it takes longer than 50ms, scream pls
             # (50ms is barely noticeable, 100ms is when I'll punch my monitor)
             if (( duration_ms > 50 )); then
                 printf "${YELLOW}%-20s${NC} took ${RED}%0.2fms${NC}\n" "$(basename "$file")" "$duration"
@@ -91,7 +91,7 @@ fi
 # ------------------------------------------
 # Lesspipe & Pager Enhancements
 # ------------------------------------------
-# allows 'less' to open and view contents of archives, pdfs, etc.
+# Allows 'less' to open and view contents of archives, pdfs, etc.
 if [[ -x /usr/bin/lesspipe ]]; then
     eval "$(SHELL=/bin/sh lesspipe)"
 fi
@@ -99,7 +99,7 @@ fi
 # ------------------------------------------
 # Debian/Chroot Detection
 # ------------------------------------------
-# set variable identifying the chroot you work in (used in the prompt below)
+# Set variable identifying the chroot you work in (used in the prompt below)
 if [[ -z "${debian_chroot:-}" ]] && [[ -r /etc/debian_chroot ]]; then
     debian_chroot=$(qat /etc/debian_chroot)
 fi
@@ -111,13 +111,13 @@ _check_update_age() {
     local stamp_file="$DOTFILES_CONFIG_DIR/.last_update"
     local now=$(date +%s)
 
-    # if the file doesn't exist, create it and exit silently
+    # If the file doesn't exist, create it and exit silently
     if [[ ! -f "$stamp_file" ]]; then
         date +%s > "$stamp_file"
         return
     fi
 
-    # read the file safely; default to 0 if empty
+    # Read the file safely; default to 0 if empty
     local last_update
     last_update=$(cat "$stamp_file" 2>/dev/null)
     last_update=${last_update:-0}
@@ -141,14 +141,14 @@ _check_update_age
 dot-clean() {
     t "INFO" "Starting deep clean of temporary files and caches.."
 
-    # clean homebrew cache
+    # Clean homebrew cache
     if command -v brew &>/dev/null; then
         t "INFO" "Removing old Homebrew downloads.."
         brew cleanup -s
         rm -rf "$(brew --cache)"
     fi
 
-    # clean uv/python caches
+    # Clean uv/python caches
     if command -v uv &>/dev/null; then
         t "INFO" "Clearing uv cache..."
         uv cache clean
@@ -156,12 +156,12 @@ dot-clean() {
     t "INFO" "Removing recursive __pycache__ folders.."
     find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null
 
-    # clean Node/npm/Yarn
+    # Clean Node/npm/Yarn
     t "INFO" "Clearing npm/yarn caches..."
     [[ -d "$HOME/.npm" ]] && rm -rf "$HOME/.npm"/*
     [[ -d "$HOME/.yarn/berry/cache" ]] && rm -rf "$HOME/.yarn/berry/cache"/*
 
-    # deep project cleaning (interactive)
+    # Deep project cleaning (interactive)
     # This looks for node_modules in the current directory and subdirectories
     local node_dirs=$(find . -name "node_modules" -type d -prune | wc -l | xargs)
     if [[ "$node_dirs" -gt 0 ]]; then
@@ -173,7 +173,7 @@ dot-clean() {
         fi
     fi
 
-    # clear system logs/caches (safe subset)
+    # Clear system logs/caches (safe subset)
     t "INFO" "Clearing user logs..."
     rm -rf "$HOME/Library/Logs"/*
 
@@ -181,11 +181,11 @@ dot-clean() {
 }
 
 # -----------------------------------------
-# Greeting, motd, and colors
+# Greeting, MOTD, and Colors
 # ------------------------------------------
-# display the Message of the Day if the 'motd' command is available
+# Display the Message of the Day if the 'motd' command is available
 if [[ -f "$DOTFILES_CONFIG_DIR/.bash_motd" ]]; then
-    # assuming 'motd' is a function or alias defined in your .bash_ files
+    # Assuming 'motd' is a function or alias defined in your .bash_ files
     motd auto
 else
     [[ $(type -t t) == "function" ]] && t WARNING "MOTD file not found at $DOTFILES_CONFIG_DIR/.bash_motd\n"
@@ -194,9 +194,9 @@ fi
 # ------------------------------------------
 # Tools & Prompt
 # ------------------------------------------
-# bat theme and man
+# Bat theme and man
 # TODO: create my own?
-# further themes can be installed to '/home/valcr/.config/bat/themes', and are added to the cache with `bat cache --build`. For more information, see:
+# Further themes can be installed to '/home/valcr/.config/bat/themes', and are added to the cache with `bat cache --build`. For more information, see:
 # https://github.com/sharkdp/bat#adding-new-themes
 if [[ -z "$BAT_THEME" ]]; then
     export BAT_THEME='Visual Studio Dark+'
@@ -233,14 +233,14 @@ if command -v direnv &> /dev/null; then
     eval "$(direnv hook bash)"
 fi
 
-# window title: sets terminal tab title to "♥ CurrentDir"
+# Sets terminal tab title to "♥ CurrentDir"
 set_win_title() {
     echo -ne "\033]2;♥ ${PWD##*/}\007"
 }
 
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 
-# transient prompt for Starship
+# Transient prompt for Starship
 _starship_transient_prompt() {
     if [[ $? -eq 0 ]]; then
         printf "${OK_F}❯ ${NC}"

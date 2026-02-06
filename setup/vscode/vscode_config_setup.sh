@@ -20,7 +20,7 @@ DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
 [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"
 # --- End Load Configuration ---
 
-# extension installation
+# Extension installation
 extensions=(
     "zhuangtongfa.Material-theme"
     "PKief.material-icon-theme"

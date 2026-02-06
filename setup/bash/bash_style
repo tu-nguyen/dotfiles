@@ -17,31 +17,6 @@ else
     COLOR_MODE="basic"
 fi
 
-# function to convert hex to 0-5 scale for ANSI cube
-# same as the one in utils.sh
-_hex_to_256() {
-    # remove leading # if it exists
-    local hex="${1#\#}"
-
-    # extract R, G, B pairs
-    local r_hex="${hex:0:2}"
-    local g_hex="${hex:2:2}"
-    local b_hex="${hex:4:2}"
-
-    # convert hex to decimal (base 16)
-    local r=$((16#$r_hex))
-    local g=$((16#$g_hex))
-    local b=$((16#$b_hex))
-
-    # calculate the 256-color cube index
-    # (safe math for all bash versions)
-    if [ "$r" -eq "$g" ] && [ "$g" -eq "$b" ]; then
-        echo $(( 232 + (r * 23) / 255 ))
-    else
-        echo $(( 16 + (36 * (r * 5 / 255)) + (6 * (g * 5 / 255)) + (b * 5 / 255) ))
-    fi
-}
-
 # function to set foreground
 _set_fg() {
     local hex_in=$1; local basic=$2

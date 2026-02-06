@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # ===================================================================== #
-# install dotfiles script
+# INSTALL DOTFILES SCRIPT
 # ===================================================================== #
 set -e
 
 # ------------------------------------------
-# Pre-checks
+# Pre-Checks
 # ------------------------------------------
 # Keep sudo alive
 # See: https://gist.github.com/cowboy/3118588
@@ -87,25 +87,17 @@ fi
 # : ${OS_TYPE:=$OS_TYPE}  # Already set from above
 mkdir -p $DOTFILES_CONFIG_DIR
 
-# Helper to update or add a variable in your .dotfile_config
-# Copied from bash_functions
-_set_config() {
-    local key="$1"
-    local value="$2"
-
-    if [[ -z "$key" || -z "$value" ]]; then
-        t ERR "Usage: _set_config <KEY> <VALUE>"
-        return 1
-    fi
-
-    if grep -q "^$key=" "$DOTFILES_CONFIG_FILE"; then
-        # Line exists: Replace it
-        # Using '|' as a delimiter to safely handle paths/slashes in values
-        sed -i "s|^$key=.*|$key=$value|" "$DOTFILES_CONFIG_FILE"
-    else
-        # Line missing: Append it
-        echo "$key=$value" >> "$DOTFILES_CONFIG_FILE"
-    fi
+# ------------------------------------------
+# Pre-Reqs
+# ------------------------------------------
+# init should source bash_functions and bash_style (for t)
+. "$DOTFILES_REPO_DIR/setup/bash/init" || {
+    echo "Error: Could not source init"
+    exit 1
+}
+. "$DOTFILES_REPO_DIR/utils.sh" || {
+    echo "Error: Could not source utils.sh"
+    exit 1
 }
 
 # ------------------------------------------
@@ -137,7 +129,7 @@ if [[ "$DOTFILES_ENV_LOADED" == "false" ]]; then
 
         mv -f "$OLD_DOTFILES_CONFIG_FILE" "$DOTFILES_CONFIG_FILE"
 
-        _set_config "DOTFILES_CONFIG_FILE" "$DOTFILES_CONFIG_FILE"
+        set_config "DOTFILES_CONFIG_FILE" "$DOTFILES_CONFIG_FILE"
         . "$DOTFILES_CONFIG_FILE"
         DOTFILES_ENV_LOADED=true
     fi
@@ -151,25 +143,12 @@ if [[ "$DOTFILES_ENV_LOADED" == "false" ]]; then
         touch $DOTFILES_CONFIG_FILE
     fi
 
-    _set_config "DOTFILES_REPO" "$DOTFILES_REPO"
-    _set_config "DOTFILES_CONFIG_DIR" "$DOTFILES_CONFIG_DIR"
-    _set_config "DOTFILES_CONFIG_FILE" "$DOTFILES_CONFIG_FILE"
-    _set_config "DOTFILES_REPO_DIR" "$DOTFILES_REPO_DIR"
-    _set_config "OS_TYPE" "$OS_TYPE"
+    set_config "DOTFILES_REPO" "$DOTFILES_REPO"
+    set_config "DOTFILES_CONFIG_DIR" "$DOTFILES_CONFIG_DIR"
+    set_config "DOTFILES_CONFIG_FILE" "$DOTFILES_CONFIG_FILE"
+    set_config "DOTFILES_REPO_DIR" "$DOTFILES_REPO_DIR"
+    set_config "OS_TYPE" "$OS_TYPE"
 fi
-
-# ------------------------------------------
-# Pre-reqs
-# ------------------------------------------
-# init should source bash_style and bash_functions (for t)
-. "$DOTFILES_REPO_DIR/setup/bash/init" || {
-    echo "Error: Could not source init"
-    exit 1
-}
-. "$DOTFILES_REPO_DIR/utils.sh" || {
-    echo "Error: Could not source utils.sh"
-    exit 1
-}
 
 # ------------------------------------------
 # Main

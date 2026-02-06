@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-
+# ===================================================================== #
+# FIREFOX SCRIPT
+# ===================================================================== #
 # This script automates the setup of userChrome.css for Firefox.
 # It attempts to find your default Firefox profile, creates the 'chrome'
 # directory if it doesn't exist, and then copies an existing userChrome.css

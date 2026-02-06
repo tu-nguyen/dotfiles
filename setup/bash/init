@@ -17,18 +17,18 @@ else
 fi
 # --- End Load Configuration ---
 
-if [[ -f "$DOTFILES_REPO_DIR/setup/bash/bash_style" ]]; then
-    . "$DOTFILES_REPO_DIR/setup/bash/bash_style"
-elif [[ -f "$DOTFILES_CONFIG_DIR/.bash_style" ]]; then
-    . "$DOTFILES_CONFIG_DIR/.bash_style"
-else
-    echo "\e[31m[ WARN ]\e[0m Failed to load shell colors/styles"
-fi
-
 if [[ -f "$DOTFILES_REPO_DIR/setup/bash/bash_functions" ]]; then
     . "$DOTFILES_REPO_DIR/setup/bash/bash_functions"
 elif [[ -f "$DOTFILES_CONFIG_DIR/.bash_functions" ]]; then
     . "$DOTFILES_CONFIG_DIR/.bash_functions"
 else
     echo "\e[31m[ WARN ]\e[0m Failed to load core shell bash_functions"
+fi
+
+if [[ -f "$DOTFILES_REPO_DIR/setup/bash/bash_style" ]]; then
+    . "$DOTFILES_REPO_DIR/setup/bash/bash_style"
+elif [[ -f "$DOTFILES_CONFIG_DIR/.bash_style" ]]; then
+    . "$DOTFILES_CONFIG_DIR/.bash_style"
+else
+    echo "\e[31m[ WARN ]\e[0m Failed to load shell colors/styles"
 fi

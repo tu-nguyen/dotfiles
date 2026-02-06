@@ -6,10 +6,10 @@
 # ------------------------------------------
 # General Helper functions or setup
 # ------------------------------------------
-# separators
+# Separators
 br="${HDR_F}---------------------------------------------------------------------${NC}"
 
-# generalized function printer
+# Generalized function printer
 function print_tt() {
     local file="$1"
     if [[ ! -f "$file" ]]; then
@@ -45,9 +45,9 @@ function print_tt() {
 }
 
 # ------------------------------------------
-# main tts
+# Main tts
 # ------------------------------------------
-# general cheatsheet
+# General cheatsheet
 function tt() {
     if [ -z "$DOTFILES_CONFIG_DIR" ]; then
         DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
@@ -78,7 +78,7 @@ function tt() {
     printf "                       ${H2}→${NC} ${KEY_F}ports${NC} (netstat -tulanp)      ${H2}→${NC} ${KEY_F}diskspace${NC} (du)\n"
     printf "                       ${H2}→${NC} ${KEY_F}folder${NC} (dir and sizes)       ${H2}→${NC} ${KEY_F}path${NC} (readible \$PATH)\n"
     printf "                       ${H2}→${NC} ${KEY_F}tree${NC} (blazeit)               ${H2}→${NC} ${KEY_F}treed${NC} (tree dir only)\n"
-    # other other
+    # Other other
     printf "%s\n" "$br"
     printf "${SUB_F}other tt${NC}               ${H2}→${NC} ${KEY_F}btt${NC} (bash)                   ${H2}→${NC} ${KEY_F}djtt${NC} (django)\n"
     printf "                       ${H2}→${NC} ${KEY_F}gtt${NC} (git)                    ${H2}→${NC} ${KEY_F}gttt${NC} (git aliases)\n"
@@ -104,13 +104,13 @@ function tt() {
     printf "  ${KEY_F}cd-dot${NC}               ${H2}→${NC} to acd to original dotfiles dir\n"
 }
 
-# functions cheatsheet
+# Functions cheatsheet
 function ftt() {
     printf "${SUB_F}functions${NC}      \n"
     print_tt "$DOTFILES_CONFIG_DIR/.bash_functions"
 }
 
-# bash cheatsheet
+# Bash cheatsheet
 function btt() {
     printf "${HDR_F}bash cheatsheet${NC}\n"
     printf "%s\n" "$br"
@@ -166,7 +166,7 @@ function btt() {
     printf "%s\n" "$br"
 }
 
-# django cheatsheet
+# Django cheatsheet
 function djtt() {
     printf "${HDR_F}django cheatsheet${NC}\n"
     printf "%s\n" "$br"
@@ -194,7 +194,7 @@ function djtt() {
     printf "%s\n" "$br"
 }
 
-# git cheatsheet
+# Git cheatsheet
 function gtt() {
     printf "${HDR_F}git cheatsheet${NC}\n"
     printf "%s\n" "$br"
@@ -257,7 +257,7 @@ function gtt() {
     printf "%s\n" "$br"
 }
 
-# git cheatsheet expanded
+# Git cheatsheet expanded
 function gttt() {
     printf "${HDR_F}Git Aliases (Active)${NC}\n"
     printf "%s\n" "$br"
@@ -269,7 +269,7 @@ function gttt() {
     printf "%s\n" "$br"
 }
 
-# ssh cheatsheet
+# SSH cheatsheet
 function sshtt() {
     printf "${HDR_F}ssh cheatsheet${NC}\n"
     printf "%s\n" "$br"
@@ -290,7 +290,7 @@ function sshtt() {
     printf "%s\n" "$br"
 }
 
-# make cheatsheet
+# Make cheatsheet
 function makett() {
     printf "${HDR_F}makefile cheatsheet${NC}\n"
     printf "%s\n" "$br"
@@ -312,7 +312,7 @@ function makett() {
     printf "%s\n" "$br"
 }
 
-# python cheatsheet
+# Python cheatsheet
 function pytt() {
     printf "${HDR_F}python cheatsheet${NC}\n"
     printf "%s\n" "$br"
@@ -342,7 +342,7 @@ function pytt() {
     printf "%s\n" "$br"
 }
 
-# docker-compose cheatsheet
+# Docker-compose cheatsheet
 function dctt() {
     printf "${HDR_F}docker-compose cheatsheet${NC}\n"
     printf "%s\n" "$br"
@@ -359,7 +359,7 @@ function dctt() {
     printf "%s\n" "$br"
 }
 
-# docker cheatsheet
+# Docker cheatsheet
 function dktt() {
     printf "${HDR_F}docker cheatsheet${NC}\n"
     printf "%s\n" "$br"
@@ -378,7 +378,7 @@ function dktt() {
     printf "%s\n" "$br"
 }
 
-# vim cheatsheet
+# Vim cheatsheet
 function vtt() {
     printf "${HDR_F}vim cheatsheet${NC}\n"
     printf "%s\n" "$br"
@@ -415,7 +415,7 @@ function vtt() {
     printf "%s\n" "$br"
 }
 
-# general cheatsheet expanded
+# General cheatsheet expanded
 function ttt() {
     printf "${HDR_F}ttt: Command Reference${NC}\n"
     printf "%s\n" "$br"

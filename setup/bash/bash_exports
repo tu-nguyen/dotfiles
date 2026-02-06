@@ -6,21 +6,21 @@
 # ------------------------------------------
 # Path & Language Settings
 # ------------------------------------------
-# append path
+# Append path
 path_append() {
     if [[ -d "$1" ]] && [[ ":$PATH:" != *":$1:"* ]]; then
         PATH="$PATH:$1"
     fi
 }
 
-# prepend path
+# Prepend path
 path_prepend() {
     if [[ -d "$1" ]] && [[ ":$PATH:" != *":$1:"* ]]; then
         PATH="$1:$PATH"
     fi
 }
 
-# standard paths
+# Standard paths
 path_prepend "/usr/local/bin"
 path_prepend "$HOME/.local/bin"
 
@@ -29,8 +29,8 @@ path_prepend "$HOME/.local/bin"
 # ------------------------------------------
 # java/android (adjust paths based on your installation)
 [[ -d "/opt/android-sdk" ]] && export ANDROID_HOME="/opt/android-sdk"
-# on linux, JAVA_HOME is often /usr/lib/jvm/default-java
-# on macos, it is often /usr/bin/java (symlink)
+# On linux, JAVA_HOME is often /usr/lib/jvm/default-java
+# On macos, it is often /usr/bin/java (symlink)
 export JAVA_HOME="/usr"
 
 # export PATH=$PATH:$HOME/.local/bin
@@ -82,7 +82,7 @@ export VISUAL=vim
 export EDITOR=vim
 export PAGER="less"
 
-# only set TERM if it's not already set to something modern
+# Only set TERM if it's not already set to something modern
 # (forcing screen-256color can break TrueColor support in some terminals)
 if [[ "$TERM" == "dumb" ]] || [[ -z "$TERM" ]]; then
     export TERM="xterm-256color"
@@ -91,7 +91,7 @@ fi
 # ------------------------------------------
 # UI & Pager (less)
 # ------------------------------------------
-# colorized man pages for better readability
+# Colorized man pages for better readability
 export LESS_TERMCAP_mb=$'\E[01;31m'      # start blink
 export LESS_TERMCAP_md=$'\E[01;31m'      # start bold
 export LESS_TERMCAP_me=$'\E[0m'          # end mode

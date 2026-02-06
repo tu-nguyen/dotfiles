@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ===================================================================== #
-# Gitconfig
+# GITCONFIG SETUP SCRIPT
 # ===================================================================== #
 DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"
 [[ -f "$DOTFILES_CONFIG_DIR/.init" ]] && . "$DOTFILES_CONFIG_DIR/.init"

@@ -1,51 +1,29 @@
 #!/usr/bin/env bash
-
+# ===================================================================== #
+# UTILS FOR INSTALLATION
+# ===================================================================== #
 
 # ------------------------------------------
-# Helper functions
+# Helper Functions
 # ------------------------------------------
-# generic prompt
-_prompt() {
+# Generic reset prompt
+_reset_prompt() {
     local config="$1"
 
-    # If FORCE_YES is set, we skip the prompt and return success (0)
-    [[ -n "$FORCE_YES" ]] && return 0
-
-    # -p: prompt, -r: raw, -n 1: read only one character
-    read -p "Are you sure you want to ${H}$config${NC}? This may ${RED}erase existing data${NC}. [y/N] " -r -n 1
-
-    # move to a new line immediately after the keypress so the next output is clean
-    echo ""
-
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        t "Skipping.."
-        return 1
-    fi
-
-    t OK "${OK}Starting ${H}$config${OK} reset.${NC}"
-    return 0
+    _prompt "Are you sure you want to ${H}$config${NC}? This may ${RED}erase existing data${NC}."
 }
 
-# function to copy and source (cpp from setup/bash/bash_functions)
+# Function to copy and source (cpp from setup/bash/bash_functions)
 _cp_and_src() {
     cpp -s "$@"
 }
 
-# function to convert hex to 0-5 scale for ansi cube
-_hex_to_256() {
-    local hex=$(echo "$1" | sed 's/#//')
-    local r=$((16#${hex:0:2} * 5 / 255))
-    local g=$((16#${hex:2:2} * 5 / 255))
-    local b=$((16#${hex:4:2} * 5 / 255))
-    echo $((16 + 36*r + 6*g + b))
-}
-
-# function to convert color, mainly for starship atm
+# Function to convert color, mainly for starship atm
 _convert_hex_to_ansi() {
     local input_file="$1"
     local output_file="${2:-$input_file.converted}"
 
-    # Create a copy to work on
+    # create a copy to work on
     cpp "$input_file" "$output_file"
 
     t OK "Converting Hex to ANSI 256 for: $(basename "$input_file")"
@@ -59,22 +37,36 @@ _convert_hex_to_ansi() {
     t OK "Hex to ANSI 256 conversion for $(basename $input_file) completed!"
 }
 
-
 # ------------------------------------------
-# Helper functions generic install
+# Helper Functions Generic install
 # ------------------------------------------
-# function to linux packages via apt install
+# Function to linux packages via apt install
 # TODO: add support for arch yoart
-_install_linux_package() {
-    if dpkg -s "$1" &>/dev/null; then
-        t SUCCESS "${HDR_F}$1${NC} is already installed via apt."
+_install_linux_packages() {
+    local missing_pkgs=()
+
+    # find what's actually missing
+    for pkg in "$@"; do
+        if dpkg -s "$pkg" &>/dev/null; then
+            t SUCCESS "${HDR_F}$pkg${NC} is already installed!"
+        else
+            missing_pkgs+=("$pkg")
+        fi
+    done
+
+    # if missing packages, install them in one batch
+    if [ ${#missing_pkgs[@]} -gt 0 ]; then
+        t "Installing missing packages: ${HDR_F}${missing_pkgs[*]}${NC}.."
+
+        # update once before batch installing to ensure we get latest versions
+        sudo apt update -y
+        sudo apt install -y "${missing_pkgs[@]}"
     else
-        t "Installing ${HDR_F}$1${NC}.."
-        sudo apt install -y "$@"
+        t SUCCESS "All Linux packages are already up to date."
     fi
 }
 
-# function to install brew
+# Function to install brew
 _install_brew() {
     if ! command -v brew &> /dev/null; then
         t INFO "${HDR_F}homebrew${NC} not found. Installing ${HDR_F}homebrew${NC}.."
@@ -84,32 +76,50 @@ _install_brew() {
     fi
 }
 
-# function to mac packages via brew
-_install_mac_package() {
+# Function to mac packages via brew
+_install_mac_packages() {
+    # Ensure brew is available before proceeding
     _install_brew
-    if brew list "$1" &>/dev/null; then
-        t SUCCESS "${HDR_F}$1${NC} is already installed via brew."
+
+    local missing_pkgs=()
+
+    # Identify which packages aren't installed yet
+    for pkg in "$@"; do
+        if brew list "$pkg" &>/dev/null; then
+            t SUCCESS "${HDR_F}$pkg${NC} is already installed via brew."
+        else
+            missing_pkgs+=("$pkg")
+        fi
+    done
+
+    # Install the missing ones in a single batch
+    if [ ${#missing_pkgs[@]} -gt 0 ]; then
+        t "Installing missing brew packages: ${HDR_F}${missing_pkgs[*]}${NC}.."
+
+        brew install "${missing_pkgs[@]}"
+
+        t SUCCESS "Installation of ${HDR_F}${missing_pkgs[*]}${NC} complete."
     else
-        t "Installing ${HDR_F}$1${NC}.."
-        brew install "$@"
+        t SUCCESS "All requested macos packages are already present."
     fi
 }
 
-# function to install packages based on os; uses above helper functions
-_install_package() {
-    local package_name="$1"
+# Function to install packages based on os; uses above helper functions
+_install_packages() {
+    [[ $# -eq 0 ]] && return
+
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
-        _install_linux_package "$package_name"
+        _install_linux_packages "$@"
     elif [[ "$OS_TYPE" == "macos" ]]; then
-        _install_mac_package "$package_name"
+        _install_mac_packages "$@"
     fi
 }
 
 
 # ------------------------------------------
-# Helper functions specific install
+# Helper Functions Specific install
 # ------------------------------------------
-# function to install (patch) fira code (nerd font icons)
+# Function to install (patch) fira code (nerd font icons)
 _install_fira_font() {
     local font_name="FiraCode Nerd Font"
     local fira_font_installed=0
@@ -128,7 +138,7 @@ _install_fira_font() {
     fi
 
     if [[ "$OS_TYPE" == "wsl" ]]; then
-        # check registry for Font registration (more reliable than 'dir' in Fonts folder)
+        # Check registry for Font registration (more reliable than 'dir' in Fonts folder)
         if powershell.exe -NoProfile -Command "Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts' | Get-Member | Where-Object Name -like '*FiraCode*'" &>/dev/null; then
             t SUCCESS "${HDR_F}${font_name,,}${NC} found in Windows Registry."
             font_installed=1
@@ -154,17 +164,17 @@ _install_fira_font() {
         unzip -o "./FiraCode.zip" -d "$font_dir" && rm "./FiraCode.zip"
         [ -x "$(command -v fc-cache)" ] && fc-cache -f
 
-        # if WSL, also trigger the windows side (chocolatey)
+        # If WSL, also trigger the windows side (chocolatey)
         if [[ "$OS_TYPE" == "wsl" ]]; then
             t INFO "Installing Chocolatey and Fira Code.."
 
-            # detect the mount point to find where to write the temp file
+            # Detect the mount point to find where to write the temp file
             local win_temp="/c/Users/Public"
             [ -d "/mnt/c/Windows" ] && win_temp="/mnt/c/Users/Public"
             local ps1_path="$win_temp/install_choco_fira.ps1"
             local win_ps1_path="C:\\Users\\Public\\install_choco_fira.ps1"
 
-            # write the ps1 file using a 'quoted' heredoc (qat << 'EOF')
+            # Write the ps1 file using a 'quoted' heredoc (qat << 'EOF')
             # this ensures bash does NOT touch any backslashes or variables inside.
             qat << 'EOF' > "$ps1_path"
 Set-Location C:\
@@ -184,14 +194,14 @@ $env:Path += ";$env:ALLUSERSPROFILE\chocolatey\bin"
 Write-Host "Installing Fira Code Nerd Font..." -ForegroundColor Cyan
 & choco install firacodenf -y
 EOF
-            # elevate and Run
+            # Elevate and Run
             # Set-Location C:\ is added to the initial call to kill the UNC/WSL path warning
             powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
                 Set-Location C:\\;
                 Start-Process powershell -ArgumentList '-NoProfile', '-ExecutionPolicy Bypass', '-File', '$win_ps1_path' -Verb RunAs -Wait
             "
 
-            # cleanup and verification
+            # Cleanup and verification
             rm "$ps1_path"
         fi
     elif [[ "$OS_TYPE" == "macos" ]]; then
@@ -201,7 +211,7 @@ EOF
     t SUCCESS "${SUCCESS}Installation complete!${NC}"
 }
 
-# function to install starship
+# Function to install starship
 _install_starship() {
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         if ! command -v starship &> /dev/null; then
@@ -215,7 +225,7 @@ _install_starship() {
     fi
 }
 
-# function to install uv
+# Function to install uv
 _install_uv() {
     if ! command -v uv &> /dev/null; then
         t "Installing ${HDR_F}uv${NC}.."
@@ -223,21 +233,14 @@ _install_uv() {
     else
         t OK "${HDR_F}$(uv --version)${NC} is already installed at $(command -v uv)"
     fi
+}
 
-    # update the uv binary itself
-    uv self update
-    # ensure ~/.local/bin is in your PATH
-    uv tool update-shell
-    # ensure python and python3 points to uv's python
-    uv python install 3.13 --default
-    # ensure python vmersion upgrades to latest supported patch release
-    uv python upgrade
-    # update all tools installed via 'uv tool install' (uv-secure, ruff, etc.)
-    uv tool upgrade --all
-
-    # list of tools to install via 'uv tool' (for python-based)
+_install_uv_tools() {
+    # List of tools to install via 'uv tool' (for python-based)
     # or system packages/binary downloads
-    local python_tools=("uv-secure" "ruff" "trufflehog" "thefuck")
+    local python_tools=("uv-secure" "ruff" "trufflehog")
+
+    # Removed "thefuck" since 3.13 broke it, tf
 
     for tool in "${python_tools[@]}"; do
         if ! command -v "$tool" &> /dev/null; then
@@ -249,7 +252,7 @@ _install_uv() {
     done
 }
 
-# function to install fast node manager
+# Function to install fast node manager
 _install_fnm() {
     if ! command -v fnm &> /dev/null; then
         t "Installing ${HDR_F}fnm${NC}.."
@@ -259,7 +262,7 @@ _install_fnm() {
     fi
 }
 
-# function to install gitstatus
+# Function to install gitstatus
 _install_gitstatus() {
     local original_dir=$(pwd)
     local installed_or_updated="installed"
@@ -283,25 +286,35 @@ _install_gitstatus() {
     t OK "${HDR_F}gitstatus${NC} $installed_or_updated successfully!"
 }
 
-
 # ------------------------------------------
 # Main
 # ------------------------------------------
-# main install packages function
-_install_packages() {
-    local core_packages=("curl" "vim" "git" "make" "jq" "colordiff" "wget" "tree" "bat")
+clone_or_pull_dotfiles
 
-    for core_package in "${core_packages[@]}"; do
-        _install_package "$core_package"
-    done
+reset_pre() {
+    t IMPORTANT "This should be ran at least once!"
+    _reset_prompt "run pre_setup"
+    if [[ $RETURN -ne 0 ]]; then
+        return 0
+    fi
+    t OK "${OK}Starting ${H}pre-config${OK} reset.${NC}"
+
+    mkdir -p "$HOME/.config"
+    # mkdir -p "$HOME/workplace"
+    # mkdir -p "$HOME/workplace/repo"
+
+    local core_packages=("curl" "vim" "git" "make" "jq" "colordiff" "wget" "tree" "bat")
+    _install_packages "${core_packages[@]}"
 
     _install_gitstatus
     _install_fira_font
     _install_starship
     _install_uv
+    _update_uv
+    _install_uv_tools
     _install_fnm
 
-    # for both linux & wsl only
+    # For both linux & wsl only
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
         # TODO: Remove when we crawl back to arch
         if ! command -v apt &>/dev/null; then
@@ -309,51 +322,33 @@ _install_packages() {
             return 1
         fi
 
-        _install_package coreutils
-        _install_package less
-        _install_package iptables
+        local linux_packages=("coreutils" "less" "iptables")
+        _install_packages "${linux_packages[@]}"
 
-        # post bat stuff
+        # Post bat stuff
         mkdir -p ~/.local/bin
         ln -sf /usr/bin/batcat ~/.local/bin/bat
     # macos only
     elif [[ "$OS_TYPE" == "macos" ]]; then
-        _install_package lesspipe
-        _install_package htop
-        _install_package rsync
-        _install_package python@3.13
+        # NOTE: python@3.13 removed in favor of uv
+        local mac_packages=("lesspipe" "htop" "rsync")
+        _install_packages "${linux_packages[@]}"
     else
         t ERROR "Unsupported OS: ${ERR}$OS_TYPE${NC}. Please install the required packages manually."
         return 1
     fi
 
     t SUCCESS "${SUCCESS}All required packages installed successfully.${NC}"
-    return 0
-}
-
-clone_or_pull_dotfiles
-
-reset_pre() {
-    t IMPORTANT "This should be ran at least once!"
-    _prompt "run pre_setup"
-    if [[ $RETURN -ne 0 ]]; then
-        return 0
-    fi
-
-    mkdir -p "$HOME/.config"
-    # mkdir -p "$HOME/workplace"
-    # mkdir -p "$HOME/workplace/repo"
-
-    _install_packages
 
     t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_pre()${SUCCESS} completed!!${NC}"
 }
 
 reset_bashrc() {
-    _prompt "reset .bashrc" "$1"
+    _reset_prompt "reset .bashrc" "$1"
     if [[ $RETURN -ne 0 ]]; then
         return 0
     fi
+    t OK "${OK}Starting ${H}bash${OK} reset.${NC}"
 
     _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bash_style" "$DOTFILES_CONFIG_DIR/.bash_style"
     _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/init" "$DOTFILES_CONFIG_DIR/.init"
@@ -377,7 +372,7 @@ reset_bashrc() {
 
     TEMP_CONFIG_DIR=$(mktemp -d)
 
-    # copy direnv config
+    # Copy direnv config
     DIRENV_TEMPLATE_FILE="$DOTFILES_REPO_DIR/setup/bash/direnv/direnv.toml"
     DIRENV_DEST_FILE="$HOME/.config/direnv/direnv.toml"
     TEMP_DIRENV_TOML="$TEMP_CONFIG_DIR/direnv.toml"
@@ -385,13 +380,13 @@ reset_bashrc() {
     sed "s|/home/username|$HOME|g" "$DIRENV_TEMPLATE_FILE" > "$TEMP_DIRENV_TOML"
     cpp -q "$TEMP_DIRENV_TOML" "$DIRENV_DEST_FILE"
 
-    # copy starship config
+    # Copy starship config
     STARSHIP_SRC_DIR="$DOTFILES_REPO_DIR/setup/bash/starship"
     STARSHIP_DEST_DIR="$HOME/.config"
 
-    # loop through all starship .toml files in the source directory
+    # Loop through all starship .toml files in the source directory
     for template in "$STARSHIP_SRC_DIR"/starship*.toml; do
-        # get just the filename (e.g., starship.gruvbox.toml)
+        # Get just the filename (e.g., starship.gruvbox.toml)
         filename=$(basename "$template")
         temp_output="$TEMP_CONFIG_DIR/$filename"
         dest_output="$STARSHIP_DEST_DIR/$filename"
@@ -399,7 +394,7 @@ reset_bashrc() {
         if [[ "$OS_TYPE" == "macos" ]]; then
             _convert_hex_to_ansi "$template" "$temp_output"
         else
-            # using -q for quiet preprocessing
+            # Using -q for quiet preprocessing
             cpp -q "$template" "$temp_output"
         fi
         cpp "$temp_output" "$dest_output"
@@ -418,9 +413,10 @@ reset_bashrc() {
 
 reset_vimrc() {
     # TODO: replace with nvim?
-    if ! _prompt "reset .vimrc"; then
+    if ! _reset_prompt "reset .vimrc"; then
         return 0
     fi
+    t OK "${OK}Starting ${H}vim${OK} reset.${NC}"
 
     cpp -q "$DOTFILES_REPO_DIR/setup/vim/vimrc" "$HOME/.vimrc"
 
@@ -436,9 +432,10 @@ reset_vimrc() {
 }
 
 reset_git_config() {
-    if ! _prompt "reset .gitconfig"; then
+    if ! _reset_prompt "reset .gitconfig"; then
         return 0
     fi
+    t OK "${OK}Starting ${H}git${OK} reset.${NC}"
 
     chmod +x $DOTFILES_REPO_DIR/setup/git/git_config_setup.sh
     $DOTFILES_REPO_DIR/setup/git/git_config_setup.sh
@@ -447,9 +444,10 @@ reset_git_config() {
 }
 
 reset_vscode_config() {
-    if ! _prompt "reset the vscode configs"; then
+    if ! _reset_prompt "reset the vscode configs"; then
         return 0
     fi
+    t OK "${OK}Starting ${H}vscode${OK} reset.${NC}"
 
     chmod +x $DOTFILES_REPO_DIR/setup/vscode/vscode_config_setup.sh
     $DOTFILES_REPO_DIR/setup/vscode/vscode_config_setup.sh || t WARNING "Some error occured during reset_vscode_config()"
@@ -458,9 +456,10 @@ reset_vscode_config() {
 }
 
 reset_wsl_config() {
-    if ! _prompt "reset the wsl configs"; then
+    if ! _reset_prompt "reset the wsl configs"; then
         return 0
     fi
+    t OK "${OK}Starting ${H}wsl${OK} reset.${NC}"
 
     if [[ "$OS_TYPE" != "wsl" ]]; then
         t WARN "This function is only for ${RED}wsl${NC}. Skipping wsl configuration reset."
@@ -474,14 +473,15 @@ reset_wsl_config() {
 }
 
 reset_registry() {
-    if ! _prompt "reset the registry entries"; then
+    if ! _reset_prompt "reset the registry entries"; then
         return 0
     fi
 
     if [[ "$OS_TYPE" != "wsl" ]]; then
-        t WARN "This function is only for ${RED}wsl${NC}. Skipping registry reset."
+        t ERR "This function is only for ${RED}wsl${NC}. Skipping registry reset."
         return 0
     fi
+    t OK "${OK}Starting ${H}registry${OK} reset.${NC}"
 
     chmod +x $DOTFILES_REPO_DIR/setup/registry/registry_script.ps1
 
@@ -491,7 +491,7 @@ reset_registry() {
 }
 
 reset_ps() {
-    if ! _prompt "reset the PowerShell profile"; then
+    if ! _reset_prompt "reset the ps profile"; then
         return 0
     fi
 
@@ -499,6 +499,7 @@ reset_ps() {
         t ERROR "This function is only for ${ERR}WSL${NC}. Skipping WSL configuration reset."
         return 0
     fi
+    t OK "${OK}Starting ${H}ps${OK} reset.${NC}"
 
     chmod +x $DOTFILES_REPO_DIR/setup/powershell/ps1_setup.sh
     $DOTFILES_REPO_DIR/setup/powershell/ps1_setup.sh  || t WARNING "Some error occured during reset_ps()"
@@ -507,9 +508,10 @@ reset_ps() {
 }
 
 reset_firefox() {
-    if ! _prompt "reset the firefox configs"; then
+    if ! _reset_prompt "reset the firefox configs"; then
         return 0
     fi
+    t OK "${OK}Starting ${H}firefox config${OK} reset.${NC}"
 
     chmod +x $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh
     $DOTFILES_REPO_DIR/setup/firefox/firefox_setup.sh || t WARNING "Some error occured during reset_firefox()"
@@ -518,7 +520,7 @@ reset_firefox() {
 }
 
 reset_macos_config() {
-    if ! _prompt "reset the macos configs"; then
+    if ! _reset_prompt "reset the macos configs"; then
         return 0
     fi
 
@@ -526,6 +528,7 @@ reset_macos_config() {
         t WARN "This function is only for ${RED}macos${NC}. Skipping macos configuration reset."
         return 0
     fi
+    t OK "${OK}Starting ${H}macos${OK} reset.${NC}"
 
     chmod +x $DOTFILES_REPO_DIR/setup/macos/macos_config_setup.sh
     $DOTFILES_REPO_DIR/setup/macos/macos_config_setup.sh  || t WARNING "Some error occured during reset_macos_config()"

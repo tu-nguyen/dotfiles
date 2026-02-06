@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-
+# ===================================================================== #
+# PS1 SETUP SCRIPT
+# ===================================================================== #
 # --- Start Load Configuration ---
 if [ -z "$DOTFILES_CONFIG_DIR" ]; then
     DOTFILES_CONFIG_DIR="$HOME/.config/dotfiles"

@@ -7,6 +7,9 @@ DOTFILES_CONFIG_FILE=/path/to/.dotfile_config
 # wsl, linux, macos
 OS_TYPE=some_os
 
+# default targets
+# DOT_PYTHON_VERSION
+
 ## Asana Project Board
 # ASANA_PROJECT_GID=
 # ASANA_PAT=

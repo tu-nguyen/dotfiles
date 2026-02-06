@@ -1,13 +1,15 @@
 [global]
-# Automatically allow .envrc files in specific directories
+# Load .env files automatically
 load_dotenv = true
 disable_status = true
+disable_stdin = true
+log_format = "-"
+
 
 [whitelist]
 # Files in these paths are allowed to run without you typing `direnv allow`
 prefix = [ "/home/username/workplace/repo/" ]
 
 [strict]
-# If true, direnv will fail if there is an error in your .envrc
-# Catch syntax errors early
+# If true, direnv load .envrc files will be loaded with set -euo pipefail
 strict_env = true

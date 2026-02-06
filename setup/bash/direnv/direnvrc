@@ -15,7 +15,8 @@ fi
 
 # Override direnv's internal log_status to t
 log_status() {
-    t INFO "$1"
+    # t INFO "$1"
+    "$1" 2>/dev/null
 }
 
 log_error() {
@@ -25,6 +26,50 @@ log_error() {
 # ------------------------------------------
 # Layouts
 # ------------------------------------------
+# Custom layout for env
+layout_dotenv() {
+    if [[ -f .env ]]; then
+        dotenv 2>/dev/null
+
+        # local vars=$(grep -E '^[A-Z0-9_]+=' .env | cut -d= -f1 | tr '\n' ',' | sed 's/,$//')
+
+        # if [[ -n "$vars" ]]; then
+        #     t OK "Loaded: $vars"
+        # fi
+        local mapfile_keys
+        mapfile -t mapfile_keys < <(grep -E '^[A-Z0-9_]+=' .env | cut -d= -f1)
+
+        local total=${#mapfile_keys[@]}
+        local display_limit=5
+        local output=""
+
+        if (( total > 0 )); then
+            # Take the first 5 variables
+            output=$(echo "${mapfile_keys[@]:0:$display_limit}" | tr ' ' ', ')
+
+            # If there are more than 5, add the "and X others" suffix
+            if (( total > display_limit )); then
+                local remaining=$(( total - display_limit ))
+                output="$output (and $remaining others)"
+            fi
+
+            t OK "Loaded from ${SUB_F}.env${NC}: $output"
+        fi
+    fi
+}
+
+# layout_custom_load() {
+#     # Check for .envrc (redundant but safe) and .env
+#     if [[ -f .envrc && -f .env ]]; then
+#         # Load the .env silently
+#         dotenv 2>/dev/null
+
+#         # Use your 't' function to announce it
+#         t INFO "Environment loaded (found .envrc + .env)"
+#     fi
+# }
+
+
 # Custom layout for uv
 layout_uv() {
     # Respect UV_PROJECT_VENV if set, otherwise default to .venv
@@ -54,10 +99,13 @@ layout_uv() {
         fi
     fi
 
+    # Silent Activation
     if [[ -d "$venv" ]]; then
         source_env "$venv/bin/activate" >/dev/null 2>&1
+        venv=$(basename "$venv")
     elif [[ -d .venv ]]; then
         source_env .venv/bin/activate >/dev/null 2>&1
+        venv=.venv
     elif [[ -d venv ]]; then
         source_env venv/bin/activate >/dev/null 2>&1
         venv=venv
@@ -120,42 +168,16 @@ layout_node() {
     fi
 }
 
-# Custom layout for env
-layout_dotenv() {
-    if [[ -f .env ]]; then
-        dotenv
-
-        # local vars=$(grep -E '^[A-Z0-9_]+=' .env | cut -d= -f1 | tr '\n' ',' | sed 's/,$//')
-
-        # if [[ -n "$vars" ]]; then
-        #     t OK "Loaded: $vars"
-        # fi
-        local mapfile_keys
-        mapfile -t mapfile_keys < <(grep -E '^[A-Z0-9_]+=' .env | cut -d= -f1)
-
-        local total=${#mapfile_keys[@]}
-        local display_limit=5
-        local output=""
-
-        if (( total > 0 )); then
-            # Take the first 5 variables
-            output=$(echo "${mapfile_keys[@]:0:$display_limit}" | tr ' ' ', ')
-
-            # If there are more than 5, add the "and X others" suffix
-            if (( total > display_limit )); then
-                local remaining=$(( total - display_limit ))
-                output="$output (and $remaining others)"
-            fi
-
-            t OK "Loaded from ${SUB_F}.env${NC}: $output"
-        fi
-    fi
-}
 
 # ------------------------------------------
 # Global Detection
 # ------------------------------------------
 if [[ "$PWD" != "$HOME" ]]; then
+    # Check for Secrets
+    if [[ -f .env ]]; then
+        layout_dotenv
+    fi
+
     # Check for Python/UV
     if [[ -f uv.lock || -f pyproject.toml || -d .venv || -d venv ]]; then
         layout_uv
@@ -166,8 +188,5 @@ if [[ "$PWD" != "$HOME" ]]; then
         layout_node
     fi
 
-    # Check for Secrets
-    if [[ -f .env ]]; then
-        layout_dotenv
-    fi
+
 fi

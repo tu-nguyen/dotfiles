@@ -37,7 +37,7 @@ layout_uv() {
         expected_version=$(cat .python-version | tr -d '[:space:]')
     elif [[ -f pyproject.toml ]]; then
         # Extracts 'requires-python = ">=3.12"' -> '3.12'
-        expected_version=$(grep "requires-python" pyproject.toml | sed 's/.*"\(.*\)".*/\1/' | tr -d '>=<^ ')
+        expected_version=$(grep "requires-python" pyproject.toml | sed 's/[^0-9.]//g')
     fi
 
     # Check if a venv is currently active
@@ -69,11 +69,26 @@ layout_uv() {
     local actual_version
     actual_version=$(python -c 'import platform; print(platform.python_version())')
 
-    if [[ -n "$expected_version" && "$actual_version" != "$expected_version"* ]]; then
-        t WARN "Version mismatch! Expected ${HDR_F}$expected_version${NC}, but venv has ${SUB_F}$actual_version${NC}"
-        t INFO "Run '${HDR_F}uv sync${NC}' to update the environment."
+    if [[ -n "$expected_version" ]]; then
+        # Check if the expected version is a range (contains >=)
+        if [[ $(grep "requires-python" pyproject.toml 2>/dev/null) == *">="* ]]; then
+            # Use sort -V to see if actual_version is at least the expected_version
+            # If the oldest version is NOT the expected_version, it means actual is >= expected
+            local lowest=$(printf '%s\n%s' "$expected_version" "$actual_version" | sort -V | head -n1)
+
+            if [[ "$lowest" != "$expected_version" && "$actual_version" != "$expected_version" ]]; then
+                t WARN "Version mismatch! Project requires ${ERR}>=$expected_version${NC}, but ${SUB_F}venv${NC} is only ${WARN}$actual_version${NC}"
+            else
+                t SUCCESS "${HDR_F}uv${NC} activated ${HDR_F}python $actual_version${NC} (meets >=$expected_version)"
+            fi
+        # Otherwise, do the standard "starts with" check for fixed versions
+        elif [[ "$actual_version" != "$expected_version"* ]]; then
+            t WARN "Version mismatch! Expected ${HDR_F}$expected_version${NC}, but venv has ${SUB_F}$actual_version${NC}"
+        else
+            t SUCCESS "${HDR_F}uv${NC} activated ${HDR_F}python $actual_version${NC}"
+        fi
     else
-        t SUCCESS "${HDR_F}uv${NC} activated ${HDR_F}python $actual_version${NC} from ${SUB_F}$(basename "$venv_path")${NC}"
+        t SUCCESS "${HDR_F}uv${NC} activated ${HDR_F}python $actual_version${NC}"
     fi
 }
 

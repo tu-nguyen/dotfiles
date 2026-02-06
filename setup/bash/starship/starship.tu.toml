@@ -228,3 +228,8 @@ format = '[$symbol($version)]($style)'
 symbol = " "
 style = "fg:color_cyan"
 format = '[$symbol($version)]($style)'
+
+[python]
+symbol = " "
+style = "fg:color_cyan"
+format = '[$symbol($version)]($style)'

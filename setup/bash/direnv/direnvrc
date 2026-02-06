@@ -3,7 +3,7 @@ layout_uv() {
     local venv="${UV_PROJECT_VENV:-.venv}"
     if [[ -n "$UV_PROJECT_VENV" && -d "$UV_PROJECT_VENV" ]]; then
         source_env "$UV_PROJECT_VENV/bin/activate"
-    if [[ -d .venv ]]; then
+    elif [[ -d .venv ]]; then
         source_env .venv/bin/activate
     elif [[ -d venv ]]; then
         source_env venv/bin/activate

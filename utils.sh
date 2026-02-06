@@ -374,6 +374,8 @@ reset_bashrc() {
         echo "alias dot='cd-dot'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
     fi
 
+    . "$DOTFILES_CONFIG_DIR/.bash_aliases"
+
     . "$HOME/.bashrc"
 
     TEMP_CONFIG_DIR=$(mktemp -d)
@@ -385,6 +387,7 @@ reset_bashrc() {
     mkdir -p "$(dirname "$DIRENV_DEST_FILE")"
     sed "s|/home/username|$HOME|g" "$DIRENV_TEMPLATE_FILE" > "$TEMP_DIRENV_TOML"
     cpp -q "$TEMP_DIRENV_TOML" "$DIRENV_DEST_FILE"
+    cpp -q "$DOTFILES_REPO_DIR/setup/bash/direnv/direnvrc" "$HOME/.config/direnv/direnvrc"
 
     # Copy starship config
     STARSHIP_SRC_DIR="$DOTFILES_REPO_DIR/setup/bash/starship"

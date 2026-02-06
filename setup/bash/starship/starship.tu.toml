@@ -219,7 +219,7 @@ format = ' [$symbol($version)]($style) '
 [java]
 symbol = " "
 style = "fg:color_cyan"
-format = ' [$symbol($version)]($style)'
+format = ' [$symbol($version)]($style) '
 
 [julia]
 symbol = " "
@@ -227,7 +227,7 @@ style = "fg:color_cyan"
 format = ' [$symbol($version)]($style) '
 
 [nodejs]
-symbol = ""
+symbol = " "
 style = "fg:color_purple"
 format = ' [$symbol($version)]($style) '
 
@@ -237,7 +237,7 @@ style = "fg:color_cyan"
 format = ' [$symbol($version)]($style) '
 
 [rust]
-symbol = ""
+symbol = " "
 style = "fg:color_cyan"
 format = ' [$symbol($version)]($style) '
 
@@ -247,7 +247,7 @@ style = "fg:color_cyan"
 format = ' [$symbol($version)]($style) '
 
 [php]
-symbol = ""
+symbol = " "
 style = "fg:color_purple"
 format = '[[ $symbol ($version) ]]($style) '
 

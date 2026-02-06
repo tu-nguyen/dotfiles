@@ -173,19 +173,19 @@ layout_node() {
 if [[ "$PWD" != "$HOME" ]]; then
     # Check for Secrets
     if [[ -f .env ]]; then
-        t OK "${HDR_F}env${NC} file detected, loading.."
+        t OK "${OK}env file detected, loading..${NC}"
         layout_dotenv
     fi
 
     # Check for Python/UV
     if [[ -f uv.lock || -f pyproject.toml || -d .venv || -d venv ]]; then
-        t OK "${HDR_F}python${NC} project detected, loading.."
+        t OK "${OK}python project detected, loading..${NC}"
         layout_uv
     fi
 
     # Check for Node
     if [[ -f package.json || -f .node-version || -f .nvmrc ]]; then
-        t OK "${HDR_F}node${NC} project detected, loading.."
+        t OK "${OK}node project detected, loading..${NC}"
         layout_node
     fi
 

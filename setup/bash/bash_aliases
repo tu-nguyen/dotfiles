@@ -169,8 +169,8 @@ alias dmesg10='sudo dmesg | tail -n 10'
 # alias folder="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
 alias folder="du -sh */ | sort -rh"
 alias wc='wc -l -w -c'
-alias tree='tree -CAhF --dirsfirst'
-alias treed='tree -CAFd'
+alias tree='eza --tree --level=2 --icons'
+alias treed='eza --tree --level=2 --icons --git-ignore --only-dirs'
 alias mountedinfo='df -hT'
 alias fkill="ps -e | fzf | awk '{print $1}' | xargs kill"
 if ! command -v cpu &> /dev/null; then

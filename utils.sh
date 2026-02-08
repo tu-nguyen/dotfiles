@@ -309,7 +309,7 @@ reset_pre() {
     # mkdir -p "$HOME/workplace"
     # mkdir -p "$HOME/workplace/repo"
 
-    local core_packages=("curl" "vim" "git" "make" "jq" "colordiff" "wget" "tree" "bat" "eza")
+    local core_packages=("curl" "vim" "git" "make" "jq" "colordiff" "wget" "bat" "eza")
     _install_packages "${core_packages[@]}"
 
     _install_gitstatus

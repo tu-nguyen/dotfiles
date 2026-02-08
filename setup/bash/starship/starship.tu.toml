@@ -61,7 +61,7 @@ disabled = false
 # vimcmd_replace_one_symbol = '[](bold color_purple)'
 # vimcmd_replace_symbol = '[](bold color_purple)'
 # vimcmd_visual_symbol = '[](bold color_yellow)'
-success_symbol = "[>](bold green)"
+success_symbol = "[»](bold green)"
 error_symbol = "[x](bold red)"
 vimcmd_symbol = "[<](bold green)"
 vimcmd_visual_symbol = "[<](bold yellow)"
@@ -257,4 +257,4 @@ format = '[[ $symbol ($version) ]]($style) '
 [python]
 symbol = " "
 style = "fg:color_cyan"
-format = ' ([${symbol}(${version})(\($virtualenv\) )]($style)) '
+format = ' ([${symbol}(${version})(\($virtualenv\))]($style)) '

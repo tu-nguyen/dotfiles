@@ -241,18 +241,18 @@ set_win_title() {
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 
 # Transient prompt for Starship
-_starship_transient_prompt() {
-    if [[ $? -eq 0 ]]; then
-        printf "${OK_F}❯ ${NC}"
-    else
-        printf "${ERR_F}❯ ${NC}"
-    fi
-}
+# _starship_transient_prompt() {
+#     if [[ $? -eq 0 ]]; then
+#         printf "${OK_F}» ${NC}"
+#     else
+#         printf "${ERR_F}» ${NC}"
+#     fi
+# }
 
 if command -v starship &> /dev/null; then
     # Custom transient logic
     starship_precmd_user_func() {
-        _starship_transient_prompt
+        # _starship_transient_prompt
         set_win_title
     }
 
@@ -264,13 +264,14 @@ if command -v dircolors >/dev/null 2>&1; then
     [[ -r $DOTFILES_CONFIG_DIR/.dircolors ]] && eval "$(dircolors -b $DOTFILES_CONFIG_DIR/.dircolors)" || eval "$(dircolors -b)"
 fi
 
-# Patch ls --dir first issue smh my head
-unset -f ls 2>/dev/null
-unalias ls 2>/dev/null
 # alias ls='command ls -Fph --color=auto --group-directories-first'
+# TODO: Use custom exa theme, see https://github.com/eza-community/eza-themes/tree/main/themes
 if command -v eza >/dev/null 2>&1; then
     alias ls='eza --group-directories-first --color=always --icons'
 else
+    # Patch ls --dir first issue smh my head
+    unset -f ls 2>/dev/null
+    unalias ls 2>/dev/null
     # Fallback to standard ls logic if eza is missing
     if [[ "$(uname)" == "Darwin" ]]; then
         alias ls='ls -Gph'

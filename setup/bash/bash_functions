@@ -591,6 +591,19 @@ dot-update() {
     t OK "Everything is up to date! Update timestamp refreshed."
 }
 
+# Starship theme quick switch
+ss() {
+    local config_dir="$HOME/.config"
+    local target="$config_dir/starship.toml"
+    local default_theme="$config_dir/starship.tu.toml"
+    if [[ -f "$default_theme" ]]; then
+        cp "$default_theme" "$target"
+        t OK "${OK}starship theme switched to${NC} ${FILE_F}${default_theme}${NC}"
+        return 0
+    fi
+    t WARN "${FILE_F}${default_theme}${NC} does not exist.${NC}"
+}
+
 # Starship theme switcher
 sss() {
     local config_dir="$HOME/.config"
@@ -627,9 +640,9 @@ sss() {
         # [[ -f "$target" ]] && cp "$target" "$target.bak"
         cp "$config_dir/$selected_theme" "$target"
 
-        t OK "${SEL_F}[✓]${NC} Switched to ${selected_theme}"
+        t OK "${OK}switched to${NC} ${FILE_F}${selected_theme}${NC}"
     else
-        t ERR "${SEL_F}[!]${NC} Invalid selection."
+        t ERR "${ERR}invalid selection.${NC}"
         return 1
     fi
 }

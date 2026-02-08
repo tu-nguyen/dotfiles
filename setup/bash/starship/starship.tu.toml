@@ -1,9 +1,11 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 format = """
+$time\
+[\\[ ](fg:color_pastel_pink)\
 $os\
 $username\
-$time\
+[ \\]](fg:color_pastel_pink)\
 $directory\
 [»](fg:color_pink)\
 $git_branch\
@@ -125,7 +127,8 @@ format = '[$symbol]($style)'
 [time]
 disabled = false
 time_format = "%H:%M:%S" # Hour:Minute Format
-style = "bold fg:color_pink"
+style = "fg:240"
+# style = "dim white"  # bim doesn't work for some reason
 format = '[$time ]($style)'
 
 [directory]

@@ -220,11 +220,12 @@ mkcd() {
 function cd() {
     builtin cd "$@" || return # Stop if the cd fails
 
-    if ls --version >/dev/null 2>&1; then
-        ls -Fph --color=auto --group-directories-first
+    if [[ "$uname" == "Darwin" ]]; then
+        alias='ls -Gph'
     else
-        ls -FpG
+        alias='ls -Fph --color=auto --group-directories-first'
     fi
+    ls
 }
 
 # Hostname to ip address

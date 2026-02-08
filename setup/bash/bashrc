@@ -252,9 +252,8 @@ _starship_transient_prompt() {
 if command -v starship &> /dev/null; then
     # Custom transient logic
     starship_precmd_user_func() {
-       _starship_transient_prompt
-
-       set_win_title
+        _starship_transient_prompt
+        set_win_title
     }
 
     eval "$(starship init bash)"
@@ -262,9 +261,10 @@ fi
 
 # dircolors
 if command -v dircolors >/dev/null 2>&1; then
-    if [[ -r ~/.config/dotfile/.dircolors ]]; then
-        eval "$(dircolors -b ~/.dircolors)"
-    else
-        eval "$(dircolors -b)"
-    fi
+    [[ -r $DOTFILES_CONFIG_DIR/.dircolors ]] && eval "$(dircolors -b $DOTFILES_CONFIG_DIR/.dircolors)" || eval "$(dircolors -b)"
 fi
+
+# Patch ls --dir first issue smh my head
+unset -f ls 2>/dev/null
+unalias ls 2>/dev/null
+alias ls='command ls -Fph --color=auto --group-directories-first'

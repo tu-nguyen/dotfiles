@@ -33,6 +33,11 @@ if (-not (Test-Path -Path $auPath)) {
 }
 Set-ItemProperty -Path $auPath -Name "NoAutoRebootWithLoggedOnUsers" -Value 1 -Type DWORD -Force
 
+# Visual Studio Code / Terminal Fix
+Write-Host "Ensuring High Performance for Windows Terminal.."
+$terminalPath = "HKCU:\Software\Microsoft\DirectX\UserGpuPreferences"
+if (-not (Test-Path $terminalPath)) { New-Item -Path $terminalPath -Force }
+
 # ------------------------------------------
 # Gaming Tweaks
 # ------------------------------------------
@@ -51,14 +56,24 @@ reg.exe add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\Applica
 Write-Host "Disabling Game Mode.."
 reg.exe add "HKEY_CURRENT_USER\SOFTWARE\Microsoft\GameBar" /v "AllowAutoGameMode" /t REG_DWORD /d 0 /f
 
+
+Write-Host "Disabling Network Throttling Index.."
+Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" -Name "NetworkThrottlingIndex" -Value 0xFFFFFFFF -Type DWORD -Force
+
 # Disable Nagle's Algorithm and Optimize TCP
 # Nagle's algorithm bundles small packets of data, which can increase latency.
 # This tweak disables it and optimizes other TCP settings for gaming.
 
+# Network Throttling Index
 Write-Host "Disabling Nagle's Algorithm and optimizing TCP.."
-reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "TcpNoDelay" /t REG_DWORD /d 1 /f
-reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "TcpAckFrequency" /t REG_DWORD /d 1 /f
-reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Tcp1323Opts" /t REG_DWORD /d 1 /f
+# reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "TcpNoDelay" /t REG_DWORD /d 1 /f
+# reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "TcpAckFrequency" /t REG_DWORD /d 1 /f
+# reg.exe add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "Tcp1323Opts" /t REG_DWORD /d 1 /f
+$interfaces = Get-ChildItem "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces"
+foreach ($id in $interfaces) {
+    Set-ItemProperty -Path $id.PSPath -Name "TcpAckFrequency" -Value 1 -Type DWORD -ErrorAction SilentlyContinue
+    Set-ItemProperty -Path $id.PSPath -Name "TCPNoDelay" -Value 1 -Type DWORD -ErrorAction SilentlyContinue
+}
 
 # Optimize TCP for Gaming
 # A common tweak to reduce latency for a smoother online experience.
@@ -69,7 +84,6 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters
 Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "MaxUserPort" -Value 65534 -Type DWORD -Force
 Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "TcpMaxDupAcks" -Value 2 -Type DWORD -Force
 Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "TCPTimedWaitDelay" -Value 30 -Type DWORD -Force
-
 
 # Improve Mouse Responsiveness
 # This tweak disables mouse acceleration, which can interfere with precise movements

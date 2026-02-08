@@ -57,7 +57,7 @@ if [[ -d "$DOTFILES_CONFIG_DIR" ]]; then
     for file in "$DOTFILES_CONFIG_DIR"/.bash_*; do
         # Skip files we already loaded or specifically want to ignore
         case "$(basename "$file")" in
-            .bash_functions|bash_t|.bash_style|.init) continue ;;
+            .bash_functions|.bash_t|.bash_style|.init) continue ;;
         esac
 
         if [[ -f "$file" && -r "$file" ]]; then
@@ -77,7 +77,7 @@ if [[ -d "$DOTFILES_CONFIG_DIR" ]]; then
             # If it takes longer than 50ms, scream pls
             # (50ms is barely noticeable, 100ms is when I'll punch my monitor)
             if (( duration_ms > 50 )); then
-                printf "${YELLOW}%-20s${NC} took ${RED}%0.2fms${NC}\n" "$(basename "$file")" "$duration"
+                printf "${FILE_F}%-20s${NC} took ${RED}%0.2fms${NC}\n" "$(basename "$file")" "$duration"
             fi
         fi
     done
@@ -258,4 +258,13 @@ if command -v starship &> /dev/null; then
     }
 
     eval "$(starship init bash)"
+fi
+
+# dircolors
+if command -v dircolors >/dev/null 2>&1; then
+    if [[ -r ~/.config/dotfile/.dircolors ]]; then
+        eval "$(dircolors -b ~/.dircolors)"
+    else
+        eval "$(dircolors -b)"
+    fi
 fi

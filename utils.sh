@@ -379,44 +379,17 @@ reset_bashrc() {
 
     . "$HOME/.bashrc"
 
-    TEMP_CONFIG_DIR=$(mktemp -d)
+    # Copy direnv configs
+    chmod +x $DOTFILES_REPO_DIR/setup/bash/direnv/direnv_setup.sh
+    $DOTFILES_REPO_DIR/setup/bash/direnv/direnv_setup.sh
 
-    # Copy direnv config
-    DIRENV_TEMPLATE_FILE="$DOTFILES_REPO_DIR/setup/bash/direnv/direnv.toml"
-    DIRENV_DEST_FILE="$HOME/.config/direnv/direnv.toml"
-    TEMP_DIRENV_TOML="$TEMP_CONFIG_DIR/direnv.toml"
-    mkdir -p "$(dirname "$DIRENV_DEST_FILE")"
-    sed "s|/home/username|$HOME|g" "$DIRENV_TEMPLATE_FILE" > "$TEMP_DIRENV_TOML"
-    cpp "$TEMP_DIRENV_TOML" "$DIRENV_DEST_FILE"
-    cpp "$DOTFILES_REPO_DIR/setup/bash/direnv/direnvrc" "$HOME/.config/direnv/direnvrc"
+    # Copy dircolors for ls --color
+    chmod +x $DOTFILES_REPO_DIR/setup/bash/dircolors/dircolors_setup.sh
+    $DOTFILES_REPO_DIR/setup/bash/dircolors/dircolors_setup.sh
 
-    # Copy starship config
-    STARSHIP_SRC_DIR="$DOTFILES_REPO_DIR/setup/bash/starship"
-    STARSHIP_DEST_DIR="$HOME/.config"
-
-    # Loop through all starship .toml files in the source directory
-    for template in "$STARSHIP_SRC_DIR"/starship*.toml; do
-        # Get just the filename (e.g., starship.gruvbox.toml)
-        filename=$(basename "$template")
-        temp_output="$TEMP_CONFIG_DIR/$filename"
-        dest_output="$STARSHIP_DEST_DIR/$filename"
-
-        if [[ "$OS_TYPE" == "macos" ]]; then
-            _convert_hex_to_ansi "$template" "$temp_output"
-        else
-            # Using -q for quiet preprocessing
-            cpp -q "$template" "$temp_output"
-        fi
-        cpp "$temp_output" "$dest_output"
-    done
-    t OK "Transfer of starship tomls complete."
-
-    rm -fr "$TEMP_CONFIG_DIR"
-
-    if [[ ! -f "$STARSHIP_DEST_DIR/starship.toml" ]]; then
-        t "starship.toml not found. Initializing with default theme.."
-        cpp "$STARSHIP_DEST_DIR/starship.tu.toml" "$STARSHIP_DEST_DIR/starship.toml"
-    fi
+    # Copy starship configs
+    chmod +x $DOTFILES_REPO_DIR/setup/bash/starship/starship_setup.sh
+    $DOTFILES_REPO_DIR/setup/bash/starship/starship_setup.sh
 
     t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_bashrc()${SUCCESS} completed!!${NC}"
 }

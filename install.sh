@@ -217,10 +217,10 @@ if [[ $# -eq 0 ]]; then
     # reset_post
 else
     # DIRECT COMMAND MODE (e.g., 'r bash' or 'r -f vim')
-    clear
+    # clear
     t WARN "${WARN}Forcing bashrc reset..${NC}"
     reset_bashrc
-    clear
+    # clear
 fi
 
 t OK "${SUCCESS}dotfiles refresh completed!${NC}"

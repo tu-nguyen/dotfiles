@@ -103,7 +103,6 @@ if [[ "$uname" == "Darwin" ]]; then
 else
     alias ls='ls -Fph --color=auto --group-directories-first'
 fi
-
 alias l='ls'
 alias ll='ls -lh'
 alias la="ls -aAlh"
@@ -116,6 +115,12 @@ alias lt='ls -Alht'               # sort by time (newest first)
 alias labc='ls -lap'              # sort by alphabetical
 alias lf="ls -l | egrep -v '^d'"  # show files only
 alias l.='ls -d .* -G'            # show only hidden files
+
+# grep
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias diff='diff --color=auto'
 
 # ------------------------------------------
 # System Monitoring & Tools
@@ -267,19 +272,4 @@ if command -v colordiff >/dev/null 2>&1; then
     alias diff='colordiff'
     # side-by-side comparison
     alias diffy='colordiff -y -W $(tput cols)'
-fi
-
-if command -v dircolors >/dev/null 2>&1; then
-    if [[ -r ~/.dircolors ]]; then
-        eval "$(dircolors -b ~/.dircolors)"
-    else
-        eval "$(dircolors -b)"
-    fi
-
-    # Standard color aliases
-    # alias ls='ls --color=auto'  # set above
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-    alias diff='diff --color=auto'
 fi

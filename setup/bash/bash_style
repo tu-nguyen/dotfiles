@@ -17,12 +17,12 @@ else
     COLOR_MODE="basic"
 fi
 
-# function to set foreground
+# Function to set foreground
 _set_fg() {
     local hex_in=$1; local basic=$2
     local hex="${hex_in#\#}" # Strip #
 
-    # apple terminal (force 256)
+    # Apple terminal (force 256)
     if [[ "$TERM_PROGRAM" == "Apple_Terminal" ]]; then
         echo -ne "\033[38;5;$(_hex_to_256 "$hex")m"
 
@@ -30,20 +30,20 @@ _set_fg() {
     elif [[ "$COLOR_MODE" == "256" ]]; then
         echo -ne "\033[38;5;$(_hex_to_256 "$hex")m"
 
-    # hex mode
+    # Hex mode
     elif [[ "$COLOR_MODE" == "hex" ]]; then
         local r=$((16#${hex:0:2}))
         local g=$((16#${hex:2:2}))
         local b=$((16#${hex:4:2}))
         echo -ne "\033[38;2;${r};${g};${b}m"
 
-    # fallback to standard ansi
+    # Fallback to standard ansi
     else
         tput setaf "$basic" 2>/dev/null || echo -ne "\033[3${basic}m"
     fi
 }
 
-# function to set background
+# Function to set background
 _set_bg() {
     local hex_in=$1; local basic=$2
     local hex="${hex_in#\#}" # Strip #
@@ -62,12 +62,12 @@ _set_bg() {
     fi
 }
 
-# function to attribute
+# Function to attribute
 _set_attr() {
     tput "$1" 2>/dev/null || echo -ne "$2"
 }
 
-# formatting
+# Formatting
 NC=$(_set_attr "sgr0" "\033[0m")
 RESET=$(_set_attr "sgr0" "\033[0m")
 BOLD=$(_set_attr "bold" "\033[1m")
@@ -75,7 +75,7 @@ DIM=$(_set_attr "dim" "\033[2m")
 ITALIC=$(_set_attr "sitm" "\033[3m")
 UNDERLINE=$(_set_attr "smul" "\033[4m")
 
-# text colors (foreground)
+# Text colors (foreground)
 BLACK=$(_set_fg '#282828' 0)
 RED=$(_set_fg '#cc241d' 1)
 GREEN=$(_set_fg '#689d6a' 2)
@@ -91,7 +91,7 @@ DARK_PINK=$(_set_fg '#e75480' 168)   # deep, punchy rose
 HOT_PINK=$(_set_fg '#ff10f0' 201)   # high-contrast "neon" pink
 PASTEL_PINK=$(_set_fg '#ffd1dc' 224) # very soft, creamy pink
 
-# bright colors (if your terminal supports them)
+# Bright colors (if your terminal supports them)
 BRIGHT_RED=$(_set_fg '#fb4934' 9)
 BRIGHT_GREEN=$(_set_fg '#b8bb26' 10)
 BRIGHT_YELLOW=$(_set_fg '#fabd2f' 11)
@@ -99,7 +99,7 @@ BRIGHT_BLUE=$(_set_fg '#83a598' 12)
 BRIGHT_MAGENTA=$(_set_fg '#d3869b' 13)
 BRIGHT_CYAN=$(_set_fg '#41fdfe' 14)
 
-# background
+# Background
 ON_BLACK=$(_set_bg '#282828' 0)
 ON_RED=$(_set_bg '#cc241d' 1)
 ON_GREEN=$(_set_bg '#689d6a' 2)
@@ -116,25 +116,35 @@ ON_BRIGHT_BLUE=$(_set_bg '#83a598' 12)
 ON_BRIGHT_MAGENTA=$(_set_bg '#d3869b' 13)
 ON_BRIGHT_CYAN=$(_set_bg '#41fdfe' 14)
 
-# status
-OK="${GREEN}${BOLD}"
-SUCCESS="${BOLD}${GREEN}"
-INFO="${BOLD}${PINK}"
+# Status
+OK="${BOLD}${PINK}"
+SUCCESS="${BOLD}${PINK}"
+INFO="${PINK}"
 WARN="${BOLD}${YELLOW}"
 ERR="${BOLD}${RED}"
 DEBUG="${DIM}"
 ALERT="${BOLD}${WHITE}${ON_RED}"  # bold white on red background
 
-# structure styles
-HDR_F="${BOLD}${PINK}"  # main headers
-SUB_F="${BOLD}${CYAN}"  # secondary headers
-KEY_F="${PINK}"  # labels/keys
+MAIN_C=${MAIN_C:=${PINK}}
+SUB_C=${SUB_C:=${CYAN}}
+ACCENT_C=${ACCENT_C:=${PASTEL_PINK}}
+
+# Structure styles
+HDR_F="${BOLD}${MAIN_C}"  # main headers
+SUB_F="${BOLD}${SUB_C}"  # secondary headers
+KEY_F="${MAIN_C}"  # labels/keys
 VAL_F="${WHITE}"  # data values
 DIM_F="${DIM}"  # data values
 SEP_F="${GRAY}"  # separator
 SEL_F="${BOLD}${WHITE}"  # selection/choice
 
-# other
+# Type styles
+DIR_F=${BOLD}${SUB_C}  # Directories
+FILE_F=${ITALIC}${ACCENT_C}  # Files
+EXE_F=${MAIN_C}  # Executables/scripts
+ARGS_F=${DIM}  # Args/Options
+
+# Other
 NOTICE_F="${BOLD}${ON_BLUE}${WHITE}" # attention-grabbing banners
 URL_F="${UNDERLINE}${BLUE}" # links
 
@@ -157,57 +167,57 @@ else
     MOTD_F="${PASTEL_PINK}"
 fi
 
-# theme switcher
+# Theme switcher
 set_theme() {
     local theme=$1
 
     case $theme in
         "main")
-            _P_MAIN='#ffc0cb' # pink
-            _P_SUB='#00ffff'  # aqua/cyan
-            _P_ACCENT='#ffd1dc' # pastel
+            MAIN_C='#ffc0cb' # pink
+            SUB_F='#00ffff'  # aqua/cyan
+            ACCENT_C='#ffd1dc' # pastel
             echo "Mood: Cyberpunk active."
             ;;
         "cyber")
-            _P_MAIN='#ff10f0' # neon pink
-            _P_SUB='#00ffff'  # aqua/cyan
-            _P_ACCENT='#ffd1dc' # pastel
+            MAIN_C='#ff10f0' # neon pink
+            SUB_F='#00ffff'  # aqua/cyan
+            ACCENT_C='#ffd1dc' # pastel
             echo "Mood: Cyberpunk active."
             ;;
         "nord")
-            _P_MAIN='#88c0d0' # frost blue
-            _P_SUB='#81a1c1'  # arctic blue
-            _P_ACCENT='#d8dee9' # snow white
+            MAIN_C='#88c0d0' # frost blue
+            SUB_F='#81a1c1'  # arctic blue
+            ACCENT_C='#d8dee9' # snow white
             echo "Mood: Arctic chill active."
             ;;
         "dracula")
-            _P_MAIN='#bd93f9' # purple
-            _P_SUB='#50fa7b'  # green
-            _P_ACCENT='#ff79c6' # pink
+            MAIN_C='#bd93f9' # purple
+            SUB_F='#50fa7b'  # green
+            ACCENT_C='#ff79c6' # pink
             echo "Mood: Vampire mode."
             ;;
         "monokai")
-            _P_MAIN='#f92672'   # vivid pink
-            _P_SUB='#a6e22e'    # bright green
-            _P_ACCENT='#66D9ef' # sky blue
+            MAIN_C='#f92672'   # vivid pink
+            SUB_F='#a6e22e'    # bright green
+            ACCENT_C='#66D9ef' # sky blue
             echo "Mood: Classic pro mode."
             ;;
         "forest")
-            _P_MAIN='#2d5a27'   # deep pine
-            _P_SUB='#9bc693'    # sage
-            _P_ACCENT='#e9ffdb' # off-white
+            MAIN_C='#2d5a27'   # deep pine
+            SUB_F='#9bc693'    # sage
+            ACCENT_C='#e9ffdb' # off-white
             echo "Mood: Woodland focus."
             ;;
         "tokyo-night")
-            _P_MAIN='#7aa2f7'   # storm blue
-            _P_SUB='#bb9af7'    # magenta/purple
-            _P_ACCENT='#c0caf5' # soft silver
+            MAIN_C='#7aa2f7'   # storm blue
+            SUB_F='#bb9af7'    # magenta/purple
+            ACCENT_C='#c0caf5' # soft silver
             echo "Mood: Tokyo neon lights."
             ;;
         "matrix")
-            _P_MAIN='#00ss41'   # matrix green
-            _P_SUB='#003b00'    # dark green
-            _P_ACCENT='#0Dd0208' # black
+            MAIN_C='#00ss41'   # matrix green
+            SUB_F='#003b00'    # dark green
+            ACCENT_C='#0Dd0208' # black
             echo "Mood: Wake up, Neo."
             ;;
         *)
@@ -216,12 +226,12 @@ set_theme() {
             ;;
     esac
 
-    # re-assign the core colors using your set_fg helper
-    NEW_HDR_F=$(_set_fg "$_P_MAIN" 5)
-    NEW_SUB_F=$(_set_fg "$_P_SUB" 6)
-    NEW_KEY_FK=$(_set_fg "$_P_ACCENT" 7)
+    # Re-assign the core colors using your set_fg helper
+    NEW_HDR_F=$(_set_fg "$MAIN_C" 5)
+    NEW_SUB_F=$(_set_fg "$SUB_F" 6)
+    NEW_KEY_FK=$(_set_fg "$ACCENT_C" 7)
 
-    # refresh the ui presets
+    # Refresh the ui presets
     HDR_F="${BOLD}${NEW_HDR_F}"
     SUB_F="${BOLD}${NEW_SUB_F}"
     KEY_F="${NEW_KEY_FK}"
@@ -229,7 +239,10 @@ set_theme() {
     H2="${SUB_F}"
 }
 
-# color verification test
+# Set color for ls
+# export LS_COLORS="di=36:ex=38;2;255;192;203:*.py=38;2;255;192;203:*.sh=38;2;255;192;203:*.js=38;2;255;192;203"
+
+# Color verification test
 color_test() {
     echo -e "${BOLD}Current Mode:${NC} $COLOR_MODE (TERM: $TERM)\n"
     echo -e "${BOLD}Primary Colors: ${NC}${PINK}PINK ${RED}RED ${GREEN}GREEN ${YELLOW}YELLOW ${BLUE}BLUE ${MAGENTA}MAGENTA ${CYAN}CYAN ${WHITE}WHITE ${GRAY}GRAY ${NC}\n"

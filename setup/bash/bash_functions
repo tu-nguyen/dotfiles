@@ -218,7 +218,13 @@ mkcd() {
 
 # Automatically 'ls' after every 'cd'
 function cd() {
-    builtin cd "$@" && ls
+    builtin cd "$@" || return # Stop if the cd fails
+
+    if ls --version >/dev/null 2>&1; then
+        ls -Fph --color=auto --group-directories-first
+    else
+        ls -FpG
+    fi
 }
 
 # Hostname to ip address

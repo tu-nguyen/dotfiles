@@ -7,8 +7,13 @@ DOTFILES_CONFIG_FILE=/path/to/.dotfile_config
 # wsl, linux, macos
 OS_TYPE=some_os
 
-# default targets
+## default targets
 # DOT_PYTHON_VERSION
+
+## direnv
+DIRENV_PATH_EXAMPLE1=/path/to/root1
+DIRENV_PATH_EXAMPLE2=/path/to/root2
+DIRENV_PATH_EXAMPLE3=/path/to/root3
 
 ## Asana Project Board
 # ASANA_PROJECT_GID=

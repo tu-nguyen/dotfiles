@@ -77,12 +77,36 @@ long_motd() {
     local KERNEL=$(uname -r | tr '[:upper:]' '[:lower:]')
     local DISK_ROOT=$(df -h / | tail -1 | awk '{print $5}')
 
+    # # Memory (macos uses 'vm_stat', linux uses 'free')
+    # if command -v free >/dev/null; then
+    #     local MEM_INFO=$(free -m | awk '/Mem:/ { print $3 "mib / " $2 "mib" }')
+    # else
+    #     local MEM_INFO="N/A (mac)"
+    # fi
     # Memory (macos uses 'vm_stat', linux uses 'free')
     if command -v free >/dev/null; then
-        local MEM_INFO=$(free -m | awk '/Mem:/ { print $3 "mib / " $2 "mib" }')
+        local MEM_INFO=$(free -m | awk '/Mem:/ {
+            total=$2;
+            available=$7;
+            used_actual=total-available;
+            pct=(used_actual/total)*100;
+            printf "%dMiB / %dMiB (%d%%)", used_actual, total, pct
+        }')
     else
         local MEM_INFO="N/A (mac)"
     fi
+
+    # if command -v df >/dev/null; then
+    #     local DISK_INFO=$(df -Ph / | awk 'NR==2 {
+    #         used=$3;
+    #         total=$2;
+    #         pct=$5;
+    #         printf "%s / %s (%s)", used, total, pct
+    #     }')
+    # else
+    #     local DISK_INFO="N/A"
+    # fi
+    DISK_INFO=$(df -Ph / | awk 'NR==2 { printf "%s / %s (%s)", $3, $2, $5 }')
 
     # CPU logic
     local CPU_CORES=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
@@ -127,6 +151,7 @@ long_motd() {
     echo -e "${MOTD_F}shell:  ${NC}${SHELL_DISPLAY}"
     echo -e "${MOTD_F}cpu:    ${NC}${CPU}"
     echo -e "${MOTD_F}memory: ${NC}${MEM_INFO}"
+    echo -e "${MOTD_F}disk /: ${NC}${DISK_INFO}"
 }
 
 motd() {

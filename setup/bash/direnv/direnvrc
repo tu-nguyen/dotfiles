@@ -53,7 +53,7 @@ layout_dotenv() {
                 output="$output (and $remaining others)"
             fi
 
-            t OK "Loaded from ${SUB_F}.env${NC}: $output"
+            t OK "${OK}loaded from ${NC}${SUB_F}.env${NC}: $output"
         fi
     fi
 }
@@ -91,25 +91,29 @@ layout_uv() {
             # Note: direnv doesn't need a manual 'deactivate' command because
             # it handles the $PATH diffing automatically.
             # We just log that we are switching.
-            t INFO "Switching venv: $(basename "$VIRTUAL_ENV") -> $venv_name"
+            t INFO "switching venv: $(basename "$VIRTUAL_ENV") -> $venv_name.."
         else
             # Already in the right place, no action needed
             return 0
         fi
     fi
 
-    # Silent Activation
+    # Virtual Env Activation
     if [[ -d "$venv" ]]; then
         source_env "$venv/bin/activate" >/dev/null 2>&1
         venv=$(basename "$venv")
+        t INFO "${ACCENT_C}activating venv: ${NC}${DIR_F}$venv${NC}"
     elif [[ -d .venv ]]; then
         source_env .venv/bin/activate >/dev/null 2>&1
         venv=.venv
+        t INFO "${ACCENT_C}activating venv: ${NC}${DIR_F}$venv${NC}"
     elif [[ -d venv ]]; then
         source_env venv/bin/activate >/dev/null 2>&1
         venv=venv
+        t OK "${ACCENT_C}activating venv: ${NC}${DIR_F}$venv${NC}"
     else
-        t WARN "uv project detected but no venv found at ${SUB_F}$venv_name${NC}, run `${HDR_F}uv sync${NC}`"
+        t WARN "python project detected but no venv found at ${DIR_F}$(basename $venv)${NC}, run '${EXE_F}uv sync${NC}'"
+        return 1
     fi
 
     # Version Check
@@ -126,16 +130,16 @@ layout_uv() {
             if [[ "$lowest" != "$expected_version" && "$actual_version" != "$expected_version" ]]; then
                 t WARN "Version mismatch! Project requires ${ERR}>=$expected_version${NC}, but ${SUB_F}venv${NC} is only ${WARN}$actual_version${NC}"
             else
-                t SUCCESS "${HDR_F}uv${NC} activated ${HDR_F}python $actual_version${NC} (meets >=$expected_version)"
+                t SUCCESS "${HDR_F}uv activated ${HDR_F}python $actual_version (meets >=$expected_version)${NC}"
             fi
         # Otherwise, do the standard "starts with" check for fixed versions
         elif [[ "$actual_version" != "$expected_version"* ]]; then
             t WARN "Version mismatch! Expected ${HDR_F}$expected_version${NC}, but venv has ${SUB_F}$actual_version${NC}"
         else
-            t SUCCESS "${HDR_F}uv${NC} activated ${HDR_F}python $actual_version${NC}"
+            t SUCCESS "${HDR_F}uv activated python $actual_version${NC}"
         fi
     else
-        t SUCCESS "${HDR_F}uv${NC} activated ${HDR_F}python $actual_version${NC}"
+        t SUCCESS "${HDR_F}uv activated python $actual_version${NC}"
     fi
 }
 
@@ -173,21 +177,19 @@ layout_node() {
 if [[ "$PWD" != "$HOME" ]]; then
     # Check for Secrets
     if [[ -f .env ]]; then
-        t OK "${OK}env file detected, loading..${NC}"
+        t INFO "${ACCENT_C}env file detected, loading..${NC}"
         layout_dotenv
     fi
 
     # Check for Python/UV
     if [[ -f uv.lock || -f pyproject.toml || -d .venv || -d venv ]]; then
-        t OK "${OK}python project detected, loading..${NC}"
+        t INFO "${ACCENT_C}python project detected, loading..${NC}"
         layout_uv
     fi
 
     # Check for Node
     if [[ -f package.json || -f .node-version || -f .nvmrc ]]; then
-        t OK "${OK}node project detected, loading..${NC}"
+        t INFO "${ACCENT_C}node project detected, loading..${NC}"
         layout_node
     fi
-
-
 fi

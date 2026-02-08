@@ -220,12 +220,19 @@ mkcd() {
 function cd() {
     builtin cd "$@" || return # Stop if the cd fails
 
-    if [[ "$uname" == "Darwin" ]]; then
-        alias='ls -Gph'
+    if command -v eza >/dev/null 2>&1; then
+        eza --group-directories-first --color=always --icons
     else
-        alias='ls -Fph --color=auto --group-directories-first'
+        # Fallback to standard ls logic if eza is missing
+        unset -f ls 2>/dev/null
+        unalias ls 2>/dev/null
+        if [[ "$(uname)" == "Darwin" ]]; then
+            alias ls='ls -Gph'
+        else
+            alias ls='ls -Fph --color=auto --group-directories-first'
+        fi
+        ls
     fi
-    ls
 }
 
 # Hostname to ip address

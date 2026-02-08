@@ -98,13 +98,16 @@ else
 fi
 
 # ls variants (colorized)
-if alias ls >/dev/null 2>&1; then
-    unalias ls
-fi
-if [[ "$uname" == "Darwin" ]]; then
-    alias ls='ls -Gph'
+unset -f ls 2>/dev/null
+if command -v eza >/dev/null 2>&1; then
+    alias ls='eza --group-directories-first --color=always --icons'
 else
-    alias ls='ls -Fph --color=auto --group-directories-first'
+    # Fallback to standard ls logic if eza is missing
+    if [[ "$(uname)" == "Darwin" ]]; then
+        alias ls='ls -Gph'
+    else
+        alias ls='ls -Fph --color=auto --group-directories-first'
+    fi
 fi
 alias l='ls'
 alias ll='ls -lh'
@@ -113,6 +116,7 @@ alias lla='ls -Alh'
 alias lsd="ls -d */"
 alias ldir="lsd"
 alias lsa="ls -la"
+alias ld='ls -d */'              # list only directories
 alias lsd='ls -d */'              # list only directories
 alias lt='ls -Alht'               # sort by time (newest first)
 alias labc='ls -lap'              # sort by alphabetical

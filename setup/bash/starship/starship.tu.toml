@@ -2,10 +2,9 @@
 
 format = """
 $time\
-[\\[ ](fg:color_pastel_pink)\
+[\\[  ](fg:color_pastel_pink)\
 $os\
-$username\
-[ \\]](fg:color_pastel_pink)\
+[   \\]](fg:color_pastel_pink)\
 $directory\
 [»](fg:color_pink)\
 $git_branch\
@@ -61,12 +60,12 @@ disabled = false
 # vimcmd_replace_one_symbol = '[](bold color_purple)'
 # vimcmd_replace_symbol = '[](bold color_purple)'
 # vimcmd_visual_symbol = '[](bold color_yellow)'
-success_symbol = "[»](bold green)"
-error_symbol = "[x](bold red)"
-vimcmd_symbol = "[<](bold green)"
-vimcmd_visual_symbol = "[<](bold yellow)"
-vimcmd_replace_symbol = "[<](bold purple)"
-vimcmd_replace_one_symbol = "[<](bold purple)"
+success_symbol = "[ ♥](bold color_light_pink)"
+error_symbol = "[ x](bold red)"
+vimcmd_symbol = "[ <](bold green)"
+vimcmd_visual_symbol = "[ <](bold yellow)"
+vimcmd_replace_symbol = "[ <](bold purple)"
+vimcmd_replace_one_symbol = "[ <](bold purple)"
 
 # An alternative to the username module which displays a symbol that
 # represents the current operating system
@@ -112,11 +111,11 @@ Unknown = ""
 Windows = ""
 
 [username]
-show_always = true
+show_always = false
 style_user = "bold fg:color_pastel_pink"
 style_root = "bold fg:color_red"
 format = '[ ♥ ]($style)'
-disabled = false
+disabled = true
 
 [sudo]
 symbol = "󰀐 "

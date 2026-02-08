@@ -1256,7 +1256,7 @@ function print_azure_status() {
         local HOURS=$(( (SECS_LEFT % 86400) / 3600 ))
         local MINS=$(( (SECS_LEFT % 3600) / 60 ))
 
-        TIME_REMAINING="Time remaining: ${KEY_F}${DAYS}${NC} days and ${KEY_F}${HOURS}${NC} hours ${KEY_F}${MINS}${NC} minutes"
+        TIME_REMAINING="Time remaining: ${SUB_F}${DAYS}${NC} days and ${SUB_F}${HOURS}${NC} hours ${SUB_F}${MINS}${NC} minutes"
     else
         TIME_REMAINING="Time remaining: Ended"
     fi
@@ -1264,7 +1264,7 @@ function print_azure_status() {
     # Print header with time remaining
     local ITERATION_END_DATE="${ITERATION_END%%T*}"
 
-    echo -e "${BOLD}${CYAN}Current Twork Iteration: $ITERATION_NAME ($ITERATION_START → $ITERATION_END_DATE)${NC}"
+    echo -e "${HDR_F}Current Twork Iteration: $ITERATION_NAME ($ITERATION_START → $ITERATION_END_DATE)${NC}"
     echo "$TIME_REMAINING"
 
     # Query all tasks/chores assigned to you in current iteration
@@ -1386,8 +1386,8 @@ function print_asana_status() {
 
     # Print header (uppercase to match your previous style)
     local display_date=$(echo "$due_on" | tr '[:lower:]' '[:upper:]')
-    echo -e "${H2}CURRENT ASANA PROJECT: $project_name (DUE: $display_date)${NC}"
-    echo -e "${H}${time_remaining}${NC}"
+    echo -e "${HDR_F}CURRENT ASANA PROJECT: $project_name (DUE: $display_date)${NC}"
+    echo -e "${SUB_F}${time_remaining}${NC}"
     printf "%s\n" "$br"
 
     # Get your (hopefully) gid
@@ -1416,7 +1416,7 @@ function print_asana_status() {
     ')
 
     if [[ -z "$tasks_data" ]]; then
-        echo -e "${KEY_F}NO TASKS ASSIGNED TO YOU.${NC}"
+        echo -e "${ERR}NO TASKS ASSIGNED TO YOU.${NC}"
         return 0
     fi
 
@@ -1447,7 +1447,7 @@ function print_asana_status() {
         trunct_title=$(_truncate_text "$title" 32)
         # ignore this pls
 
-        printf "${BOLD}$s_color%-12s>${NC} %-10s${NC} $t_color%-5s (%s pts)${NC} %s[ ${BLUE}%s${NC} ] ${DIM_F}%s${NC}\n" \
+        printf "${BOLD}$s_color%-12s>${NC} %-10s${NC} $t_color%-5s (%s pts)${NC} %-31s [ ${BLUE}%s${NC} ] ${DIM_F}%s${NC}\n" \
             "$clean_section" "$r_tid" "$r_type" "$r_pts" "$trunct_title" "$id"
 
     done <<< "$tasks_data"

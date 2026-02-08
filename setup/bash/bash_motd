@@ -8,23 +8,26 @@
 # ------------------------------------------
 # MOTD display header aka short
 short_motd() {
-    echo -e "${MOTD_F} ------ $OS_TYPE ------ ${NC}"
-
     local USER=$(whoami | tr '[:upper:]' '[:lower:]')
     local HOSTNAME=$(hostname | tr '[:upper:]' '[:lower:]')
     local LEFT_TEXT="${USER}@${HOSTNAME}"
 
-    # print date in "Friday, 2025-06-05" format
+    # print date in "25-06-05 fr" format
     # print time in "Time: 17:32:08" format
-    local DATE=$(date '+%a %Y/%m/%d' | tr '[:upper:]' '[:lower:]')
-    local TIME=$(date '+%H:%M:%S')
-    local RIGHT_TEXT=${DATE}
+    FULL_DATE=$(date +'%y/%m/%d %a' | tr '[:upper:]' '[:lower:]')
+    DATE_PART=${FULL_DATE% *}         # Everything before the space
+    DAY_PART=${FULL_DATE##* }         # Everything after the space (the day)
 
-    local TERMWIDTH=$(tput cols)
-    local PADDING_SIZE=$(( (TERMWIDTH / 4) - ${#LEFT_TEXT} - ${#RIGHT_TEXT} ))
-    local SPACES=$(printf '%*s' "$PADDING_SIZE" "")
+    # Combine them: Date + First 2 chars of day
+    DATE="${DIM}${DATE_PART}${NC} ${ACCENT_C}[  ${DAY_PART:0:2}  ]${NC}"
+    # local TIME=$(date '+%H:%M:%S')
+    # local RIGHT_TEXT=${DATE}
 
-    echo -e "${BOLD}${MOTD_F}${USER}${WHITE}@${MOTD_F}${BOLD}${HOSTNAME}${SPACES}${DATE}${NC}"
+    # local TERMWIDTH=$(tput cols)
+    # local PADDING_SIZE=$(( (TERMWIDTH / 4) - ${#LEFT_TEXT} - ${#RIGHT_TEXT} ))
+    # local SPACES=$(printf '%*s' "$PADDING_SIZE" "")
+
+    echo -e "${DATE}${NC} ${MOTD_F}${USER}${NC}${BOLD}${WHITE}@${NC}${MOTD_F}${HOSTNAME}${NC}${BOLD}${WHITE} on ${NC}${MOTD_F}${OS_TYPE}"
     # echo -e "${${MOTD_F}}date:   ${NC}${DATE}"
     # echo -e "${${MOTD_F}}Time:    ${NC}${TIME}"  # Comment out since we always display time
 }
@@ -145,13 +148,13 @@ long_motd() {
 
     # echo -e "${BOLD}${MOTD_F}${USER}${WHITE}@${BOLD}${MOTD_F}${HOSTNAME}${NC}"
     echo -e "${WHITE}------------------------------------------${NC}"
-    echo -e "${MOTD_F}os:     ${NC}${OS}"
-    echo -e "${MOTD_F}kernel: ${NC}${KERNEL}"
-    echo -e "${MOTD_F}uptime: ${NC}${UPTIME}"
-    echo -e "${MOTD_F}shell:  ${NC}${SHELL_DISPLAY}"
-    echo -e "${MOTD_F}cpu:    ${NC}${CPU}"
-    echo -e "${MOTD_F}memory: ${NC}${MEM_INFO}"
-    echo -e "${MOTD_F}disk /: ${NC}${DISK_INFO}"
+    echo -e "  ${MOTD_F}os:     ${NC}${OS}"
+    echo -e "  ${MOTD_F}kernel: ${NC}${KERNEL}"
+    echo -e "  ${MOTD_F}uptime: ${NC}${UPTIME}"
+    echo -e "  ${MOTD_F}shell:  ${NC}${SHELL_DISPLAY}"
+    echo -e "  ${MOTD_F}cpu:    ${NC}${CPU}"
+    echo -e "  ${MOTD_F}memory: ${NC}${MEM_INFO}"
+    echo -e "  ${MOTD_F}disk /: ${NC}${DISK_INFO}"
 }
 
 motd() {

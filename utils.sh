@@ -367,8 +367,9 @@ reset_bashrc() {
     _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bash_tt" "$DOTFILES_CONFIG_DIR/.bash_tt"
     _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bashrc" "$HOME/.bashrc"
     _cp_and_src "$DOTFILES_REPO_DIR/setup/bash/bash_profile" "$HOME/.bash_profile"
+
     echo "" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
-    echo "alias cd-dot='builtin cd $DOTFILES_REPO_DIR'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
+    echo "alias cd-dot='builtin cd $DOTFILES_REPO_DIR && ls'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
     echo "alias cd-dotfile='cd-dot'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
     echo "alias cd-dotfiles='cd-dot'" >> "$DOTFILES_CONFIG_DIR/.bash_aliases"
     if ! command -v graphviz &> /dev/null; then

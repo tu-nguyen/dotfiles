@@ -60,12 +60,12 @@ disabled = false
 # vimcmd_replace_one_symbol = '[](bold color_purple)'
 # vimcmd_replace_symbol = '[](bold color_purple)'
 # vimcmd_visual_symbol = '[](bold color_yellow)'
-success_symbol = "[ ♥](bold color_light_pink)"
-error_symbol = "[ x](bold red)"
-vimcmd_symbol = "[ <](bold green)"
-vimcmd_visual_symbol = "[ <](bold yellow)"
-vimcmd_replace_symbol = "[ <](bold purple)"
-vimcmd_replace_one_symbol = "[ <](bold purple)"
+success_symbol = "[ ♥ ](bold color_light_pink)"
+error_symbol = "[ x ](bold red)"
+vimcmd_symbol = "[ < ](bold green)"
+vimcmd_visual_symbol = "[ < ](bold yellow)"
+vimcmd_replace_symbol = "[ < ](bold purple)"
+vimcmd_replace_one_symbol = "[ < ](bold purple)"
 
 # An alternative to the username module which displays a symbol that
 # represents the current operating system

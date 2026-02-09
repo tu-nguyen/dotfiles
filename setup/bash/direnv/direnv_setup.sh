@@ -85,3 +85,5 @@ done
 rm -fr "$TEMP_CONFIG_DIR"
 
 t OK "Whitelist updated in $TOML_FILE"
+
+t OK "direnv configuration updated!"

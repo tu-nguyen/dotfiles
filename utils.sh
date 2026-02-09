@@ -392,6 +392,10 @@ reset_bashrc() {
     chmod +x $DOTFILES_REPO_DIR/setup/bash/starship/starship_setup.sh
     $DOTFILES_REPO_DIR/setup/bash/starship/starship_setup.sh
 
+    # Copy eza configs
+    chmod +x $DOTFILES_REPO_DIR/setup/bash/eza/eza_setup.sh
+    $DOTFILES_REPO_DIR/setup/bash/eza/eza_setup.sh
+
     t SUCCESS "${SUCCESS}Function to ${HDR_F}reset_bashrc()${SUCCESS} completed!!${NC}"
 }
 

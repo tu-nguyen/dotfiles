@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ===================================================================== #
-# DIRENV SETUP
+# STARSHIP SETUP
 # ===================================================================== #
 # ------------------------------------------
 # Prep
@@ -37,3 +37,5 @@ if [[ ! -f "$STARSHIP_DEST_DIR/starship.toml" ]]; then
     t "starship.toml not found. Initializing with default theme.."
     cpp "$STARSHIP_DEST_DIR/starship.tu.toml" "$STARSHIP_DEST_DIR/starship.toml"
 fi
+
+t OK "Starship configuration updated!"

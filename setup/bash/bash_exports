@@ -83,6 +83,9 @@ export VISUAL=vim
 export EDITOR=vim
 export PAGER="less"
 
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+
 # Only set TERM if it's not already set to something modern
 # (forcing screen-256color can break TrueColor support in some terminals)
 if [[ "$TERM" == "dumb" ]] || [[ -z "$TERM" ]]; then

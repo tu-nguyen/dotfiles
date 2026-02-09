@@ -75,7 +75,7 @@ STICKY_OTHER_WRITABLE 30;42 # dir that is sticky and other-writable (+t,o+w)
 OTHER_WRITABLE 34;42 # dir that is other-writable (o+w) and not sticky
 STICKY 37;44 # dir with the sticky bit set (+t) and not other-writable
 # This is for files with execute permission:
-EXEC 3;38;2;255;192;203
+EXEC 38;2;255;192;203
 # ===================================================================
 # File extension attributes
 # ===================================================================
@@ -240,26 +240,32 @@ EXEC 3;38;2;255;192;203
 
 
 
-.sh 3;38;2;255;192;203
-.rs 3;38;2;255;192;203
-.py 3;38;2;255;192;203
+.sh 38;2;255;192;203
+.rs 38;2;255;192;203
+.py 38;2;255;192;203
 # .toml 3;38;2;255;192;203
-.js 3;38;2;255;192;203
+.js 38;2;255;192;203
 
-.md 3;01;36
-.toml 3;01;36
+# .md 01;36
+# .toml 01;36
+.md 0
 .mk 0
+.toml 0
 *Makefile 0
 *makefile 0
 .txt 0
-.xml 3;01;36
-.yaml 3;01;36
-.yml 3;01;36
+# .xml 01;36
+# .yaml 01;36
+# .yml 01;36
+.xml 0
+.yaml 0
+.yml 0
 
 .git 01;36
 .python-version 01;02;36
 
-*Dockerfile* 3;01;36
+# *Dockerfile* 01;36
+*Dockerfile* 0
 
 *~ 02;90
 .bak 02;90

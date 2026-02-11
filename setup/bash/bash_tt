@@ -276,7 +276,7 @@ function gref() {
     printf "    ${H2}:${NC} when you are on main >  HEAD -> main -> a1b2c3d\n"
     printf "      ${H2}:${NC} when you run 'git checkout feature\n"
     printf "        ${H2}:${NC} HEAD moves to point at feature branch\n"
-    printf "  ${KEY_F}3 stages${NC}${H2}:${NC} working fir -> staging (index) -> repo (.git)\n"
+    printf "  ${KEY_F}3 stages${NC}${H2}:${NC} working dir -> staging (index) -> repo (.git)\n"
     printf "    ${H2}:${NC} git add: moves changes to the stage (the 'loading dock')\n"
     printf "    ${H2}:${NC} git commit: moves stage to the repo (the 'warehouse')\n"
     printf "    ${H2}:${NC} git checkout/switch: moves repo to working dir\n"

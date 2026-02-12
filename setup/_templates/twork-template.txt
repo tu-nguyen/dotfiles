@@ -1,4 +1,7 @@
-# .config/dotfiles/.bash_twork
+#!/usr/bin/env bash
+# ===================================================================== #
+# TWORK BASH TEMPLATE
+# ===================================================================== #
 
 # twork ref
 function tworktt() {

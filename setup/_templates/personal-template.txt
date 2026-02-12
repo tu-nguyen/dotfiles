@@ -8,13 +8,14 @@
 # ------------------------------------------
 
 if ! command -v cdw &> /dev/null; then
-    alias cd-cdw="cd /home/valcr/workplace"
+    alias cdw="cd $HOME/workplace"
+    alias cd-dw="cd $HOME/workplace"
 fi
-alias cd-main="cd /home/valcr/workplace/repo/main"
+alias cd-main="cd $HOME/workplace/repo/main"
 
-alias cd-example1="cd /location/of/example1"
-alias cd-example2="cd /location/of/example2"
-alias cd-example3="cd /location/of/example3"
+# alias cd-example1="cd /location/of/example1"
+# alias cd-example2="cd /location/of/example2"
+# alias cd-example3="cd /location/of/example3"
 
 # ------------------------------------------
 # Functions

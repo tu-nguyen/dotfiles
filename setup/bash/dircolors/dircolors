@@ -39,8 +39,6 @@ TERM tmux*
 TERM vt100
 TERM xterm*
 
-.* 01;02;36
-.* 03;02;38;2;255;182;193
 # ===================================================================
 # Basic file attributes
 # ===================================================================
@@ -55,11 +53,12 @@ TERM xterm*
 # Background color codes:
 # 40=black 41=red 42=green 43=yellow 44=blue 45=magenta 46=cyan 47=white
 NORMAL 00 # no color code at all
-FILE 00 # regular file: use no color at all
+FILE 0;38;2;255;182;193
 RESET 0 # reset to "normal" color
 DIR 01;36 # directory
-LINK 01;34 # symbolic link. (If you set this to 'target' instead of a
- # numerical value, the color is as for the file pointed to.)
+# LINK 02;36 # symbolic link. (If you set this to 'target' instead of a
+# numerical value, the color is as for the file pointed to.)
+LINK target
 MULTIHARDLINK 00 # regular file with more than one link
 FIFO 00;33 # pipe
 SOCK 01;31 # socket
@@ -75,7 +74,54 @@ STICKY_OTHER_WRITABLE 30;42 # dir that is sticky and other-writable (+t,o+w)
 OTHER_WRITABLE 34;42 # dir that is other-writable (o+w) and not sticky
 STICKY 37;44 # dir with the sticky bit set (+t) and not other-writable
 # This is for files with execute permission:
-EXEC 38;2;255;192;203
+# EXEC 38;2;255;192;203
+EXEC 1;38;2;255;182;193
+
+# hidden init
+.* 02;36
+
+# Hidden dir
+# 02;36
+.aws 02;36
+.azure 02;36
+.git 02;36
+.cache 02;36
+.config 02;36
+.docker 02;36
+.dotnet 02;36
+.gitstatus 02;36
+.ionic 02;36
+.landscape 02;36
+# .local 02;36
+.npm 02;36
+.nvm 02;36
+.ssh 02;36
+.vscode-server 02;36
+.w3m 02;36
+
+
+# Hidden file
+# 02;38;2;255;182;193
+.bashrc 02;38;2;255;182;193
+.bash* 02;38;2;255;182;193
+.env 02;38;2;255;182;193
+.gitignore 02;38;2;255;182;193
+.gitconfig 02;38;2;255;182;193
+.lesshst 02;38;2;255;182;193
+.motd_shown 02;38;2;255;182;193
+.*rc 02;38;2;255;182;193
+.pgpass 02;38;2;255;182;193
+.profile 02;38;2;255;182;193
+.python_history 02;38;2;255;182;193
+.python-version 02;38;2;255;182;193
+.sudo_as_admin_successful 02;38;2;255;182;193
+.viminfo 02;38;2;255;182;193
+.wget-hsts 02;38;2;255;182;193
+.gitattributes 02;38;2;255;182;193
+.coverage 02;38;2;255;182;193
+.dockerignore 02;38;2;255;182;193
+.editorconfig 02;38;2;255;182;193
+
 # ===================================================================
 # File extension attributes
 # ===================================================================
@@ -215,7 +261,7 @@ EXEC 38;2;255;192;203
 .xspf 00;36
 # backup files
 *~ 00;90
-*# 00;90
+# *# 00;90
 .bak 00;90
 .crdownload 00;90
 .dpkg-dist 00;90
@@ -237,36 +283,36 @@ EXEC 38;2;255;192;203
 #
 # Subsequent TERM or COLORTERM entries, can be used to add / override
 # config specific to those matching environment variables.
+# potentially executable bold and light pink
+# 1;38;2;255;182;193
+.sh 1;38;2;255;182;193
+.rs 1;38;2;255;182;193
+.py 1;38;2;255;182;193
+.js 1;38;2;255;182;193
 
+# other file ext > light pink
+# 0;38;2;255;182;193
+.toml 0;38;2;255;182;193
+.md 0;38;2;255;182;193
+*Makefile 0;38;2;255;182;193
+*makefile 0;38;2;255;182;193
+.md 0;38;2;255;182;193
+.mk 0;38;2;255;182;193
+.txt 0;38;2;255;182;193
+.yaml 0;38;2;255;182;193
+.yml 0;38;2;255;182;193
+.json 0;38;2;255;182;193
+.xml 0;38;2;255;182;193
+.lock 0;38;2;255;182;193
 
-
-.sh 38;2;255;192;203
-.rs 38;2;255;192;203
-.py 38;2;255;192;203
-# .toml 3;38;2;255;192;203
-.js 38;2;255;192;203
-
-# .md 01;36
-# .toml 01;36
-.md 0
-.mk 0
-.toml 0
-*Makefile 0
-*makefile 0
-.txt 0
-# .xml 01;36
-# .yaml 01;36
-# .yml 01;36
-.xml 0
-.yaml 0
-.yml 0
-
-.git 01;36
-.python-version 01;02;36
+# hidden fall back with ext
+# 02;38;2;255;182;193
+.pre-commit-config.yaml 02;38;2;255;182;193
 
 # *Dockerfile* 01;36
-*Dockerfile* 0
+# *Dockerfile* 0
 
 *~ 02;90
 .bak 02;90
 .tmp 02;90
+

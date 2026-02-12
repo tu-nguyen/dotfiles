@@ -267,7 +267,7 @@ fi
 # alias ls='command ls -Fph --color=auto --group-directories-first'
 # TODO: Use custom exa theme, see https://github.com/eza-community/eza-themes/tree/main/themes
 if command -v eza >/dev/null 2>&1; then
-    alias ls='eza --group-directories-first --color=always --icons'
+    alias ls="eza --group-directories-first --color=always --icons"
 else
     # Patch ls --dir first issue smh my head
     unset -f ls 2>/dev/null

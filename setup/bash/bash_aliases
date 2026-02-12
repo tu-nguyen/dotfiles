@@ -89,6 +89,10 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .4="cd ../../../.."
 alias .5="cd ../../../../.."
+alias cdc="cd ~/.config"
+if ! command -v cdcd &> /dev/null; then
+    alias cdcd="cd ~/.config/dotfiles"
+fi
 
 # Open folder
 if [[ "$uname" == "Darwin" ]]; then
@@ -100,7 +104,7 @@ fi
 # ls variants (colorized)
 unset -f ls 2>/dev/null
 if command -v eza >/dev/null 2>&1; then
-    alias ls='eza --group-directories-first --color=always --icons'
+    alias ls="eza --group-directories-first --color=auto --icons"
     alias lt='ls -la --sort=modified'
     alias labc='ls -la --sort=name'
 else
@@ -151,8 +155,14 @@ alias edit='vim'
 alias ebrc='vim ~/.bashrc'
 alias vb='vim ~/.bashrc'
 alias vimh='vim -c ":h | only"'
-alias vc='vim $DOTFILES_CONFIG_FILE'
-alias vdot='vim $DOTFILES_CONFIG_FILE'
+alias vc="vim $DOTFILES_CONFIG_FILE"
+alias vdot="vim $DOTFILES_CONFIG_FILE"
+if ! command -v vp &> /dev/null; then
+    alias vp="vim $DOTFILES_CONFIG_DIR/.bash_personal"
+fi
+if ! command -v vw &> /dev/null; then
+    alias vw="vim $DOTFILES_CONFIG_DIR/.bash_twork"
+fi
 
 # Code
 alias c.='code .'

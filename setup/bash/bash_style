@@ -139,10 +139,10 @@ SEP_F="${GRAY}"  # separator
 SEL_F="${BOLD}${WHITE}"  # selection/choice
 
 # Type styles
-DIR_F=${BOLD}${SUB_C}  # Directories
-FILE_F=${ITALIC}${ACCENT_C}  # Files
-EXE_F=${MAIN_C}  # Executables/scripts
-ARGS_F=${DIM}  # Args/Options
+DIR_F="${SUB_C}"  # Directories
+FILE_F="${ACCENT_C}"  # Files
+EXE_F="${BOLD}${MAIN_C}"  # Executables/scripts
+ARGS_F="${DIM}"  # Args/Options
 
 # Other
 NOTICE_F="${BOLD}${ON_BLUE}${WHITE}" # attention-grabbing banners
@@ -241,6 +241,7 @@ set_theme() {
 
 # Set color for ls
 # export LS_COLORS="di=36:ex=38;2;255;192;203:*.py=38;2;255;192;203:*.sh=38;2;255;192;203:*.js=38;2;255;192;203"
+export EZA_COLORS="uu=38;2;255;182;193:un=38;2;255;182;193:gu=02;36:gn=02;36:da=02;37:ux=1;38;2;255;182;193:hd=1;38;2;255;182;193"
 
 # Color verification test
 color_test() {

@@ -96,17 +96,17 @@ security_context:
 # octal: {foreground: Purple}
 # flags: {foreground: Default}
 
-symlink_path: {foreground: Cyan}
-control_char: {foreground: Red}
-broken_symlink: {foreground: Red}
-broken_path_overlay: {foreground: Default, is_underline: true}
+# symlink_path: {foreground: Cyan}
+# control_char: {foreground: Red}
+# broken_symlink: {foreground: Red}
+# broken_path_overlay: {foreground: Default, is_underline: true}
 
-filenames:
+# filenames:
   # Custom filename-based overrides
   # Cargo.toml: {icon: {glyph: 🦀}}
 
-extensions:
-  # Custom extension-based overrides
-  rs: {filename: {foreground: 'ffb6C1'}, icon: {glyph: 🦀}}
-  py: {filename: {foreground: 'ffb6C1'}, icon: {glyph: }}
-  js: {filename: {foreground: 'ffb6C1'}, icon: {glyph: }}
+# extensions:
+#   # Custom extension-based overrides
+#   rs: {filename: {foreground: 'ffb6C1'}, icon: {glyph: 🦀}}
+#   py: {filename: {foreground: 'ffb6C1'}, icon: {glyph: }}
+#   js: {filename: {foreground: 'ffb6C1'}, icon: {glyph: }}

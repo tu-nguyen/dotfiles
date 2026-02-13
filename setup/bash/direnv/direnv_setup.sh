@@ -54,7 +54,6 @@ for raw_path in "${PATHS[@]}"; do
         # Create directory and empty .envrc
         mkdir -p "$clean_path"
         touch "$clean_path/.envrc"
-        # TODO: figure out for sure if I need to add 'source_up'
         t OK "Prepared: $clean_path"
     fi
 done

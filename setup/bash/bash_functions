@@ -1015,10 +1015,19 @@ function _gco() {
         return 1
     fi
 
-    if git checkout "$branch"; then
-        t SUCCESS "Switched to existing branch ${H2}$branch${NC}"
-        return 0
+    # Check if the branch exists locally or remotely
+    if git rev-parse --verify "$branch" >/dev/null 2>&1; then
+        # Branch exists! Now try to switch.
+        if git checkout "$branch"; then
+            t SUCCESS "Switched to existing branch ${H2}$branch${NC}"
+            return 0
+        else
+            # If this fails, it's likely due to uncommitted changes.
+            t ERROR "Could not switch to ${H2}$branch${NC}. You likely have uncommitted changes."
+            return 1
+        fi
     else
+        # Branch does NOT exist. Offer to create it.
         read -p "The branch ${H}$branch${NC} does not exist. Do you want to ${H2}create${NC} it? [y/N] " -r -n 1
         echo ""
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then

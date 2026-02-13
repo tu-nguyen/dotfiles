@@ -4,9 +4,32 @@
 # ===================================================================== #
 
 # ------------------------------------------
+# ptt
+# ------------------------------------------
+function ptt() {
+    printf "${HDR_F}personal cheatsheet${NC}\n"
+    printf "%s\n" H"$br"
+    printf "${SUB_F}cd${NC}\n"
+    printf "  ${KEY_F}cd0${NC} or ${KEY_F}cd-example1${NC}\n"
+    printf "  ${KEY_F}cd1${NC} or ${KEY_F}cd-example2${NC}\n"
+    printf "  ${KEY_F}cd2${NC} or ${KEY_F}cd-example3${NC}\n"
+    printf "  ${KEY_F}cd3${NC} or ${KEY_F}cd-example4${NC}\n"
+    printf "%s\n" "$br"
+    printf "${SUB_F}ssh${NC}\n"
+    printf "  ${KEY_F}ssh-example1${NC} (example server 1)\n"
+    printf "  ${KEY_F}ssh-example2${NC} (example server 2)\n"
+    printf "  ${KEY_F}ssh-example3${NC} (example server 3)\n"
+    printf "  ${KEY_F}ssh-example4${NC} (example server 4)\n"
+    printf "%s\n" "$br"
+    printf "${SUB_F}twork functions${NC}\n"
+    # printf "  ${KEY_F}azr${NC}                  ${H2}→${NC} Clear the Azure CLI cache\n"
+    # printf "  ${KEY_F}print_azure_status${NC}      ${H2}→${NC} Print current Azure DevOps iter..\n"
+    printf "%s\n" "$br"
+ }
+
+# ------------------------------------------
 # Aliases
 # ------------------------------------------
-
 if ! command -v cdw &> /dev/null; then
     alias cdw="cd $HOME/workplace"
     alias cd-dw="cd $HOME/workplace"

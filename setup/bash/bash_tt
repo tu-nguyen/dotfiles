@@ -56,21 +56,18 @@ function tt() {
 
     printf "${HDR_F}tt cheatsheet${NC}\n"
     printf "%s\n" "$br"
-    # TODO: add chmod aliases
     printf "${SUB_F}primary functions${NC}      ${H2}→${NC} ${EXE_F}ttt${NC} (show all tt)            ${H2}→${NC} ${EXE_F}j${NC} (jobs -l)\n"
     printf "                       ${H2}→${NC} ${EXE_F}cls${NC} (clear and ls)           ${H2}→${NC} ${EXE_F}df${NC} (df -H)\n"
     printf "                       ${H2}→${NC} ${EXE_F}mkcd${NC} (mkdir then cd)         ${H2}→${NC} ${EXE_F}du${NC} (du -ch)\n"
     printf "                       ${H2}→${NC} ${EXE_F}h${NC} (history)                  ${H2}→${NC} ${EXE_F}dmesg10${NC} (10 recent logs)\n"
     printf "                       ${H2}→${NC} ${EXE_F}x${NC} (exit)                     ${H2}→${NC} ${EXE_F}top${NC} (htop)\n"
     printf "                       ${H2}→${NC} ${EXE_F}v${NC} (vim)                      ${H2}→${NC} ${EXE_F}top10${NC} (top 10 ps)\n"
-    # ls
     printf "%s\n" "$br"
     printf "${SUB_F}ls & cd${NC}                ${H2}→${NC} ${EXE_F}ll${NC} (ls -alh)                 ${H2}→${NC} ${EXE_F}~${NC} (cd ~)\n"
     printf "                       ${H2}→${NC} ${EXE_F}la${NC} (ls -A)                   ${H2}→${NC} ${EXE_F}..${NC} (cd ..)\n"
     printf "                       ${H2}→${NC} ${EXE_F}lsd${NC} (ls -a1F | grep /$)      ${H2}→${NC} ${EXE_F}...${NC} (cd ../..)\n"
     printf "                       ${H2}→${NC} ${EXE_F}lt${NC} (la -lt)                  ${H2}→${NC} ${EXE_F}....${NC} (cd ../../..)\n"
     printf "                       ${H2}→${NC} ${EXE_F}la${NC} (ls -A)                   ${H2}→${NC} ${EXE_F}.4${NC} (../../../../)\n"
-    # cd
     printf "%s\n" "$br"
     printf "${SUB_F}utils${NC}                  ${H2}→${NC} ${EXE_F}myip${NC} (get ip)                ${H2}→${NC} ${EXE_F}now${NC}/${EXE_F}nowtime${NC} (time)\n"
     printf "                       ${H2}→${NC} ${EXE_F}ping${NC} (ping -c 5)             ${H2}→${NC} ${EXE_F}nowdate${NC} (date)\n"
@@ -78,7 +75,8 @@ function tt() {
     printf "                       ${H2}→${NC} ${EXE_F}ports${NC} (netstat -tulanp)      ${H2}→${NC} ${EXE_F}diskspace${NC} (du)\n"
     printf "                       ${H2}→${NC} ${EXE_F}folder${NC} (dir and sizes)       ${H2}→${NC} ${EXE_F}path${NC} (readible \$PATH)\n"
     printf "                       ${H2}→${NC} ${EXE_F}tree${NC} (blazeit)               ${H2}→${NC} ${EXE_F}treed${NC} (tree dir only)\n"
-    # Other other
+    printf "                       ${H2}→${NC} ${EXE_F}mx${NC} (chmod a+x)               ${H2}→${NC} ${EXE_F}000${NC} (chmod -R 000)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}666${NC} (chmod -R 666)           ${H2}→${NC} ${EXE_F}644/755/777${NC}\n"
     printf "%s\n" "$br"
     printf "${SUB_F}other tt${NC}               ${H2}→${NC} ${EXE_F}btt${NC} (bash)                   ${H2}→${NC} ${EXE_F}djtt${NC} (django)\n"
     printf "                       ${H2}→${NC} ${EXE_F}gtt${NC} (git)                    ${H2}→${NC} ${EXE_F}gttt${NC} (git aliases)\n"

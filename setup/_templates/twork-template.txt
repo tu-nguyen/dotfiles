@@ -3,7 +3,9 @@
 # TWORK BASH TEMPLATE
 # ===================================================================== #
 
-# twork ref
+# ------------------------------------------
+# tworktt
+# ------------------------------------------
 function tworktt() {
     printf "${HDR_F}twork cheatsheet${NC}\n"
     printf "%s\n" H"$br"
@@ -20,12 +22,31 @@ function tworktt() {
     printf "  ${KEY_F}ssh-example4${NC} (example server 4)\n"
     printf "%s\n" "$br"
     printf "${SUB_F}twork functions${NC}\n"
-
     # printf "  ${KEY_F}azr${NC}                  ${H2}→${NC} Clear the Azure CLI cache\n"
     # printf "  ${KEY_F}print_azure_status${NC}      ${H2}→${NC} Print current Azure DevOps iter..\n"
     printf "%s\n" "$br"
  }
 
+# ------------------------------------------
+# Aliases
+# ------------------------------------------
+alias cd0="cd /location/of/example1"
+alias cd-example1='cd0'
+alias cd1="cd /location/of/example2"
+alias cd-example2='cd1'
+alias cd2="cd /location/of/example3"
+alias cd-example1='cd2'
+alias cd3="cd /location/of/example4"
+alias cd-example4='cd4'
+alias qs="ssh something@something.com"
+alias ssh-example1='ssh example1@123.45.6789'
+alias ssh-example2='az ssh vm --ip example2.canadacentral.cloudapp.azure.com'
+alias ssh-example3='ssh example3@example3.com'
+alias ssh-example4='ssh example4@example4.com'
+
+# ------------------------------------------
+# Functions
+# ------------------------------------------
 twork_motd() {
     printf "${WARN}Welcome to twork!${NC}\n"
     # printf "Run '${HDR_F}td${NC}' to display tasks.\n"
@@ -44,21 +65,9 @@ function td() {
     # fi
 }
 
-# twork aliases
-alias cd0="cd /location/of/example1"
-alias cd-example1='cd0'
-alias cd1="cd /location/of/example2"
-alias cd-example2='cd1'
-alias cd2="cd /location/of/example3"
-alias cd-example1='cd2'
-alias cd3="cd /location/of/example4"
-alias cd-example4='cd4'
-alias qs="ssh something@something.com"
-alias ssh-example1='ssh example1@123.45.6789'
-alias ssh-example2='az ssh vm --ip example2.canadacentral.cloudapp.azure.com'
-alias ssh-example3='ssh example3@example3.com'
-alias ssh-example4='ssh example4@example4.com'
-
+# ------------------------------------------
+# Exports
+# ------------------------------------------
 # twork exports
 # Setting PATH for Python 3.13
 # The original version is saved in .bash_profile.pysave

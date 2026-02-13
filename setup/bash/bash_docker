@@ -23,12 +23,6 @@ KEEP_IMAGES=(
 # ------------------------------------------
 # Functions
 # ------------------------------------------
-# Export an image to tar
-dkexport() {
-	# TODO: add dest arg
-	docker save -o ${HOME}/Downloads/docker_image_backup.tar $1
-}
-
 # Helper function to remove images (filtered)
 function dkrmif() {
 	# Fetch all existing images in the format "repo:tag"
@@ -85,12 +79,12 @@ dkimport () {
 
 # Docker build
 function dkbuild() {
-	docker-compose build --no-cache
+	docker-compose build --no-cache $@
 }
 
 # Docker up
 function dkup() {
-	docker-compose up -d
+	docker-compose up -d $@
 }
 
 # Docker down
@@ -101,12 +95,7 @@ function dkdown() {
 # Docker buildup
 function dkbuildup() {
 	docker-compose build --no-cache
-	docker-compose up -d
-}
-
-# Docker restart
-function dkrestart() {
-	t "todo"
+	docker-compose up -d $@
 }
 
 # Run stop, rmi, and prunes

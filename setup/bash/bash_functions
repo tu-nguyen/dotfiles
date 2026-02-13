@@ -251,7 +251,6 @@ flip() {
 
 # Rngesus
 rng() {
-    # TODO: add history for last x results?
     # handle "x-y" format by replacing '-' with ' ' to create two args
     if [[ $# -eq 1 && $1 =~ ^[0-9]+-[0-9]+$ ]]; then
         set -- ${1/-/ }
@@ -1345,13 +1344,6 @@ function _get_asa_header() {
 
 # Print current asana project details and tasks assigned to the user
 function print_asana_status() {
-    # if [[ $# -lt 2 ]]; then
-    #     echo "Usage: print_asana_status <TODO>"
-    #     return 1
-    # fi
-    # local asana_project_gid="$1"
-    # local asana_pat="$2"
-
     local asana_project_gid=$(get_config "ASANA_PROJECT_GID")
     local asana_pat=$(get_config "ASANA_PAT")
     local auth_header=$(_get_asa_header)
@@ -1365,7 +1357,7 @@ function print_asana_status() {
     local project_json=$(curl -s -H "$auth_header" "$project_api")
     local project_name=$(echo "$project_json" | jq -r '.data.name // "Unknown Project"')
     if [[ "$TERM_PROGRAM" == "vscode" ]]; then
-        # if we are in vs code, replace complex emojis with stable nerd font icons
+        # If we are in vs code, replace complex emojis with stable nerd font icons
         local smh_star=$'\uf005 '
         project_name=$(echo "$project_name" | sed "s/🏃‍♀️/$smh_star/g")
     fi

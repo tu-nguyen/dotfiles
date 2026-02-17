@@ -328,7 +328,7 @@ reset_pre() {
             return 1
         fi
 
-        local linux_packages=("coreutils" "less" "iptables")
+        local linux_packages=("coreutils" "less" "iptables", "mpv")
         _install_packages "${linux_packages[@]}"
 
         # Post bat stuff
@@ -337,7 +337,7 @@ reset_pre() {
     # macos only
     elif [[ "$OS_TYPE" == "macos" ]]; then
         # NOTE: python@3.13 removed in favor of uv
-        local mac_packages=("lesspipe" "htop" "rsync")
+        local mac_packages=("lesspipe" "htop" "rsync", "mpv")
         _install_packages "${linux_packages[@]}"
     else
         t ERROR "Unsupported OS: ${ERR}$OS_TYPE${NC}. Please install the required packages manually."

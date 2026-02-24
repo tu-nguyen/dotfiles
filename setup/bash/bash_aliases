@@ -3,7 +3,7 @@
 # BASH ALIASES
 # ===================================================================== #
 # aliases cause you're a lazy pos smfh
-uname="$(uname)"
+
 # ------------------------------------------
 # Safety & Administrative
 # ------------------------------------------
@@ -17,7 +17,7 @@ if (( EUID != 0 )); then
     alias reboot='sudo reboot'
 
     # Package manager detection
-    if [[ "$uname" == "Darwin" ]]; then
+    if [[ "$OS_TYPE" == "macos" ]]; then
         # macos: use homebrew for 'update'
         if command -v brew &>/dev/null; then
             alias update='brew update && brew upgrade'
@@ -31,7 +31,7 @@ if (( EUID != 0 )); then
     fi
 
     # Firewall / iptables (Guard for macos)
-    if [[ "$uname" == "Darwin" ]]; then
+    if [[ "$OS_TYPE" == "macos" ]]; then
         # macos: use pfctl equivalents
         alias ipt='sudo pfctl'
         alias iptlist='sudo pfctl -s rules'
@@ -49,7 +49,7 @@ if (( EUID != 0 )); then
 fi
 
 # macos compatibility for timeout
-[[ "$uname" == "Darwin" ]] && alias timeout=gtimeout
+[[ "$OS_TYPE" == "macos" ]] && alias timeout=gtimeout
 
 # Prevent catastrophic accidents on root
 alias chown='chown --preserve-root'
@@ -65,18 +65,22 @@ alias mv='mv -iv'
 alias rm='rm -Iv --one-file-system --preserve-root'
 alias rmd='rm -rfv'
 
+# chmod
+alias mx='chmod a+x'
+alias 000='chmod -R 000'
+alias 644='chmod -R 644'
+alias 666='chmod -R 666'
+alias 755='chmod -R 755'
+alias 777='chmod -R 777'
+
 # ------------------------------------------
 # Navigation & Listing
 # ------------------------------------------
-alias c='clear'
-alias cls='clear && ls'
-alias clss='clear && lsa'
+# basic
 alias h='history'
 alias x='exit'
 
 # cat
-# alias qat='/usr/bin/cat'
-# alias cat='bat --paging=never --force-colorization'
 alias qat="$(command -v cat)"
 alias cat="$(command -v batcat || command -v bat || echo 'cat') --paging=never --force-colorization"
 
@@ -94,10 +98,18 @@ if ! command -v cdcd &> /dev/null; then
     alias cdcd="cd ~/.config/dotfiles"
 fi
 
+# clear
+alias c='clear'
+if ! command -v cl &> /dev/null; then
+    alias cl='clear && ls'
+fi
+alias cls='clear && ls'
+alias cla='clear && lsa'
+
 # Open folder
-if [[ "$uname" == "Darwin" ]]; then
+if [[ "$OS_TYPE" == "macos" ]]; then
     alias f='open -a Finder'
-else
+elif [[ "$OS_TYPE" == "wsl" ]]
     alias f='explorer.exe'
 fi
 
@@ -109,7 +121,7 @@ if command -v eza >/dev/null 2>&1; then
     alias labc='ls -la --sort=name'
 else
     # Fallback to standard ls logic if eza is missing
-    if [[ "$(uname)" == "Darwin" ]]; then
+    if [[ "$OS_TYPE" == "macos" ]]; then
         alias ls='ls -Gph'
     else
         alias ls='ls -Fph --color=auto --group-directories-first'
@@ -146,6 +158,16 @@ alias y="yaourt"
 # Lang
 alias rb='ruby'
 alias py='python'
+# # python and uv
+# commented out, using 'uv python link 3.13' instead
+# alias python3='uv run --python 3.13 python3'
+# alias python='uv run --python 3.13 python'
+
+# irc
+alias irc='${IRC_CLIENT:-irc}'
+
+# Code
+alias c.='code .'
 
 # Vim
 alias v='vim'
@@ -164,17 +186,21 @@ if ! command -v vw &> /dev/null; then
     alias vw="vim $DOTFILES_CONFIG_DIR/.bash_twork"
 fi
 
-# Code
-alias c.='code .'
+# diff
+if command -v colordiff >/dev/null 2>&1; then
+    alias diff='colordiff'
+    # side-by-side comparison
+    alias diffy='colordiff -y -W $(tput cols)'
+fi
 
 # Resource usage
-alias ps='[[ "$uname" == "Darwin" ]] && ps aux || ps auxf'
+alias ps='[[ "$OS_TYPE" == "macos" ]] && ps aux || ps auxf'
 alias j='jobs -l'
 alias df='df -H'
 alias du='du -ch'
 alias top='htop'
-alias top10='[[ "$uname" == "Darwin" ]] && ps -arcwwwxo pid,comm,%cpu,%mem | head -n 11 || ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 11'
-alias uptime='[[ "$uname" == "Darwin" ]] && uptime || uptime -p'
+alias top10='[[ "$OS_TYPE" == "macos" ]] && ps -arcwwwxo pid,comm,%cpu,%mem | head -n 11 || ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 11'
+alias uptime='[[ "$OS_TYPE" == "macos" ]] && uptime || uptime -p'
 alias nowtime='date +"%T"'
 alias nowdate='date +"%d-%m-%Y"'
 alias path='echo -e ${PATH//:/\\n}'
@@ -195,7 +221,7 @@ fi
 alias myip="curl -s icanhazip.com"
 alias ping='ping -c 5'
 alias p4="ping 4.2.2.2 -c 4"
-alias ports='[[ "$uname" == "Darwin" ]] && netstat -tulanp || ss -tulanp'
+alias ports='[[ "$OS_TYPE" == "macos" ]] && netstat -tulanp || ss -tulanp'
 alias header='curl -I'  # get web server headers
 alias headerc='curl -I --compress'  # find out if remote server supports gzip / mod_deflate or not
 alias dnstop='dnstop -l 5  eth1'  # all of our servers eth1 is connected to the internets via vlan / router etc
@@ -211,22 +237,6 @@ if ! command -v host &> /dev/null; then
     alias host="sudo $EDITOR /etc/hosts"
     alias hosts="sudo $EDITOR /etc/hosts"
 fi
-
-# chmod
-alias mx='chmod a+x'
-alias 000='chmod -R 000'
-alias 644='chmod -R 644'
-alias 666='chmod -R 666'
-alias 755='chmod -R 755'
-alias 777='chmod -R 777'
-
-# # python and uv
-# commented out, using 'uv python link 3.13' instead
-# alias python3='uv run --python 3.13 python3'
-# alias python='uv run --python 3.13 python'
-
-# irc
-alias irc='${IRC_CLIENT:-irc}'
 
 # ------------------------------------------
 # Archives (The "I always forget the flags" section)
@@ -283,13 +293,3 @@ alias nus='npm uninstall --save'
 alias nup='npm update'
 
 alias so0="cmatrix"
-# alias mv='timeout 8 mv -iv'
-# alias rm='timeout 3 rm -Iv --one-file-system --preserve-root'
-# alias rmd='rm  --recursive --force --verbose '
-# alias mkdir='mkdir -pv'
-
-if command -v colordiff >/dev/null 2>&1; then
-    alias diff='colordiff'
-    # side-by-side comparison
-    alias diffy='colordiff -y -W $(tput cols)'
-fi

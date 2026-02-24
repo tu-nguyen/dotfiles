@@ -1016,7 +1016,7 @@ function _gco() {
     fi
 
     # Check if the branch exists locally or remotely
-    if git rev-parse --verify "$branch" >/dev/null 2>&1; then
+    if git show-ref --verify --quiet "refs/heads/$branch" || git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
         # Branch exists! Now try to switch.
         if git checkout "$branch"; then
             t SUCCESS "Switched to existing branch ${H2}$branch${NC}"

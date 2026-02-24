@@ -109,7 +109,7 @@ alias cla='clear && lsa'
 # Open folder
 if [[ "$OS_TYPE" == "macos" ]]; then
     alias f='open -a Finder'
-elif [[ "$OS_TYPE" == "wsl" ]]
+elif [[ "$OS_TYPE" == "wsl" ]]; then
     alias f='explorer.exe'
 fi
 

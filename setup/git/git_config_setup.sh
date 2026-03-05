@@ -17,7 +17,6 @@ git config --global pull.rebase true                    # keeps history linear o
 git config --global rebase.autoStash true               # enable autostash by default
 git config --global core.editor "vim"                   # use Vim for commit messages
 git config --global init.defaultBranch main             # standardize default branch name
-git config --global rebase.autoStash true               # reuse recorded resolution
 
 # ------------------------------------------
 # Aliases

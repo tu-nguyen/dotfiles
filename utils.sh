@@ -49,6 +49,18 @@ _convert_hex_to_ansi() {
 # ------------------------------------------
 # Helper Functions Generic install
 # ------------------------------------------
+# pre instation steps
+_pre_install() {
+    t OK "${OK}Pre install steps started..${NC}"
+    if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
+        sudo apt update -y
+    fi
+
+    # TODO: add macos and PowerShell
+
+    t SUCCESS "Pre install steps completed!"
+}
+
 # Function to linux packages via apt install
 # TODO: add support for arch yoart
 _install_linux_packages() {
@@ -66,9 +78,6 @@ _install_linux_packages() {
     # If missing packages, install them in one batch
     if [ ${#missing_pkgs[@]} -gt 0 ]; then
         t "Installing missing packages: ${HDR_F}${missing_pkgs[*]}${NC}.."
-
-        # update once before batch installing to ensure we get latest versions
-        sudo apt update -y
         sudo apt install -y "${missing_pkgs[@]}"
     fi
 }
@@ -93,7 +102,7 @@ _install_mac_packages() {
     # Identify which packages aren't installed yet
     for pkg in "$@"; do
         if brew list "$pkg" &>/dev/null; then
-            t SUCCESS "${HDR_F}$pkg${NC} is already installed via brew."
+            t SUCCESS "${HDR_F}$pkg${NC} is already installed via brew!"
         else
             missing_pkgs+=("$pkg")
         fi
@@ -102,10 +111,8 @@ _install_mac_packages() {
     # Install the missing ones in a single batch
     if [ ${#missing_pkgs[@]} -gt 0 ]; then
         t "Installing missing brew packages: ${HDR_F}${missing_pkgs[*]}${NC}.."
-
         brew install "${missing_pkgs[@]}"
-
-        t SUCCESS "Installation of ${HDR_F}${missing_pkgs[*]}${NC} complete."
+        t SUCCESS "Installation of ${HDR_F}${missing_pkgs[*]}${NC} complete!"
     fi
 }
 
@@ -124,6 +131,31 @@ _install_packages() {
 # ------------------------------------------
 # Helper Functions Specific install
 # ------------------------------------------
+# Function to install gitstatus
+_install_gitstatus() {
+    local original_dir=$(pwd)
+    local installed_or_updated="installed"
+    GITSTATUS_DIR="$HOME/.gitstatus"
+    if [ -d "$GITSTATUS_DIR/.git" ]; then
+        t OK "${HDR_F}gitstatus${NC} directory '${SUB_F}$GITSTATUS_DIR${NC}' already exists. Pulling latest changes.."
+        cd "$GITSTATUS_DIR"
+        if ! git pull origin master &> /dev/null; then
+            t Warning "Failed to pull ${HDR_F}gitstatus${NC}. Using existing version."
+        fi
+        # printf "\033[1A\r\033[K"
+        local installed_or_updated="updated"
+    else
+        t "Cloning ${HDR_F}gitstatus${NC} repository to '${SUB_F}$GITSTATUS_DIR${NC}'.."
+        if ! git clone https://github.com/romkatv/gitstatus.git "$GITSTATUS_DIR"; then
+            t Error"Failed to clone ${ERR}gitstatus${NC} repository."
+        fi
+        local installed_or_updated=installed
+    fi
+    cd "$original_dir"
+    printf "\033[1A\r\033[K"
+    t OK "${HDR_F}gitstatus${NC} $installed_or_updated successfully!"
+}
+
 # Function to install (patch) fira code (nerd font icons)
 _install_fira_font() {
     local font_name="FiraCode Nerd Font"
@@ -267,30 +299,29 @@ _install_fnm() {
     fi
 }
 
-# Function to install gitstatus
-_install_gitstatus() {
-    local original_dir=$(pwd)
-    local installed_or_updated="installed"
-    GITSTATUS_DIR="$HOME/.gitstatus"
-    if [ -d "$GITSTATUS_DIR/.git" ]; then
-        t OK "${HDR_F}gitstatus${NC} directory '${SUB_F}$GITSTATUS_DIR${NC}' already exists. Pulling latest changes.."
-        cd "$GITSTATUS_DIR"
-        if ! git pull origin master &> /dev/null; then
-            t Warning "Failed to pull ${HDR_F}gitstatus${NC}. Using existing version."
-        fi
-        # printf "\033[1A\r\033[K"
-        local installed_or_updated="updated"
-    else
-        t "Cloning ${HDR_F}gitstatus${NC} repository to '${SUB_F}$GITSTATUS_DIR${NC}'.."
-        if ! git clone https://github.com/romkatv/gitstatus.git "$GITSTATUS_DIR"; then
-            t Error"Failed to clone ${ERR}gitstatus${NC} repository."
-        fi
-        local installed_or_updated=installed
-    fi
-    cd "$original_dir"
-    printf "\033[1A\r\033[K"
-    t OK "${HDR_F}gitstatus${NC} $installed_or_updated successfully!"
-}
+# TODO: Determine if this is still needed?
+# # Function to install eza
+# _install_eza() {
+#     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
+#         if ! command -v eza &> /dev/null; then
+#             t "Installing ${HDR_F}eza${NC}.."
+
+#             # First make sure you have the gpg command
+#             _install_packages gpg
+
+#             sudo mkdir -p /etc/apt/keyrings
+#             wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+#             echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
+#             sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+#             _pre_install
+#             _install_packages eza
+#         else
+#             t OK "${HDR_F}$(eza -V)${NC} is already installed at ${SUB_F}$(command -v eza)${NC}"
+#         fi
+#     elif [[ "$OS_TYPE" == "macos" ]]; then
+#         _install_mac_package eza
+#     fi
+# }
 
 # ------------------------------------------
 # Main
@@ -309,7 +340,9 @@ reset_pre() {
     # mkdir -p "$HOME/workplace"
     # mkdir -p "$HOME/workplace/repo"
 
-    local core_packages=("curl" "vim" "git" "make" "jq" "colordiff" "wget" "bat" "eza")
+    _pre_install
+
+    local core_packages=("curl" "vim" "git" "make" "jq" "colordiff" "wget" "bat" "eza" "ncdu" "fd-find" "ripgrep")
     _install_packages "${core_packages[@]}"
 
     _install_gitstatus
@@ -319,6 +352,7 @@ reset_pre() {
     _update_uv
     _install_uv_tools
     _install_fnm
+    # _install_eza
 
     # For both linux & wsl only
     if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
@@ -328,7 +362,7 @@ reset_pre() {
             return 1
         fi
 
-        local linux_packages=("coreutils" "less" "iptables", "mpv")
+        local linux_packages=("coreutils" "less" "iptables" "mpv")
         _install_packages "${linux_packages[@]}"
 
         # Post bat stuff

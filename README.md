@@ -1,4 +1,5 @@
 # dotfiles
+
 My personal configuration files (.bashrc, .vimrc, git)
 
 Everyone create little "systems" or ways of doing things, and programmers are the laziest kinds of people on Earth.

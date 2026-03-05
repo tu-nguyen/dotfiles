@@ -79,6 +79,7 @@ alias 777='chmod -R 777'
 # basic
 alias h='history'
 alias x='exit'
+alias fd='fdfind'
 
 # cat
 alias qat="$(command -v cat)"
@@ -207,6 +208,7 @@ alias path='echo -e ${PATH//:/\\n}'
 alias dmesg10='sudo dmesg | tail -n 10'
 # alias folder="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
 alias folder="du -sh */ | sort -rh"
+alias du="ncdu --color dark"
 alias wc='wc -l -w -c'
 alias tree='eza --tree --level=2 --icons'
 alias treed='eza --tree --level=2 --icons --only-dirs'

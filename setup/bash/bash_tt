@@ -47,6 +47,54 @@ function print_tt() {
 # ------------------------------------------
 # Main tts
 # ------------------------------------------
+
+# helper for ttcli
+show_tt_help_menu() {
+    if [[ ! "$DOT_DEBUG" == "1" ]]; then
+        clear
+    fi
+    printf "${HDR_F}Available Cheatsheets:${NC}\n"
+    printf "  ${H2}→${NC} ${EXE_F}ttcli git${NC} (or gtt)\n"
+    printf "  ${H2}→${NC} ${EXE_F}ttcli fd${NC}  (or fdtt)\n"
+    printf "  ${H2}→${NC} ${EXE_F}ttcli rg${NC}  (or rgtt)\n"
+}
+# Central Hub for all CLI Cheatsheets
+function ttcli() {
+    # TODO: Figure out a better flow
+    while true; do
+        local topic=$1
+
+        if [ -z "$topic" ]; then
+            show_tt_help_menu
+            read -p "Enter your choice (press ${HDR_F}Enter${NC} for default: tt): " topic
+        fi
+
+        case "$topic" in
+            tt)
+                tt
+                ;;
+            git|gtt)
+                gtt
+                ;;
+            fd|fdtt)
+                fdtt
+                ;;
+            rg|rgtt)
+                rgg
+                ;;
+            "" | 0)
+            return 0
+                ;;
+            *)
+                printf "${ERROR_F}Error:${NC} No cheatsheet found for '${H2}$topic${NC}'\n"
+                return 1
+                ;;
+        esac
+        read -p "Press ${HDR_F}Enter${NC} to continue.."
+    done
+
+}
+
 # General cheatsheet
 function tt() {
     if [ -z "$DOTFILES_CONFIG_DIR" ]; then
@@ -83,7 +131,7 @@ function tt() {
     printf "                       ${H2}→${NC} ${EXE_F}sshtt${NC} (ssh)                  ${H2}→${NC} ${EXE_F}makett${NC} (makefile)\n"
     printf "                       ${H2}→${NC} ${EXE_F}pytt${NC} (python)                ${H2}→${NC} ${EXE_F}vtt${NC} (vim)\n"
     printf "                       ${H2}→${NC} ${EXE_F}dctt${NC} (docker-compose)        ${H2}→${NC} ${EXE_F}dktt${NC} (docker)\n"
-
+    printf "                       ${H2}→${NC} ${EXE_F}fdtt${NC} (fdfind/fd)             ${H2}→${NC} ${EXE_F}rgtt${NC} (ripgrep)\n"
     if [[ ! -f "$DOTFILES_CONFIG_DIR/.bash_personal" ]]; then
         printf "  ${EXE_F}ptt${NC}                  ${H2}→${NC} config ${FILE_F}.bash_personal${NC} ${RED}does not exist${NC} inside ${DIR_F}$(basename $DOTFILES_CONFIG_DIR)${NC}; run ${EXE_F}set-ptt${NC}\n"
     else
@@ -96,6 +144,7 @@ function tt() {
         printf "  ${EXE_F}tworktt${NC}              ${H2}→${NC} to view ${H}twork${NC} stuff\n"
     fi
     printf "  ${EXE_F}ftt${NC}                  ${H2}→${NC} to view list of ${H}functions${NC}\n"
+    printf "  ${EXE_F}ttcli${NC}                ${H2}→${NC} to view list of ${H}tts${NC}\n"
 
     printf "%s\n" "$br"
     printf "${SUB_F}reminder${NC}      \n"
@@ -440,6 +489,58 @@ function vtt() {
     printf "  ${ARGS_F}:${NC}${WHITE}q${NC}                   ${H2}→${NC} Quit\n"
     printf "  ${ARGS_F}:${NC}${WHITE}wq${NC}                  ${H2}→${NC} Save & Quit\n"
     printf "  ${ARGS_F}:${NC}${WHITE}q!${NC}                  ${H2}→${NC} Quit without saving\n"
+    printf "%s\n" "$br"
+}
+
+# fdfind (fd) cheatsheet
+function fdtt() {
+    printf "${HDR_F}fdfind (fd) cheatsheet${NC}\n"
+    printf "%s\n" "$br"
+    printf "${SUB_F}basics:${NC}                ${H2}→${NC} ${EXE_F}fd${NC} ${ARGS_F}pattern${NC} (search recursively)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}fd -e${NC} ${ARGS_F}ext${NC} (search by extension)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}fd -H${NC} (include hidden files)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}fd -I${NC} (ignore .gitignore rules)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}fd -g${NC} ${ARGS_F}glob${NC} (use glob instead of regex)\n"
+    printf "${SUB_F}filtering:${NC}             ${H2}→${NC} ${EXE_F}fd -t f${NC} (files only)         ${H2}→${NC} ${EXE_F}fd -t d${NC} (dirs only)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}fd -t x${NC} (executables)        ${H2}→${NC} ${EXE_F}fd -t s${NC} (symlinks)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}fd -S ${NC} ${ARGS_F}+10M${NC} (size filter)    ${H2}→${NC} ${EXE_F}fd -o${NC} ${ARGS_F}1h${NC} (changed in last hour)\n"
+    printf "%s\n" "$br"
+    printf "${SUB_F}execution (exec):${NC}\n"
+    printf "  ${EXE_F}fd${NC} ${ARGS_F}pat${NC} ${EXE_F}-x${NC} ${ARGS_F}cmd${NC}                                       ${H2}→${NC} execute command for each result\n"
+    printf "  ${EXE_F}fd -e jpg -x convert {} {.}.png${NC}                     ${H2}→${NC} batch convert extensions\n"
+    printf "  ${EXE_F}fd -t f -x rm${NC}                                       ${H2}→${NC} delete all matching files\n"
+    printf "  ${EXE_F}fd -p${NC} ${ARGS_F}'/path/pat'${NC}                                   ${H2}→${NC} search in a full absolute path\n"
+    printf "%s\n" "$br"
+    printf "${SUB_F}ref placeholders:${NC}\n"
+    printf "  ${KEY_F}{}${NC}                   ${H2}→${NC} full path (default)\n"
+    printf "  ${KEY_F}{.}${NC}                  ${H2}→${NC} path without extension\n"
+    printf "  ${KEY_F}{/}${NC}                  ${H2}→${NC} basename only (filename)\n"
+    printf "  ${KEY_F}{//}${NC}                 ${H2}→${NC} parent directory\n"
+    printf "%s\n" "$br"
+}
+
+# ripgrep (rg) cheatsheet
+function rgtt() {
+    printf "${HDR_F}ripgrep (rg) cheatsheet${NC}\n"
+    printf "%s\n" "$br"
+    printf "${SUB_F}searching:${NC}             ${H2}→${NC} ${EXE_F}rg${NC} ${ARGS_F}'pattern'${NC} (recursive search)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}rg -i${NC} (case insensitive)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}rg -v${NC} (invert match/exclude)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}rg -F${NC} (fixed string/no regex)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}rg -w${NC} (match whole word only)\n"
+    printf "${SUB_F}filtering:${NC}             ${H2}→${NC} ${EXE_F}rg -t${NC} ${ARGS_F}py${NC} (only python files)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}rg -T${NC} ${ARGS_F}js${NC} (exclude javascript files)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}rg -g${NC} ${ARGS_F}'*.md'${NC} (glob/filename filter)\n"
+    printf "%s\n" "$br"
+    printf "${SUB_F}context & view:${NC}\n"
+    printf "  ${EXE_F}rg -C 3${NC} ${ARGS_F}pat${NC}                                         ${H2}→${NC} show 3 lines of context (A+B)\n"
+    printf "  ${EXE_F}rg -l${NC} ${ARGS_F}pat${NC}                                           ${H2}→${NC} only show filenames with matches\n"
+    printf "  ${EXE_F}rg -p${NC} ${ARGS_F}pat${NC}                                           ${H2}→${NC} 'pretty' (headings + colors)\n"
+    printf "  ${EXE_F}rg --stats${NC} ${ARGS_F}pat${NC}                                      ${H2}→${NC} see speed/file stats\n"
+    printf "%s\n" "$br"
+    printf "${SUB_F}find & replace (preview):${NC}\n"
+    printf "  ${EXE_F}rg${NC} ${ARGS_F}'old'${NC} ${EXE_F}-r${NC} ${ARGS_F}'new'${NC}                                   ${H2}→${NC} preview replacement in stdout\n"
+    printf "  ${EXE_F}rg${NC} ${ARGS_F}'(..) (..)'${NC} ${EXE_F}-r${NC} ${ARGS_F}'\$2 \$1'${NC}                           ${H2}→${NC} swap capture groups\n"
     printf "%s\n" "$br"
 }
 

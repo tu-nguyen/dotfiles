@@ -82,6 +82,9 @@ function ttcli() {
             rg|rgtt)
                 rgg
                 ;;
+            sd|sdtt)
+                sdtt
+                ;;
             "" | 0)
             return 0
                 ;;
@@ -541,6 +544,24 @@ function rgtt() {
     printf "${SUB_F}find & replace (preview):${NC}\n"
     printf "  ${EXE_F}rg${NC} ${ARGS_F}'old'${NC} ${EXE_F}-r${NC} ${ARGS_F}'new'${NC}                                   ${H2}→${NC} preview replacement in stdout\n"
     printf "  ${EXE_F}rg${NC} ${ARGS_F}'(..) (..)'${NC} ${EXE_F}-r${NC} ${ARGS_F}'\$2 \$1'${NC}                           ${H2}→${NC} swap capture groups\n"
+    printf "%s\n" "$br"
+}
+
+# sd (search & displace) cheatsheet
+function sdtt() {
+    printf "${HDR_F}sd (sed alternative) cheatsheet${NC}\n"
+    printf "%s\n" "$br"
+    printf "${SUB_F}basics:${NC}                ${H2}→${NC} ${EXE_F}sd${NC} ${ARGS_F}'find' 'replace' file.txt${NC}\n"
+    printf "                       ${H2}→${NC} ${EXE_F}sd -s${NC} (string literal mode / no regex)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}sd -p${NC} (preview changes in stdout)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}sd -f${NC} ${ARGS_F}flags${NC} (e.g. -f i for case-insensitive)\n"
+    printf "${SUB_F}regex:${NC}                 ${H2}→${NC} ${EXE_F}sd${NC} ${ARGS_F}'(..) (..)' '\$2 \$1'${NC} (capture groups)\n"
+    printf "                       ${H2}→${NC} ${EXE_F}sd${NC} ${ARGS_F}'\d{4}' 'YEAR'${NC} (standard regex syntax)\n"
+    printf "%s\n" "$br"
+    printf "${SUB_F}power moves (with fd/rg):${NC}\n"
+    printf "  ${EXE_F}fd -e py | xargs sd 'old' 'new'${NC}                     ${H2}→${NC} find & replace in all .py files\n"
+    printf "  ${EXE_F}rg -l 'fixme' | xargs sd 'fixme' 'DONE'${NC}             ${H2}→${NC} replace only in files with match\n"
+    printf "  ${EXE_F}cat file | sd 'pattern' 'replacement'${NC}               ${H2}→${NC} use as a pipe/stream filter\n"
     printf "%s\n" "$br"
 }
 

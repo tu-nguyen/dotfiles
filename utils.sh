@@ -342,7 +342,7 @@ reset_pre() {
 
     _pre_install
 
-    local core_packages=("curl" "vim" "git" "make" "jq" "colordiff" "wget" "bat" "eza" "ncdu" "fd-find" "ripgrep")
+    local core_packages=("curl" "vim" "git" "make" "jq" "colordiff" "wget" "bat" "eza" "ncdu" "fd-find" "ripgrep" "btop" "sd")
     _install_packages "${core_packages[@]}"
 
     _install_gitstatus
@@ -371,7 +371,7 @@ reset_pre() {
     # macos only
     elif [[ "$OS_TYPE" == "macos" ]]; then
         # NOTE: python@3.13 removed in favor of uv
-        local mac_packages=("lesspipe" "htop" "rsync", "mpv")
+        local mac_packages=("lesspipe" "rsync", "mpv")
         _install_packages "${linux_packages[@]}"
     else
         t ERROR "Unsupported OS: ${ERR}$OS_TYPE${NC}. Please install the required packages manually."

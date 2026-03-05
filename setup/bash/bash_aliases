@@ -79,7 +79,9 @@ alias 777='chmod -R 777'
 # basic
 alias h='history'
 alias x='exit'
-alias fd='fdfind'
+if command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1; then
+    alias fd='fdfind'
+fi
 
 # cat
 alias qat="$(command -v cat)"
@@ -199,7 +201,7 @@ alias ps='[[ "$OS_TYPE" == "macos" ]] && ps aux || ps auxf'
 alias j='jobs -l'
 alias df='df -H'
 alias du='du -ch'
-alias top='htop'
+alias top='btop'
 alias top10='[[ "$OS_TYPE" == "macos" ]] && ps -arcwwwxo pid,comm,%cpu,%mem | head -n 11 || ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 11'
 alias uptime='[[ "$OS_TYPE" == "macos" ]] && uptime || uptime -p'
 alias nowtime='date +"%T"'

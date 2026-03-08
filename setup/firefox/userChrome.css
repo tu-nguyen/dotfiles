@@ -1,130 +1,136 @@
-/* Hide main tabs */
-/* #TabsToolbar { / * This would remove the min, max, and close buttons
-    visibility: collapse;
-} */
-
-/* Hide only the tabs themselves */
-#tabbrowser-tabs {
-    visibility: collapse;
+/* ------ THEME VARIABLES ------ */
+:root {
+    --bg-dark: #0a0a0a;
+    --bg-surface: #0a0a0a;
+    --bg-sidebar: #0a0a0a;
+    --pastel-pink: #f9c8d9;
+    --pastel-blue: #b0e2ff;
+    --text-main: #e0e0e0;
 }
 
-#main-window[tabsintitlebar="true"]:not([extradragspace="true"]) #TabsToolbar > .titlebar-buttonbox-container {
-    display: flex !important; /* Use flexbox for proper alignment */
-    position: absolute; /* Position it absolutely within its parent */
-    top: 0;
-    right: 0;
-    margin-top: 0; 
-    margin-right: 0;
+/* ------ HIDE DEFAULT TABS ------ */
+#TabsToolbar {
+    visibility: collapse !important;
 }
 
-
-#navigator-toolbox {
-    display: block;
-    align-items: end;
+/* Force the window controls to show up even when tabs are hidden */
+#TabsToolbar .titlebar-buttonbox-container {
+    visibility: visible !important;
+    display: flex !important;
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    height: 40px;
+    /* z-index: 10; */
 }
 
-#titlebar {
-    order: 1;
-    background-color: rgb(0, 0, 0);
-    margin-right: 0%;
-    /* padding-left: calc(100% - 146px); */
-    height: 1.8em;
-    align-items: end;
-}
+/* Ensure the window controls (min/max/close) still show up in the navbar */
 #nav-bar {
-    order: 0;
-}
-#PersonalToolbar {
-    order: 2;
+    margin-right: 132px !important;
+    border-top: none !important;
 }
 
-/* Hide border on tab bar, force its state to 'scroll', adjust margin-left for width of scrollbar. */
+/* Clean up the top spacing */
+#navigator-toolbox {
+    border-bottom: none !important;
+    --tabs-navbar-shadow-size: 0px;
+}
+
+#tabs-newtab-button,
+#TabsToolbar .toolbar-items,
+#TabsToolbar .tabs-newtab-button {
+    visibility: visible !important;
+}
+
+/* Relocate the + button so it doesn't float in the hidden tab bar space */
+#tabs-newtab-button {
+    position: fixed !important;
+    top: 0 !important;
+    right: 140px !important; /* Adjust this so it doesn't overlap your window controls */
+    height: 40px !important;
+    width: 40px !important;
+    z-index: 1000 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Optional: Give it a slight background so it's easier to see on your dark theme */
+#tabs-newtab-button:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+#sidebar {
+    width: 100% !important;
+    height: 100% !important;
+    flex-grow: 1 !important;
+    background-color: #050505 !important;
+}
+
+/* ------ TREE STYLE TAB UI ENHANCEMENTS ------ */
+
+/* Background of the entire sidebar */
 #tabbar {
-    border: 0;
-    scrollbar-width: none;
-    overflow: scroll !important;
-    margin-top: 0 !important;
+    background-color: var(--bg-dark) !important;
+    border: none !important;
 }
 
-/* general tabs */
+/* General Tab Styling */
 .tab {
-    background-color: transparent;
-}
-.tab,
-.tab.pinned {
-    height: 2.8em;
+    background-color: transparent !important;
+    border: none !important;
+    transition: all 0.2s ease;
 }
 
-/* Push tab labels slightly to the right so they're completely hidden in collapsed state, but still look fine while expanded. */
-.tab .label {
-    margin-left: 1em;
+#tabbar, .tab {
+  background-color: var(--bg-sidebar) !important;
 }
 
-.tab .counter {
-    margin-left: auto;
-    display: inline-block !important;
-}
-
-/* Hide sound playing/muted button. */
-.sound-button {
-    margin-left: 0;
-    display: inline-block;
-    visibility: collapse;
-}
-
-.tab.audible .sound-button {
-    visibility: visible;
-    margin-left: 0.25em;
-}
-
-/* active tab */
+/* Active Tab: Pastel Pink Highlight */
 .tab.active {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    box-shadow: inset 3px 0 0 #ffffff99 !important;
-}
-.tab:hover,
-.tab.active:hover {
-    background-color: inherit;
-}
-.tab.active .label {
-    font-weight: bold;
-    color: #f4f4f4 !important;
-}
-.tab .label,
-.tab.active .label {
-    border-bottom: 1px solid transparent;
-}
-.tab:hover .label,
-.tab.active:hover .label {
-    border-bottom: 1px dotted;
-    min-width: 0 !important;
-    flex-shrink: 1 !important;
-    flex-grow: unset !important;
+    background-color: rgba(249, 200, 217, 0.1) !important; /* Subtle pink glow */
+    box-shadow: inset 4px 0 0 var(--pastel-pink) !important; /* Pink left border */
 }
 
-/* pending / unloaded tabs */
+.tab.active .label {
+    color: var(--pastel-pink) !important;
+    font-weight: 600;
+}
+
+/* Unread/Unloaded Tabs: Pastel Blue Accent */
+.tab.unread .label {
+    color: var(--pastel-blue) !important;
+    font-style: italic;
+}
+
 .tab.discarded {
-    background-color: #1d1d1d;
-}
-.tab.discarded .label {
-    color: #efefefCC !important;
-}
-.tab.discarded:hover .label {
-    color: #efefef !important;
+    opacity: 0.6;
 }
 
-/* Adjust style for tab that has sound playing. */
-.tab.sound-playing .favicon::after,
-.tab.muted .favicon::after {
-    content: '🔊';
-    z-index: var(--favicon-base-z-index);
+/* Hover State: Subtle Blue Highlight */
+.tab:hover:not(.active) {
+    background-color: rgba(176, 226, 255, 0.05) !important;
+    box-shadow: inset 2px 0 0 var(--pastel-blue) !important;
+}
+
+/* Progress bar (loading) */
+.tab .progress-bar {
+    background-color: var(--pastel-pink) !important;
+}
+
+/* ------ CLEANER INDICATORS ------ */
+
+/* Replace standard sound icons with colored dots or cleaner emojis */
+.tab.audible .favicon::after {
+    content: '•';
+    color: var(--pastel-pink);
     position: absolute;
-    font-size: 0.5em;
-    bottom: -0.35em;
-    right: -0.7em;
+    bottom: -5px;
+    right: -2px;
+    font-size: 1.2em;
 }
 
-/* Adjust style for tab that is muted. */
-.tab.muted .favicon::after {
-    content: '🔇';
+/* Hide the bulky sound button since we have the indicator */
+.sound-button {
+    display: none !important;
 }

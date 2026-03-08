@@ -186,6 +186,6 @@ motd() {
     short_motd
     long_motd
     if [[ $- == *i* ]] && [ -t 0 ] && command -v td >/dev/null; then
-        td
+        twork_motd
     fi
 }

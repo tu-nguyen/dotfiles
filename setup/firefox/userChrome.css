@@ -13,49 +13,6 @@
     visibility: collapse !important;
 }
 
-/* Force the window controls to show up even when tabs are hidden */
-#TabsToolbar .titlebar-buttonbox-container {
-    visibility: visible !important;
-    display: flex !important;
-    position: absolute !important;
-    top: 0 !important;
-    right: 0 !important;
-    height: 40px;
-    /* z-index: 10; */
-}
-
-/* Ensure the window controls (min/max/close) still show up in the navbar */
-#nav-bar {
-    margin-right: 132px !important;
-    border-top: none !important;
-}
-
-/* Clean up the top spacing */
-#navigator-toolbox {
-    border-bottom: none !important;
-    --tabs-navbar-shadow-size: 0px;
-}
-
-#tabs-newtab-button,
-#TabsToolbar .toolbar-items,
-#TabsToolbar .tabs-newtab-button {
-    visibility: visible !important;
-}
-
-/* Relocate the + button so it doesn't float in the hidden tab bar space */
-#tabs-newtab-button {
-    position: fixed !important;
-    top: 0 !important;
-    right: 140px !important; /* Adjust this so it doesn't overlap your window controls */
-    height: 40px !important;
-    width: 40px !important;
-    z-index: 1000 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-/* Optional: Give it a slight background so it's easier to see on your dark theme */
 #tabs-newtab-button:hover {
     background-color: rgba(255, 255, 255, 0.1) !important;
 }
@@ -88,8 +45,8 @@
 
 /* Active Tab: Pastel Pink Highlight */
 .tab.active {
-    background-color: rgba(249, 200, 217, 0.1) !important; /* Subtle pink glow */
-    box-shadow: inset 4px 0 0 var(--pastel-pink) !important; /* Pink left border */
+    background-color: rgba(249, 200, 217, 0.1) !important;
+    box-shadow: inset 4px 0 0 var(--pastel-pink) !important;
 }
 
 .tab.active .label {
@@ -130,7 +87,19 @@
     font-size: 1.2em;
 }
 
-/* Hide the bulky sound button since we have the indicator */
-.sound-button {
-    display: none !important;
+/* Hide the bulky sound button since we have the indicator /
+/* Adjust style for tab that has sound playing. */
+.tab.sound-playing .favicon::after,
+.tab.muted .favicon::after {
+    content: '🔊';
+    z-index: var(--favicon-base-z-index);
+    position: absolute;
+    font-size: 0.5em;
+    bottom: -0.35em;
+    right: -0.7em;
+}
+
+/* Adjust style for tab that is muted. */
+.tab.muted .favicon::after {
+    content: '🔇';
 }

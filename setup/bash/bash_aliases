@@ -221,6 +221,41 @@ if ! command -v cpu &> /dev/null; then
     alias cpu="$(echo "$cpu_speed_mhz" | awk '{printf "%.3f", $1/1000}')Ghz"
 fi
 
+function ::() {
+    local kill=""
+    local port=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -k|--kill)  kill=1
+            shift
+            ;;
+            *)  port="$1"
+            shift
+            ;;
+        esac
+    done
+
+    if [ -z "$port" ]; then
+        return 0
+    fi
+    lsof -i :$port
+
+    if [ -n "$kill" ]; then
+        echo "TODO: add extract and kill PID here"
+    fi
+
+    echo ${H}$Reminder:${NC}
+    echo "\"${EXE_F}lsof -i :${NC}${DIM_F}XXXX${NC}\" (Port number) to check others"
+    echo "\"${EXE_F}kill -9 ${NC}${DIM_F}XXXX${NC}\" (PID) to end the process"
+}
+# alias 3000="lsof -i :3000 && echo '\"${EXE_F}lsof -i :${NC}${DIM_F}XXXX${NC}\" (Port number) to check others'"
+# alias 3000="lsof -i :3000" && echo "\"${EXE_F}lsof -i :${NC}${DIM_F}XXXX${NC}\" (Port number) to check others" && echo "\"${EXE_F}kill -9 ${NC}${DIM_F}XXXX${NC}\" (PID) to end the process" 2>/dev/null
+# alias 3001="lsof -i :3001" && echo "\"${EXE_F}lsof -i :${NC}${DIM_F}XXXX${NC}\" (Port number) to check others" && echo "\"${EXE_F}kill -9 ${NC}${DIM_F}XXXX${NC}\" (PID) to end the process" 2>/dev/null
+# alias 8000="lsof -i :8000" && echo "\"${EXE_F}lsof -i :${NC}${DIM_F}XXXX${NC}\" (Port number) to check others" && echo "\"${EXE_F}kill -9 ${NC}${DIM_F}XXXX${NC}\" (PID) to end the process" 2>/dev/null
+# alias 8001="lsof -i :8001" && echo "\"${EXE_F}lsof -i :${NC}${DIM_F}XXXX${NC}\" (Port number) to check others" && echo "\"${EXE_F}kill -9 ${NC}${DIM_F}XXXX${NC}\" (PID) to end the process" 2>/dev/null
+# alias 8002="lsof -i :8002" && echo "\"${EXE_F}lsof -i :${NC}${DIM_F}XXXX${NC}\" (Port number) to check others" && echo "\"${EXE_F}kill -9 ${NC}${DIM_F}XXXX${NC}\" (PID) to end the process" 2>/dev/null
+
 # Networking
 alias myip="curl -s icanhazip.com"
 alias ping='ping -c 5'

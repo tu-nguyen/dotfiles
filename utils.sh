@@ -299,6 +299,27 @@ _install_fnm() {
     fi
 }
 
+# Function to install VS Code
+_install_vs_code() {
+    if [[ "$OS_TYPE" == "linux" || "$OS_TYPE" == "wsl" ]]; then
+        if ! command -v code &> /dev/null; then
+            t "Installing ${HDR_F}VS Code${NC}.."
+            sudo apt-get install wget gpg
+            wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+            sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+            echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
+            rm -f packages.microsoft.gpg
+            sudo apt install apt-transport-https
+            sudo apt update
+            sudo apt install code
+        else
+            t OK "${HDR_F}$(code --version)${NC} is already installed at ${SUB_F}$(command -v code)${NC}"
+        fi
+    elif [[ "$OS_TYPE" == "macos" ]]; then
+        t WARNING "${HDR_F}VS Code${NC} needs to be manually installed for macOs!"
+    fi
+}
+
 # TODO: Determine if this is still needed?
 # # Function to install eza
 # _install_eza() {
@@ -352,6 +373,7 @@ reset_pre() {
     _update_uv
     _install_uv_tools
     _install_fnm
+    _install_vs_code
     # _install_eza
 
     # For both linux & wsl only

@@ -400,5 +400,5 @@ alias cta='cat'
 alias meow='cat'
 alias gerp='grep'
 if ! command -v sl &> /dev/null; then
-    alias sl
+    alias sl='ls'
 fi

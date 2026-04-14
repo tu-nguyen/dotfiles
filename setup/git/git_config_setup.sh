@@ -25,7 +25,9 @@ git config --global init.defaultBranch main             # standardize default br
 git config --global alias.s "status -s"                 # short status
 git config --global alias.st status                     # standard status
 git config --global alias.a "add"                       # add file
+git config --global alias.all "add ."                   # add all file
 git config --global alias.ap "add -p"                   # interactive patch add TODO: relearn
+git config --global alias.u "add -u"                    # add mod file
 git config --global alias.cl "show --stat"              # show changes in last commit
 
 # checkout & branching aliases
@@ -33,19 +35,30 @@ git config --global alias.co "checkout"
 git config --global alias.cob "checkout -b"
 git config --global alias.coB "checkout -B"
 git config --global alias.br "branch -vv"               # branch list with remote tracking info
+git config --global alias.f "fetch"                     # fetch
 
 # list branches sorted by most recent activity
 git config --global alias.b "!git for-each-ref --sort='-authordate' --format='%(authordate)%09%(objectname:short)%09%(refname)' refs/heads | sed -e 's-refs/heads/--'" --replace-all
 
-# commits & diffs aliases
+# commits aliases
 git config --global alias.c "commit --verbose"
 git config --global alias.ca "commit -a --verbose"
 git config --global alias.cm "commit -m"
+git config --global alias.com "commit -m"
 git config --global alias.cam "commit -a -m"
+git config --global alias.ce "commit --allow-empty -m 'empty commit to trigger'"
 git config --global alias.m "commit --amend --verbose"   # amend the last commit
+
+# diffs aliases
 git config --global alias.d "diff"
 git config --global alias.ds "diff --stat"               # summary of changes
 git config --global alias.dc "diff --cached"             # diff of staged changes
+
+# stash aliases
+git config --global alias.ss "stash"
+git config --global alias.sth "stash"
+git config --global alias.sp "stash pop"
+git config --global alias.spop "stash pop"
 
 # reset & cleanup aliases
 git config --global alias.undo "reset --soft HEAD~1"     # un-commit but keep changes

@@ -427,6 +427,9 @@ ex() {
         t ERROR "'$1' is not a valid file!"
     fi
  }
+ if ! command -v extract &> /dev/null; then
+    alias extract='ex'
+fi
 
 # Display a PDF of a given man page
 pdfman() {
@@ -523,6 +526,32 @@ cpp() {
             return 1
         fi
     fi
+}
+
+# Copy and go to the directory
+cpg () {
+	if [ -d "$2" ];then
+		cp $1 $2 && cd $2
+	else
+		cp $1 $2
+	fi
+}
+
+# Move and go to the directory
+mvg ()
+{
+	if [ -d "$2" ];then
+		mv $1 $2 && cd $2
+	else
+		mv $1 $2
+	fi
+}
+
+# Create and go to the directory
+mkdirg ()
+{
+	mkdir -p $1
+	cd $1
 }
 
 # Find a file with a pattern in name:

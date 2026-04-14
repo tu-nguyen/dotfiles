@@ -363,7 +363,7 @@ reset_pre() {
 
     _pre_install
 
-    local core_packages=("curl" "vim" "git" "make" "jq" "colordiff" "wget" "bat" "eza" "ncdu" "fd-find" "ripgrep" "btop" "sd")
+    local core_packages=("curl" "vim" "git" "make" "jq" "colordiff" "wget" "bat" "eza" "ncdu" "fd-find" "ripgrep" "btop" "sd" "net-tools")
     _install_packages "${core_packages[@]}"
 
     _install_gitstatus

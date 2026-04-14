@@ -63,11 +63,11 @@ export PATH
 # ------------------------------------------
 # History Configuration
 # ------------------------------------------
-export HISTCONTROL=ignoredups:ignorespace  # don't save duplicates or lines starting with space
+export HISTCONTROL=erasedups:ignoredups:ignorespace  # don't save duplicates or lines starting with space
 export HISTSIZE=10000                      # commands to remember in the current session
 export HISTFILESIZE=20000                  # commands to keep in the history file
 # sync history across all open terminals after every command
-export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+export PROMPT_COMMAND="history -a; history -n"
 
 # ------------------------------------------
 # System & Localization
@@ -79,6 +79,7 @@ export LANG='en_US.UTF-8'
 export LC_ALL='en_US.UTF-8'
 export LC_COLLATE=C
 
+export GREP_OPTIONS=' — color=auto'
 export VISUAL=vim
 export EDITOR=vim
 export PAGER="less"

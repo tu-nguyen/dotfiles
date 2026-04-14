@@ -37,6 +37,22 @@ if [ -z "$OS_TYPE" ]; then
     fi
 fi
 
+# Get Linux distro
+if [ -z "$OS_TYPE" ]; then
+    if [ "$OS_TYPE" = 'linux' ]; then
+        echo "[ INFO ] Detecting Linux Distro.." >&2
+        if [ if /etc/os-release ]; then
+            # Source the file to get access to the ID variable
+            . /etc/os-release
+            LINUX_DISTRO=$ID
+        else
+            # Fallback for older systems
+            echo "[ ERR  ] Unknown/older linux"
+            LINUX_DISTRO="unknown_linux"
+        fi
+    fi
+fi
+
 # Check for modern bash
 if ((BASH_VERSINFO[0] < 4)); then
     echo "[ WARN ] You are running ${BASH_VERSION}. Let's fix that."
@@ -148,6 +164,7 @@ if [[ "$DOTFILES_ENV_LOADED" == "false" ]]; then
     set_config "DOTFILES_CONFIG_FILE" "$DOTFILES_CONFIG_FILE"
     set_config "DOTFILES_REPO_DIR" "$DOTFILES_REPO_DIR"
     set_config "OS_TYPE" "$OS_TYPE"
+    set_config "LINUX_DISTRO" "$LINUX_DISTRO"
 fi
 
 # ------------------------------------------

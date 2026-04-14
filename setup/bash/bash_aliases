@@ -7,7 +7,7 @@
 # ------------------------------------------
 # Safety & Administrative
 # ------------------------------------------
-# Escalation shortcuts
+# escalation shortcuts
 alias root='sudo -i'
 alias su='sudo -i'
 alias svi='sudo vi'
@@ -79,42 +79,75 @@ alias 777='chmod -R 777'
 # basic
 alias h='history'
 alias x='exit'
+alias f="find . | grep "
 if command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1; then
     alias fd='fdfind'
+fi
+if ! command -v pd &> /dev/null; then
+    alias pd='pwd'
 fi
 
 # cat
 alias qat="$(command -v cat)"
 alias cat="$(command -v batcat || command -v bat || echo 'cat') --paging=never --force-colorization"
+alias p='cat'
 
 # cd
-alias home="cd ~"
-alias ~="home"
-alias cd~="home"
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
-alias .4="cd ../../../.."
-alias .5="cd ../../../../.."
-alias cdc="cd ~/.config"
+alias home='cd ~'
+alias rootdir='cd /'
+alias ~='home'
+alias cd~='home'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .4='cd ../../../..'
+alias .5='cd ../../../../..'
+alias cdc='cd ~/.config'
 if ! command -v cdcd &> /dev/null; then
-    alias cdcd="cd ~/.config/dotfiles"
+    alias cdcd='cd ~/.config/dotfiles'
+    alias cdcf='cdcd'
 fi
+alias wp='cd ~/workplace'
+alias cdwp='wp'
+if ! command -v bd &> /dev/null; then
+    alias bd='cd "$OLDPWD"'
+fi
+alias back='cd "$OLDPWD"'
 
 # clear
 alias c='clear'
 if ! command -v cl &> /dev/null; then
-    alias cl='clear && ls'
+    alias cl='clear;ls'
 fi
-alias cls='clear && ls'
-alias cla='clear && lsa'
+if ! command -v cs &> /dev/null; then
+    alias cs='clear;ls'
+fi
+alias cls='clear;ls'
+alias cla='clear;lsa'
+alias ca='clear;lsa'
 
-# Open folder
-if [[ "$OS_TYPE" == "macos" ]]; then
-    alias f='open -a Finder'
-elif [[ "$OS_TYPE" == "wsl" ]]; then
-    alias f='explorer.exe'
+# open
+alias o='open'
+if [ "$OS_TYPE" = 'linux' ]; then
+    if [ "$LINUX_DISTRO" = "ubuntu" ]; then
+        o='xdg-open'
+    else
+        o='open'
+    fi
 fi
+
+# open folder
+if [[ "$OS_TYPE" == "macos" ]]; then
+    alias d='open -a Finder'
+elif [[ "$OS_TYPE" == "wsl" ]]; then
+    alias d='explorer.exe'
+fi
+alias folder='d'
+
+# rcs
+alias vimrc='vim ~/.vimrc'
+alias bashrc='vim ~/.bash_profile'
+alias loadbash='source ~/.bash_profile'
 
 # ls variants (colorized)
 unset -f ls 2>/dev/null
@@ -137,13 +170,14 @@ alias l='ls'
 alias ll='ls -lh'
 alias la="ls -aAlh"
 alias lla='ls -Alh'
-alias lsd="ls -d */"
-alias ldir="lsd"
 alias lsa="ls -la"
-alias ld='ls -d */'              # list only directories
+alias lsd="ls -d */"
+alias lsl='ls -lh'
+alias ldir="lsd"
+alias ld='ls -d */'               # list only directories
 alias lsd='ls -d */'              # list only directories
 alias lf="ls -l | egrep -v '^d'"  # show files only
-alias l.='ls -d .* -G'            # show only hidden files
+# alias l.='ls -d .* -G'            # show only hidden files
 
 # grep
 alias grep='grep --color=auto'
@@ -154,13 +188,21 @@ alias diff='diff --color=auto'
 # ------------------------------------------
 # System Monitoring & Tools
 # ------------------------------------------
-# Installer
-alias p="sudo pacman"
-alias y="yaourt"
+# installer
+if [ "$OS_TYPE" = 'linux' ]; then
+    if [ "$LINUX_DISTRO" = "arch" ]; then
+        alias p="sudo pacman"
+        alias y="yaourt"
+    else
+        alias p="cat"
+    fi
+fi
 
-# Lang
+# lang
+alias gcc='gcc-6'
+alias g++='g++-6'
 alias rb='ruby'
-alias py='python'
+alias py='python3'
 # # python and uv
 # commented out, using 'uv python link 3.13' instead
 # alias python3='uv run --python 3.13 python3'
@@ -169,10 +211,10 @@ alias py='python'
 # irc
 alias irc='${IRC_CLIENT:-irc}'
 
-# Code
+# code
 alias c.='code .'
 
-# Vim
+# vim
 alias v='vim'
 alias svi='sudo vi'
 alias vis='vim "+set si"'
@@ -196,7 +238,7 @@ if command -v colordiff >/dev/null 2>&1; then
     alias diffy='colordiff -y -W $(tput cols)'
 fi
 
-# Resource usage
+# resource usage
 alias ps='[[ "$OS_TYPE" == "macos" ]] && ps aux || ps auxf'
 alias j='jobs -l'
 alias df='df -H'
@@ -208,47 +250,53 @@ alias nowtime='date +"%T"'
 alias nowdate='date +"%d-%m-%Y"'
 alias path='echo -e ${PATH//:/\\n}'
 alias dmesg10='sudo dmesg | tail -n 10'
-# alias folder="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
-alias folder="du -sh */ | sort -rh"
+alias fdu="find . -maxdepth 1 -type d -print | xargs du -sk | sort -rn"
 alias du="ncdu --color dark"
 alias wc='wc -l -w -c'
 alias tree='eza --tree --level=2 --icons'
 alias treed='eza --tree --level=2 --icons --only-dirs'
+if ! command -v folders &> /dev/null; then
+    alias folders='du -h --max-depth=1'
+fi
+alias folderssort='find . -maxdepth 1 -type d -print0 | xargs -0 du -sk | sort -rn'
 alias mountedinfo='df -hT'
 alias fkill="ps -e | fzf | awk '{print $1}' | xargs kill"
+alias k='fkill'
+# TODO: fix command not found output
 if ! command -v cpu &> /dev/null; then
     cpu_speed_mhz=$(wmic.exe cpu get MaxClockSpeed 2>/dev/null | tail -n +2 | tr -d '\r' | xargs)
     alias cpu="$(echo "$cpu_speed_mhz" | awk '{printf "%.3f", $1/1000}')Ghz"
 fi
 
-function ::() {
-    local kill=""
-    local port=""
+# # TODO: fix port func
+# function ::() {
+#     local kill=""
+#     local port=""
 
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            -k|--kill)  kill=1
-            shift
-            ;;
-            *)  port="$1"
-            shift
-            ;;
-        esac
-    done
+#     while [[ $# -gt 0 ]]; do
+#         case "$1" in
+#             -k|--kill)  kill=1
+#             shift
+#             ;;
+#             *)  port="$1"
+#             shift
+#             ;;
+#         esac
+#     done
 
-    if [ -z "$port" ]; then
-        return 0
-    fi
-    lsof -i :$port
+#     if [ -z "$port" ]; then
+#         return 0
+#     fi
+#     lsof -i :$port
 
-    if [ -n "$kill" ]; then
-        echo "TODO: add extract and kill PID here"
-    fi
+#     if [ -n "$kill" ]; then
+#         echo "TODO: add extract and kill PID here"
+#     fi
 
-    echo ${H}$Reminder:${NC}
-    echo "\"${EXE_F}lsof -i :${NC}${DIM_F}XXXX${NC}\" (Port number) to check others"
-    echo "\"${EXE_F}kill -9 ${NC}${DIM_F}XXXX${NC}\" (PID) to end the process"
-}
+#     echo ${H}$Reminder:${NC}
+#     echo "\"${EXE_F}lsof -i :${NC}${DIM_F}XXXX${NC}\" (Port number) to check others"
+#     echo "\"${EXE_F}kill -9 ${NC}${DIM_F}XXXX${NC}\" (PID) to end the process"
+# }
 # alias 3000="lsof -i :3000 && echo '\"${EXE_F}lsof -i :${NC}${DIM_F}XXXX${NC}\" (Port number) to check others'"
 # alias 3000="lsof -i :3000" && echo "\"${EXE_F}lsof -i :${NC}${DIM_F}XXXX${NC}\" (Port number) to check others" && echo "\"${EXE_F}kill -9 ${NC}${DIM_F}XXXX${NC}\" (PID) to end the process" 2>/dev/null
 # alias 3001="lsof -i :3001" && echo "\"${EXE_F}lsof -i :${NC}${DIM_F}XXXX${NC}\" (Port number) to check others" && echo "\"${EXE_F}kill -9 ${NC}${DIM_F}XXXX${NC}\" (PID) to end the process" 2>/dev/null
@@ -256,11 +304,11 @@ function ::() {
 # alias 8001="lsof -i :8001" && echo "\"${EXE_F}lsof -i :${NC}${DIM_F}XXXX${NC}\" (Port number) to check others" && echo "\"${EXE_F}kill -9 ${NC}${DIM_F}XXXX${NC}\" (PID) to end the process" 2>/dev/null
 # alias 8002="lsof -i :8002" && echo "\"${EXE_F}lsof -i :${NC}${DIM_F}XXXX${NC}\" (Port number) to check others" && echo "\"${EXE_F}kill -9 ${NC}${DIM_F}XXXX${NC}\" (PID) to end the process" 2>/dev/null
 
-# Networking
+# networking
 alias myip="curl -s icanhazip.com"
 alias ping='ping -c 5'
 alias p4="ping 4.2.2.2 -c 4"
-alias ports='[[ "$OS_TYPE" == "macos" ]] && netstat -tulanp || ss -tulanp'
+alias ports='[[ "$OS_TYPE" == "macos" ]] && netstat -tulanp || netstat -nape --inet'
 alias header='curl -I'  # get web server headers
 alias headerc='curl -I --compress'  # find out if remote server supports gzip / mod_deflate or not
 alias dnstop='dnstop -l 5  eth1'  # all of our servers eth1 is connected to the internets via vlan / router etc
@@ -276,6 +324,12 @@ if ! command -v host &> /dev/null; then
     alias host="sudo $EDITOR /etc/hosts"
     alias hosts="sudo $EDITOR /etc/hosts"
 fi
+
+# logs
+alias logs="sudo find /var/log -type f -exec file {} \; | grep 'text' | cut -d' ' -f1 | sed -e's/:$//g' | grep -v '[0-9]$' | xargs tail -f"
+
+# other utils
+alias checkcommand="type -t"
 
 # ------------------------------------------
 # Archives (The "I always forget the flags" section)
@@ -293,23 +347,30 @@ alias ungz='tar -xvzf'
 # Note: These assume you have these aliases defined in your .gitconfig as well
 # push, pull, checkout, check -b, rename in .bash_functions
 alias ga='git a'
+alias gu='git u'  # add mod files
+
 alias gb='git b'
 alias gbr='git br'
 # alias gbr='git branch -vv --color=always | fzf --ansi | awk "{print \$1}" | sed "s/* //" | tr -d "\n" | (pbcopy 2>/dev/null || clip.exe 2>/dev/null || xclip -sel clip 2>/dev/null)'
 alias gbd='git branch -D'
 alias gd='git branch -D'
 alias grm='git branch -D'
+
 alias gc='git cam'
 alias gcl='git cl'
 alias gl="git l"
 alias gll="git ll"
-alias grr="git rr"
+alias grr="git rr"  # hard reset
 alias gs='git st'
+alias gss='git ss'
+alias gsp='git sp'
+alias gspop='git spop'
 alias greset='git reset --hard HEAD'
 alias gclean='git clean -f'
 alias gclone='git clone'
-alias gf='git fetch'
-alias gfetch='git fetch'
+alias gf='git f'
+alias gfetch='git f'
+alias gconflicts='git conflicts'  # list files with conflicts
 
 # ------------------------------------------
 # Other
@@ -332,3 +393,12 @@ alias nus='npm uninstall --save'
 alias nup='npm update'
 
 alias so0="cmatrix"
+
+# misspells
+alias givm='gvim'
+alias cta='cat'
+alias meow='cat'
+alias gerp='grep'
+if ! command -v sl &> /dev/null; then
+    alias sl
+fi

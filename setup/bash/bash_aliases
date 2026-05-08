@@ -138,9 +138,9 @@ fi
 
 # open folder
 if [[ "$OS_TYPE" == "macos" ]]; then
-    alias d='open -a Finder'
+    d() { open -a Finder "${1:-.}"; }
 elif [[ "$OS_TYPE" == "wsl" ]]; then
-    alias d='explorer.exe'
+    d() { explorer.exe "${1:-.}"; }
 fi
 alias folder='d'
 

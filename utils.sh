@@ -269,6 +269,7 @@ _install_uv() {
     if ! command -v uv &> /dev/null; then
         t "Installing ${HDR_F}uv${NC}.."
         curl -LsSf https://astral.sh/uv/install.sh | sh
+        . $HOME/.local/bin/env
     else
         t OK "${HDR_F}$(uv --version)${NC} is already installed at ${SUB_F}$(command -v uv)${NC}"
     fi

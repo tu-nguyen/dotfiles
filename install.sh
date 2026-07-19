@@ -10,7 +10,7 @@ set -e
 # Keep sudo alive
 # See: https://gist.github.com/cowboy/3118588
 if ! command -v sudo &> /dev/null; then
-    t Error "${ERR}sudo${NC} is not installed. Please install sudo or run as root."
+    echo "${ERR}sudo${NC} is not installed. Please install sudo or run as root."
     exit 1
 fi
 
@@ -114,7 +114,7 @@ function set_config() {
     local config_file="${3:-$DOTFILES_CONFIG_FILE}"
 
     if [[ -z "$key" || -z "$value" ]]; then
-        t ERR "Usage: set_config <KEY> <VALUE> [CONFIG_FILE]"
+        echo "Usage: set_config <KEY> <VALUE> [CONFIG_FILE]"
         return 1
     fi
 

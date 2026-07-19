@@ -199,7 +199,9 @@ _install_fira_font() {
         curl -fLo "./FiraCode.zip" https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip
 
         unzip -o "./FiraCode.zip" -d "$font_dir" && rm "./FiraCode.zip"
-        [ -x "$(command -v fc-cache)" ] && fc-cache -f
+        mkdir -p ~/.cache/fontconfig
+        chmod 700 ~/.cache/fontconfig
+        [ -x "$(command -v fc-cache)" ] && fc-cache -f -v
 
         # If WSL, also trigger the windows side (chocolatey)
         if [[ "$OS_TYPE" == "wsl" ]]; then

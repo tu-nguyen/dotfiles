@@ -106,6 +106,32 @@ mkdir -p $DOTFILES_CONFIG_DIR
 # ------------------------------------------
 # Load env
 # ------------------------------------------
+
+# Function to update or add a config/variable
+function set_config() {
+    local key="$1"
+    local value="$2"
+    local config_file="${3:-$DOTFILES_CONFIG_FILE}"
+
+    if [[ -z "$key" || -z "$value" ]]; then
+        t ERR "Usage: set_config <KEY> <VALUE> [CONFIG_FILE]"
+        return 1
+    fi
+
+    # Ensure the directory exists
+    mkdir -p "$(dirname "$config_file")"
+    touch "$config_file"
+
+    if grep -q "^$key=" "$config_file"; then
+        # line exists: replace it
+        # using '|' as a delimiter to safely handle paths/slashes in values
+        sed -i "s|^$key=.*|$key=$value|" "$config_file"
+    else
+        # line missing: append it
+        echo "$key=$value" >> "$config_file"
+    fi
+}
+
 DOTFILES_ENV_LOADED=false
 if [ -f .env ]; then
     echo "[ INFO ] Configuration loaded from .env"

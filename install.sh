@@ -40,7 +40,7 @@ fi
 # Get Linux distro
 if [ "$OS_TYPE" = 'linux' ]; then
     echo "[ INFO ] Detecting Linux Distro.." >&2
-    if [ if /etc/os-release ]; then
+    if [ -f /etc/os-release ]; then
         # Source the file to get access to the ID variable
         . /etc/os-release
         LINUX_DISTRO=$ID
@@ -50,7 +50,6 @@ if [ "$OS_TYPE" = 'linux' ]; then
         LINUX_DISTRO="unknown_linux"
     fi
 fi
-
 
 # Check for modern bash
 if ((BASH_VERSINFO[0] < 4)); then
@@ -99,8 +98,8 @@ fi
 : ${DOTFILES_CONFIG_DIR:="$HOME/.config/dotfiles"}
 : ${DOTFILES_CONFIG_FILE:="$DOTFILES_CONFIG_DIR/.dotfile_config"}
 : ${DOTFILES_REPO_DIR:=$(pwd)}
-# : ${OS_TYPE:=$OS_TYPE}  # Already set from above
 mkdir -p $DOTFILES_CONFIG_DIR
+
 
 # ------------------------------------------
 # Load env
@@ -178,7 +177,9 @@ if [[ "$DOTFILES_ENV_LOADED" == "false" ]]; then
     set_config "DOTFILES_CONFIG_FILE" "$DOTFILES_CONFIG_FILE"
     set_config "DOTFILES_REPO_DIR" "$DOTFILES_REPO_DIR"
     set_config "OS_TYPE" "$OS_TYPE"
-    set_config "LINUX_DISTRO" "$LINUX_DISTRO"
+    if [ "$LINUX_DISTRO" ]; then
+        set_config "LINUX_DISTRO" "$LINUX_DISTRO"
+    fi
 fi
 
 

@@ -38,20 +38,19 @@ if [ -z "$OS_TYPE" ]; then
 fi
 
 # Get Linux distro
-if [ -z "$OS_TYPE" ]; then
-    if [ "$OS_TYPE" = 'linux' ]; then
-        echo "[ INFO ] Detecting Linux Distro.." >&2
-        if [ if /etc/os-release ]; then
-            # Source the file to get access to the ID variable
-            . /etc/os-release
-            LINUX_DISTRO=$ID
-        else
-            # Fallback for older systems
-            echo "[ ERR  ] Unknown/older linux"
-            LINUX_DISTRO="unknown_linux"
-        fi
+if [ "$OS_TYPE" = 'linux' ]; then
+    echo "[ INFO ] Detecting Linux Distro.." >&2
+    if [ if /etc/os-release ]; then
+        # Source the file to get access to the ID variable
+        . /etc/os-release
+        LINUX_DISTRO=$ID
+    else
+        # Fallback for older systems
+        echo "[ ERR  ] Unknown/older linux"
+        LINUX_DISTRO="unknown_linux"
     fi
 fi
+
 
 # Check for modern bash
 if ((BASH_VERSINFO[0] < 4)); then

@@ -104,19 +104,6 @@ fi
 mkdir -p $DOTFILES_CONFIG_DIR
 
 # ------------------------------------------
-# Pre-Reqs
-# ------------------------------------------
-# init should source bash_functions and bash_style (for t)
-. "$DOTFILES_REPO_DIR/setup/bash/init" || {
-    echo "Error: Could not source init"
-    exit 1
-}
-. "$DOTFILES_REPO_DIR/utils.sh" || {
-    echo "Error: Could not source utils.sh"
-    exit 1
-}
-
-# ------------------------------------------
 # Load env
 # ------------------------------------------
 DOTFILES_ENV_LOADED=false
@@ -166,6 +153,21 @@ if [[ "$DOTFILES_ENV_LOADED" == "false" ]]; then
     set_config "OS_TYPE" "$OS_TYPE"
     set_config "LINUX_DISTRO" "$LINUX_DISTRO"
 fi
+
+
+# ------------------------------------------
+# Pre-Reqs
+# ------------------------------------------
+# init should source bash_functions and bash_style (for t)
+. "$DOTFILES_REPO_DIR/setup/bash/init" || {
+    echo "Error: Could not source init"
+    exit 1
+}
+. "$DOTFILES_REPO_DIR/utils.sh" || {
+    echo "Error: Could not source utils.sh"
+    exit 1
+}
+
 
 # ------------------------------------------
 # Main

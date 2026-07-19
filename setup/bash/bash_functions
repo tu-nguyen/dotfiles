@@ -136,7 +136,9 @@ function set_config() {
 
     # Ensure the directory exists
     mkdir -p "$(dirname "$config_file")"
-    touch "$config_file"
+    if [[ ! -f "$config_file" ]]; then
+        touch "$config_file"
+    fi
 
     if grep -q "^$key=" "$config_file"; then
         # line exists: replace it

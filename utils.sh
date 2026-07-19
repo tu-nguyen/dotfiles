@@ -285,7 +285,7 @@ _install_uv_tools() {
     for tool in "${python_tools[@]}"; do
         if ! command -v "$tool" &> /dev/null; then
             t "Installing ${HDR_F}$tool${NC} via uv.."
-            uv tool install "$tool"
+            uv tool install "$tool" --force
         else
             t OK "${HDR_F}$tool${NC} is already available."
         fi
